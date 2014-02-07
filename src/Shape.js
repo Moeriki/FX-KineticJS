@@ -102,6 +102,18 @@
         _get: function(selector) {
             return this.className === selector || this.nodeType === selector ? [this] : [];
         },
+        _calculateAdaptiveDash: function(){
+            if(this.adaptiveDash() && this.dash())
+            {   
+                var strokeWidth = this.strokeWidth(),
+                    adaptedDash = this.dash().map(function(x){return x * strokeWidth;});
+                this._setAttr('adaptiveDash', adaptedDash);
+            } 
+            else if (this.adaptiveDash())
+            {
+                this._setAttr('adaptiveDash', []);
+            }
+        },
         /**
          * determines if point is in the shape, regardless if other shapes are on top of it.  Note: because
          *  this method clears a temporary canvas and then redraws the shape, it performs very poorly if executed many times
@@ -366,7 +378,7 @@
      * shape.strokeAlpha(0.5);
      */
 
-    Kinetic.Factory.addGetterSetter(Kinetic.Shape, 'strokeWidth', 2);
+    Kinetic.Factory.addGetterSetter(Kinetic.Shape, 'strokeWidth', 2, null, function(){this._calculateAdaptiveDash();});
 
     /**
      * get/set stroke width
@@ -462,7 +474,7 @@
      * });
      */
 
-    Kinetic.Factory.addGetterSetter(Kinetic.Shape, 'dash');
+    Kinetic.Factory.addGetterSetter(Kinetic.Shape, 'dash', null, null, function(){this._calculateAdaptiveDash();});
 
     /**
      * get/set dash array for stroke.
@@ -479,6 +491,23 @@
      *  // lines that are 10px long and 20px apart, and dots that have<br> 
      *  // a radius of 5px and are 20px apart<br>
      *  line.dash([10, 20, 0.001, 20]);
+     */
+
+    Kinetic.Factory.addGetterSetter(Kinetic.Shape, 'adaptiveDash', null, null, function(){this._calculateAdaptiveDash();});
+
+    /**
+     * get/set adaptive dash for stroke (dash changes with strokeWidth).
+     * @name adaptive dash
+     * @method
+     * @memberof Kinetic.Shape.prototype
+     * @param {Boolean} adaptiveDash
+     * @returns {Boolean}
+     * @example
+     *  // set adaptive dash<br>
+     *  line.adaptiveDash(true);<br><br>
+     *  
+     *  // get adaptive dash<br>
+     *  line.adaptiveDash();
      */
 
 
