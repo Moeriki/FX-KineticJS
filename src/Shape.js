@@ -1,5 +1,6 @@
 (function() {
-    var HAS_SHADOW = 'hasShadow';
+    var HAS_SHADOW = 'hasShadow',
+        ADAPTIVE_DASH = 'adaptiveDash';
 
     function _fillFunc(context) {
         context.fill();
@@ -107,11 +108,11 @@
             {   
                 var strokeWidth = this.strokeWidth(),
                     adaptedDash = this.dash().map(function(x){return x * strokeWidth;});
-                this._setAttr('adaptiveDash', adaptedDash);
+                this._setAttr(ADAPTIVE_DASH, adaptedDash);
             } 
             else if (this.adaptiveDash())
             {
-                this._setAttr('adaptiveDash', []);
+                this._setAttr(ADAPTIVE_DASH, []);
             }
         },
         /**
@@ -493,7 +494,7 @@
      *  line.dash([10, 20, 0.001, 20]);
      */
 
-    Kinetic.Factory.addGetterSetter(Kinetic.Shape, 'adaptiveDash', null, null, function(){this._calculateAdaptiveDash();});
+    Kinetic.Factory.addGetterSetter(Kinetic.Shape, ADAPTIVE_DASH, null, null, function(){this._calculateAdaptiveDash();});
 
     /**
      * get/set adaptive dash for stroke (dash changes with strokeWidth).
