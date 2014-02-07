@@ -1384,24 +1384,27 @@
          * node.setAttr('x', 5);
          */
         setAttr: function() {
-            var args = Array.prototype.slice.call(arguments),
-                attr = args[0],
-                val = args[1],
-                method = SET + Kinetic.Util._capitalize(attr),
-                func = this[method];
+            if(!this.locked())
+            {
+                var args = Array.prototype.slice.call(arguments),
+                    attr = args[0],
+                    val = args[1],
+                    method = SET + Kinetic.Util._capitalize(attr),
+                    func = this[method];
 
-            if(Kinetic.Util._isFunction(func)) {
-                func.call(this, val);
-            }
-            // otherwise set directly
-            else {
-                this._setAttr(attr, val);
+                if(Kinetic.Util._isFunction(func)) {
+                    func.call(this, val);
+                }
+                // otherwise set directly
+                else {
+                    this._setAttr(attr, val);
+                }
             }
             return this;
         },
         _setAttr: function(key, val) {
             var oldVal;
-            if(val !== undefined) {
+            if(val !== undefined && !this.locked()) {
                 oldVal = this.attrs[key];
                 this.attrs[key] = val;
                 this._fireChangeEvent(key, oldVal, val);
@@ -1928,6 +1931,23 @@
      *
      * // enable all transforms<br>
      * node.transformsEnabled('all');
+     */
+
+     Kinetic.Factory.addGetterSetter(Kinetic.Node, 'locked', false);
+
+    /**
+     * get/set locked
+     * @name locked
+     * @method
+     * @memberof Kinetic.Node.prototype
+     * @param {Boolean} locked
+     * @returns {Boolean}
+     * @example
+     * // get locked<br>
+     * var locked = node.locked();<br><br>
+     *
+     * // set locked<br>
+     * node.locked(true);
      */
 
     Kinetic.Factory.backCompat(Kinetic.Node, {
