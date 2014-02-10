@@ -3186,4 +3186,91 @@ suite('Node', function() {
       };
       imageObj.src = 'assets/darth-vader.jpg';
   });
+
+  // ======================================================
+  test('setAttr on locked Node', function() {
+      var stage = addStage();
+      var layer = new Kinetic.Layer();
+      var circle = new Kinetic.Circle({
+          x: 100,
+          y: 100,
+          radius: 70,
+          fill: 'yellow',
+          stroke: 'black',
+          strokeWidth: 4,
+          foobar: 100
+      });
+      circle.locked(true);
+      stage.add(layer.add(circle));
+
+      circle.setAttr('fill', 'red');
+      layer.draw();
+      assert.equal(circle.getFill(), 'yellow');
+
+      circle.setAttr('position', {x: 5, y: 6});
+
+      assert.equal(circle.getX(), 100);
+      assert.equal(circle.getY(), 100);
+
+      circle.setAttr('foobar', 12);
+
+      assert.equal(circle.getAttr('foobar'), 100);
+  });
+
+  // ======================================================
+  test('setters on locked Node', function() {
+      var stage = addStage();
+      var layer = new Kinetic.Layer();
+      var circle = new Kinetic.Circle({
+          x: 100,
+          y: 100,
+          radius: 70,
+          fill: 'yellow',
+          stroke: 'black',
+          strokeWidth: 4
+      });
+      circle.setLocked(true);
+      stage.add(layer.add(circle));
+
+      circle.fill('red');
+      layer.draw();
+      assert.equal(circle.getFill(), 'yellow');
+
+      circle.x(5);
+      circle.y(6);
+      circle.setX(5);
+      circle.setY(6);
+      circle.position({
+        x: 10,
+        y: 10
+      })
+
+      assert.equal(circle.getX(), 100);
+      assert.equal(circle.getY(), 100);
+
+      circle.setRadius(100);
+      circle.radius(100);
+
+      assert.equal(circle.getRadius(), 70);
+  });
+
+  test('draggable on locked Node', function() {
+      var stage = addStage();
+      var layer = new Kinetic.Layer();
+      var circle = new Kinetic.Circle({
+          x: 100,
+          y: 100,
+          radius: 70,
+          fill: 'yellow',
+          stroke: 'black',
+          strokeWidth: 4, 
+          draggable: true
+      });
+      stage.add(layer.add(circle));
+
+      circle.locked(true);
+      layer.draw();
+
+      assert.equal(circle.draggable(), true);
+  });
 });
