@@ -3186,4 +3186,63 @@ suite('Node', function() {
       };
       imageObj.src = 'assets/darth-vader.jpg';
   });
+
+  // ======================================================
+  test('anchor attribute on rect', function() {
+      var stage = addStage(),
+          layer = new Kinetic.Layer(),
+          x = 55,
+          y = 55,
+          w = 100,
+          h = 50,
+          anchor = 0.5;
+
+      var rect0 = new Kinetic.Rect({
+          x: x,
+          y: y,
+          width: w,
+          height: h,
+          fill: 'white',
+          stroke: 'black',
+          strokeWidth: 4
+      });
+      var rect1 = new Kinetic.Rect({
+          draggable: true,
+          x: x + 200,
+          y: y,
+          width: w,
+          height: h,
+          fill: 'yellow',
+          stroke: 'red',
+          strokeWidth: 4
+      });
+
+      var rect2 = new Kinetic.Rect({
+          draggable: true,
+          x: x + 400,
+          y: y,
+          width: w,
+          height: h,
+          fill: 'red',
+          stroke: 'yellow',
+          strokeWidth: 4
+      });
+      rect1.scale({x: 1.5, y: 1.5});
+      rect1.placeAnchor(0.5);
+      rect2.placeAnchor(0.5);
+
+      rect0.on('click', function(){
+        rect2.rotate(10);
+        rect1.rotate(10);
+        layer.draw();
+      });
+
+      assert.equal(rect0.rotation(), 0);
+
+      layer.add(rect0);
+      layer.add(rect1);
+      layer.add(rect2);
+      
+      stage.add(layer);
+  });
 });

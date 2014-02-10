@@ -1307,6 +1307,26 @@
             return this.className || this.nodeType;
         },
         /**
+         * place anchor for rotation
+         * @method
+         * @memberof Kinetic.Node.prototype
+         * @returns {Node}
+         */
+        placeAnchor: function(anchor){
+            var x = this.x(),
+                y = this.y(),
+                sx = this.scaleX(),
+                sy = this.scaleY(),
+                w = this.width(),
+                h = this.height(),
+                a = anchor;
+            this._setAttr('x', x + w * sx * a);
+            this._setAttr('y', y + h * sy * a);
+            this._setAttr('offsetX', w * a);
+            this._setAttr('offsetY', h * a);
+            return this;
+        },
+        /**
          * get the node type, which may return Stage, Layer, Group, or Node
          * @method
          * @memberof Kinetic.Node.prototype
@@ -1928,6 +1948,22 @@
      *
      * // enable all transforms<br>
      * node.transformsEnabled('all');
+     */
+
+    // Kinetic.Factory.addGetterSetter(Kinetic.Node, 'anchor', 0, undefined, function(){this.placeAnchor();});
+
+    /**
+     * get/set anchor
+     * @name anchor
+     * @memberof Kinetic.Node.prototype
+     * @param {Number} anchor
+     * @returns {Number}
+     * @example
+     * // get anchor<br>
+     * var anchor = node.anchor();<br><br>
+     *
+     * // set anchor <br>
+     * node.anchor(0.5);
      */
 
     Kinetic.Factory.backCompat(Kinetic.Node, {
