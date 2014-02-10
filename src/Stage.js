@@ -47,12 +47,6 @@
         // cached variables
         eventsLength = EVENTS.length;
 
-    function addEvent(ctx, eventName) {
-      ctx.content.addEventListener(eventName, function(evt) {
-        ctx[UNDERSCORE + eventName](evt);
-      }, false);
-    }
-
     Kinetic.Util.addMethods(Kinetic.Stage, {
         ___init: function(config) {
             this.nodeType = STAGE;
@@ -336,11 +330,24 @@
             return this.getChildren();
         },
         _bindContentEvents: function() {
-            var that = this,
-                n;
-
+            var n, fnName;
             for (n = 0; n < eventsLength; n++) {
-              addEvent(this, EVENTS[n]);
+                fnName = UNDERSCORE + EVENTS[n];
+                this[fnName] = this[fnName].bind(this);
+                this.content.addEventListener(EVENTS[n], this[fnName], false);
+            }
+        },
+        /**
+         * If you want to implement your own events layer, call this function. Please note:
+         * - that there is no toggle to turn it back on again.
+         * - kinetic does (among other things) some additional fixes to the event data to ensure cross-browser compatibility.
+         *
+         * Only use this if you know what you are doing. Use this at your own risk.
+         */
+        disableContentEvents: function() {
+            var n;
+            for (n = 0; n < eventsLength; n++) {
+                this.content.removeEventListener(EVENTS[n], this[UNDERSCORE + EVENTS[n]], false);
             }
         },
         _mouseover: function(evt) {
