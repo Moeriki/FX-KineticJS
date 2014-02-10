@@ -621,4 +621,63 @@ suite('Shape', function() {
     assert.equal(shape.fillPatternRotation(), 0);
   });
 
+  // ======================================================
+  test('adaptive dash', function() {
+    var dashArray = [0.001, 3];
+    var stage = addStage();
+    var layer = new Kinetic.Layer();
+
+    var circle = new Kinetic.Circle({
+        x: 75,
+        y: 75,
+        fill: 'yellow',
+        radius: 50,
+        stroke: 'red',
+        strokeWidth: 22,
+        lineCap: 'round',
+        dash: dashArray,
+        adaptiveDash: true
+    });
+
+    var circle2 = new Kinetic.Circle({
+        x: 225,
+        y: 75,
+        fill: 'yellow',
+        radius: 50,
+        stroke: 'red',
+        lineCap: 'round',
+        adaptiveDash: true
+    });
+
+    circle2.dash(dashArray);
+    circle2.strokeWidth(7.5);
+
+    var circle3 = new Kinetic.Circle({
+        x: 375,
+        y: 75,
+        fill: 'yellow',
+        radius: 50,
+        stroke: 'red',
+        lineCap: 'round',
+        strokeWidth: 2.5,
+        dash: dashArray
+    });
+
+    circle3.adaptiveDash(true);
+
+    layer.add(circle);
+    layer.add(circle2);
+    layer.add(circle3);
+    stage.add(layer);
+
+    assert.equal(circle.dash()[0] * circle.strokeWidth(), circle.adaptiveDash()[0]);
+    assert.equal(circle.dash()[1] * circle.strokeWidth(), circle.adaptiveDash()[1]);
+
+    assert.equal(circle2.dash()[0] * circle2.strokeWidth(), circle2.adaptiveDash()[0]);
+    assert.equal(circle2.dash()[1] * circle2.strokeWidth(), circle2.adaptiveDash()[1]);
+
+    assert.equal(circle3.dash()[0] * circle3.strokeWidth(), circle3.adaptiveDash()[0]);
+    assert.equal(circle3.dash()[1] * circle3.strokeWidth(), circle3.adaptiveDash()[1]);
+  });
+
 });
