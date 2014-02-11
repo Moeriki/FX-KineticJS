@@ -49,6 +49,7 @@ module.exports = function(grunt) {
     'src/shapes/Line.js', 
     'src/shapes/Sprite.js',
     'src/shapes/TriangleIsosceles.js',
+    'src/shapes/TriangleRightAngled.js',
 
     // plugins
     'src/plugins/Path.js', 
