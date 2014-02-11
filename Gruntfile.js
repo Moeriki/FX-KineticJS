@@ -51,6 +51,7 @@ module.exports = function(grunt) {
     'src/shapes/TriangleIsosceles.js',
     'src/shapes/TriangleRightAngled.js',
     'src/shapes/TriangleEquilateral.js',
+    'src/shapes/Square.js',
     'src/shapes/Diamond.js',
     'src/shapes/Parallelogram.js',
     'src/shapes/Trapezoid.js',
