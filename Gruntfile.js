@@ -52,7 +52,7 @@ module.exports = function(grunt) {
     'src/shapes/TriangleRightAngled.js',
     'src/shapes/TriangleEquilateral.js',
     'src/shapes/Parallelogram.js',
-
+    'src/shapes/Trapezoid.js',
 
     // plugins
     'src/plugins/Path.js', 

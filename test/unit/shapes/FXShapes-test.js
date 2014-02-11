@@ -234,4 +234,62 @@ suite('FX Shapes', function(){
     var trace = layer.getContext().getTrace();
     assert.equal(trace, 'clearRect(0,0,578,200);clearRect(0,0,578,200);save();transform(1,0,0,1,10,80);beginPath();moveTo(0,0);lineTo(100,0);lineTo(130,-60);lineTo(30,-60);lineTo(0,0);closePath();fillStyle=yellow;fill();lineWidth=4;strokeStyle=red;stroke();restore();save();transform(-1,0,0,1,280,80);beginPath();moveTo(0,0);lineTo(100,0);lineTo(130,-60);lineTo(30,-60);lineTo(0,0);closePath();fillStyle=blue;fill();lineCap=round;setLineDash(0.1,10);lineWidth=4;strokeStyle=red;stroke();restore();save();transform(1,0,0,1,300,120);beginPath();moveTo(0,0);lineTo(200,0);lineTo(260,-100);lineTo(60,-100);lineTo(0,0);closePath();fillStyle=red;fill();lineWidth=4;strokeStyle=yellow;stroke();restore();');
   });
+  
+  // ======================================================
+
+  test('trapezoid', function(){
+    var stage = addStage();
+    var layer = new Kinetic.Layer();
+    var trapezoid1 = new Kinetic.Trapezoid({
+        x: 10,
+        y: 80,
+        fill: 'yellow',
+        stroke: 'red',
+        strokeWidth: 4,
+        height: 60,
+        width: 100,
+        draggable: true
+    });
+
+    var trapezoid2 = new Kinetic.Trapezoid({
+        x: 150,
+        y: 20,
+        fill: 'blue',
+        stroke: 'red',
+        strokeWidth: 4,
+        dash: [0.1, 10],
+        lineCap: 'round',
+        height: 60,
+        width: 100,
+        draggable: true,
+        scale: {y: -1}
+    });
+
+    var trapezoid3 = new Kinetic.Trapezoid({
+        x: 300,
+        y: 120,
+        fill: 'red',
+        stroke: 'yellow',
+        strokeWidth: 4,
+        height: 100,
+        width: 200,
+        draggable: true
+    });
+
+    
+    stage.add(layer);
+    layer.add(trapezoid1);
+    layer.add(trapezoid2);
+    layer.add(trapezoid3);
+    layer.draw();
+
+    assert.equal(trapezoid1.getClassName(), 'Trapezoid');
+    assert.equal(trapezoid2.getClassName(), 'Trapezoid');
+
+    assert.equal(trapezoid1.height(), trapezoid2.height());
+    assert.equal(trapezoid1.width(), trapezoid2.width());
+
+    var trace = layer.getContext().getTrace();
+    assert.equal(trace, 'clearRect(0,0,578,200);clearRect(0,0,578,200);save();transform(1,0,0,1,10,80);beginPath();moveTo(0,0);lineTo(100,0);lineTo(75,-60);lineTo(25,-60);lineTo(0,0);closePath();fillStyle=yellow;fill();lineWidth=4;strokeStyle=red;stroke();restore();save();transform(1,0,0,-1,150,20);beginPath();moveTo(0,0);lineTo(100,0);lineTo(75,-60);lineTo(25,-60);lineTo(0,0);closePath();fillStyle=blue;fill();lineCap=round;setLineDash(0.1,10);lineWidth=4;strokeStyle=red;stroke();restore();save();transform(1,0,0,1,300,120);beginPath();moveTo(0,0);lineTo(200,0);lineTo(150,-100);lineTo(50,-100);lineTo(0,0);closePath();fillStyle=red;fill();lineWidth=4;strokeStyle=yellow;stroke();restore();');
+  });
 });
