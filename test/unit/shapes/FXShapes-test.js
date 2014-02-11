@@ -179,6 +179,52 @@ suite('FX Shapes', function(){
 
   // ======================================================
 
+  test('diamond', function(){
+    var stage = addStage();
+    var layer = new Kinetic.Layer();
+    var diamond1 = new Kinetic.Diamond({
+        x: 10,
+        y: 70,
+        fill: 'yellow',
+        stroke: 'red',
+        strokeWidth: 4,
+        height: 60,
+        width: 120,
+        draggable: true
+    });
+
+    var diamond2 = new Kinetic.Diamond({
+        x: 180,
+        y: 10,
+        fill: 'blue',
+        stroke: 'red',
+        strokeWidth: 4,
+        height: 60,
+        width: 120,
+        draggable: true,
+        rotation: 90
+    });
+    
+    stage.add(layer);
+    layer.add(diamond1);
+    layer.add(diamond2);
+
+    layer.draw();
+
+    assert.equal(diamond1.getClassName(), 'Diamond');
+    assert.equal(diamond2.getClassName(), 'Diamond');
+
+    assert.equal(diamond1.height(), diamond2.height());
+    assert.equal(diamond1.width(), diamond2.width());
+
+    assert.equal(diamond2.rotation(), 90);
+
+    var trace = layer.getContext().getTrace();
+    //assert.equal(trace, 'clearRect(0,0,578,200);clearRect(0,0,578,200);save();transform(1,0,0,1,10,80);beginPath();moveTo(0,0);lineTo(100,0);lineTo(130,-60);lineTo(30,-60);lineTo(0,0);closePath();fillStyle=yellow;fill();lineWidth=4;strokeStyle=red;stroke();restore();save();transform(-1,0,0,1,280,80);beginPath();moveTo(0,0);lineTo(100,0);lineTo(130,-60);lineTo(30,-60);lineTo(0,0);closePath();fillStyle=blue;fill();lineCap=round;setLineDash(0.1,10);lineWidth=4;strokeStyle=red;stroke();restore();save();transform(1,0,0,1,300,120);beginPath();moveTo(0,0);lineTo(200,0);lineTo(260,-100);lineTo(60,-100);lineTo(0,0);closePath();fillStyle=red;fill();lineWidth=4;strokeStyle=yellow;stroke();restore();');
+  });
+
+  // ======================================================
+
   test('parallelogram', function(){
     var stage = addStage();
     var layer = new Kinetic.Layer();
