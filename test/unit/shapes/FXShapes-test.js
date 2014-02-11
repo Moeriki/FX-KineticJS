@@ -176,4 +176,62 @@ suite('FX Shapes', function(){
     var trace = layer.getContext().getTrace();
     assert.equal(trace, 'clearRect(0,0,578,200);clearRect(0,0,578,200);save();transform(1,0,0,1,100,20);beginPath();moveTo(0,0);lineTo(-50,86.603);lineTo(50,86.603);lineTo(0,0);closePath();fillStyle=yellow;fill();lineWidth=4;strokeStyle=red;stroke();restore();save();transform(1,0,0,1,250,20);beginPath();moveTo(0,0);lineTo(-50,86.603);lineTo(50,86.603);lineTo(0,0);closePath();fillStyle=red;fill();lineWidth=4;strokeStyle=yellow;stroke();restore();save();transform(-1,0,0,-1,175,105);beginPath();moveTo(0,0);lineTo(-50,86.603);lineTo(50,86.603);lineTo(0,0);closePath();fillStyle=blue;fill();lineWidth=4;strokeStyle=red;stroke();restore();');
   });
+
+  // ======================================================
+
+  test('parallelogram', function(){
+    var stage = addStage();
+    var layer = new Kinetic.Layer();
+    var parallelogram1 = new Kinetic.Parallelogram({
+        x: 10,
+        y: 80,
+        fill: 'yellow',
+        stroke: 'red',
+        strokeWidth: 4,
+        height: 60,
+        width: 100,
+        draggable: true
+    });
+
+    var parallelogram2 = new Kinetic.Parallelogram({
+        x: 280,
+        y: 80,
+        fill: 'blue',
+        stroke: 'red',
+        strokeWidth: 4,
+        dash: [0.1, 10],
+        lineCap: 'round',
+        height: 60,
+        width: 100,
+        draggable: true,
+        scale: {x: -1}
+    });
+
+    var parallelogram3 = new Kinetic.Parallelogram({
+        x: 300,
+        y: 120,
+        fill: 'red',
+        stroke: 'yellow',
+        strokeWidth: 4,
+        height: 100,
+        width: 200,
+        draggable: true
+    });
+
+    
+    stage.add(layer);
+    layer.add(parallelogram1);
+    layer.add(parallelogram2);
+    layer.add(parallelogram3);
+    layer.draw();
+
+    assert.equal(parallelogram1.getClassName(), 'Parallelogram');
+    assert.equal(parallelogram2.getClassName(), 'Parallelogram');
+
+    assert.equal(parallelogram1.height(), parallelogram2.height());
+    assert.equal(parallelogram1.width(), parallelogram2.width());
+
+    var trace = layer.getContext().getTrace();
+    assert.equal(trace, 'clearRect(0,0,578,200);clearRect(0,0,578,200);save();transform(1,0,0,1,10,80);beginPath();moveTo(0,0);lineTo(100,0);lineTo(130,-60);lineTo(30,-60);lineTo(0,0);closePath();fillStyle=yellow;fill();lineWidth=4;strokeStyle=red;stroke();restore();save();transform(-1,0,0,1,280,80);beginPath();moveTo(0,0);lineTo(100,0);lineTo(130,-60);lineTo(30,-60);lineTo(0,0);closePath();fillStyle=blue;fill();lineCap=round;setLineDash(0.1,10);lineWidth=4;strokeStyle=red;stroke();restore();save();transform(1,0,0,1,300,120);beginPath();moveTo(0,0);lineTo(200,0);lineTo(260,-100);lineTo(60,-100);lineTo(0,0);closePath();fillStyle=red;fill();lineWidth=4;strokeStyle=yellow;stroke();restore();');
+  });
 });
