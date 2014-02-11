@@ -8,6 +8,7 @@
      * @memberof Kinetic
      * @augments Kinetic.Shape
      * @param {Object} config
+     * @param {Number} config.side
      * @@shapeParams
      * @@nodeParams
      * @example
