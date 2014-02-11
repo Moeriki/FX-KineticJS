@@ -14,8 +14,7 @@
      * @example
      * // create equilateral triangle
      * var triangle = new Kinetic.TriangleEquilateral({<br>
-     *   height: 100,<br>
-     *   width: 50,<br>
+     *   side: 100,<br>
      *   fill: 'red',<br>
      *   stroke: 'black'<br>
      *   strokeWidth: 5<br>
