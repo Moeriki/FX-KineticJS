@@ -285,11 +285,73 @@ suite('FX Shapes', function(){
 
     assert.equal(trapezoid1.getClassName(), 'Trapezoid');
     assert.equal(trapezoid2.getClassName(), 'Trapezoid');
+    assert.equal(trapezoid3.getClassName(), 'Trapezoid');
 
     assert.equal(trapezoid1.height(), trapezoid2.height());
     assert.equal(trapezoid1.width(), trapezoid2.width());
 
     var trace = layer.getContext().getTrace();
     assert.equal(trace, 'clearRect(0,0,578,200);clearRect(0,0,578,200);save();transform(1,0,0,1,10,80);beginPath();moveTo(0,0);lineTo(100,0);lineTo(75,-60);lineTo(25,-60);lineTo(0,0);closePath();fillStyle=yellow;fill();lineWidth=4;strokeStyle=red;stroke();restore();save();transform(1,0,0,-1,150,20);beginPath();moveTo(0,0);lineTo(100,0);lineTo(75,-60);lineTo(25,-60);lineTo(0,0);closePath();fillStyle=blue;fill();lineCap=round;setLineDash(0.1,10);lineWidth=4;strokeStyle=red;stroke();restore();save();transform(1,0,0,1,300,120);beginPath();moveTo(0,0);lineTo(200,0);lineTo(150,-100);lineTo(50,-100);lineTo(0,0);closePath();fillStyle=red;fill();lineWidth=4;strokeStyle=yellow;stroke();restore();');
+  });
+
+  // ======================================================
+
+  test('split-t', function(){
+    var stage = addStage();
+    var layer = new Kinetic.Layer();
+    var split1 = new Kinetic.SplitT({
+        x: 10,
+        y: 10,
+        stroke: 'red',
+        strokeWidth: 4,
+        height: 50,
+        width: 100,
+        draggable: true
+    });
+
+    var split2 = new Kinetic.SplitT({
+        x: 150,
+        y: 10,
+        stroke: 'yellow',
+        strokeWidth: 8,
+        height: 100,
+        width: 200,
+        draggable: true
+    });
+
+    var split3 = new Kinetic.SplitT({
+        x: 370,
+        y: 10,
+        stroke: 'blue',
+        strokeWidth: 8,
+        height: 50,
+        width: 100,
+        lineCap: 'round',
+        dash: [0.001, 10],
+        draggable: true
+    });
+
+    
+    stage.add(layer);
+    layer.add(split1);
+    layer.add(split2);
+    layer.add(split3);
+    layer.draw();
+
+    assert.equal(split1.getClassName(), 'SplitT');
+    assert.equal(split2.getClassName(), 'SplitT');
+    assert.equal(split3.getClassName(), 'SplitT');
+
+    assert.equal(split1.height() * 2, split2.height());
+    assert.equal(split1.width() * 2, split2.width());
+
+    assert.equal(split2.strokeWidth(), split3.strokeWidth());
+    assert.equal(split2.height() / 2, split3.height());
+    assert.equal(split2.width() / 2, split3.width());
+
+    assert.equal(split3.lineCap(), 'round');
+
+    var trace = layer.getContext().getTrace();
+    assert.equal(trace, 'clearRect(0,0,578,200);clearRect(0,0,578,200);save();transform(1,0,0,1,10,10);beginPath();moveTo(0,0);lineTo(100,0);moveTo(50,0);lineTo(50,50);closePath();lineWidth=4;strokeStyle=red;stroke();restore();save();transform(1,0,0,1,150,10);beginPath();moveTo(0,0);lineTo(200,0);moveTo(100,0);lineTo(100,100);closePath();lineWidth=8;strokeStyle=yellow;stroke();restore();save();transform(1,0,0,1,370,10);beginPath();moveTo(0,0);lineTo(100,0);moveTo(50,0);lineTo(50,50);closePath();lineCap=round;setLineDash(0.001,10);lineWidth=8;strokeStyle=blue;stroke();restore();');
   });
 });
