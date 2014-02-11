@@ -1,4 +1,4 @@
-suite('Triangle', function(){
+suite('FX Shapes', function(){
   // ======================================================
 
   test('isosceles triangle', function(){
