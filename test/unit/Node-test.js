@@ -3214,7 +3214,8 @@ suite('Node', function() {
           height: h,
           fill: 'yellow',
           stroke: 'red',
-          strokeWidth: 4
+          strokeWidth: 4,
+          anchor: 0.5
       });
 
       var rect2 = new Kinetic.Rect({
@@ -3225,11 +3226,12 @@ suite('Node', function() {
           height: h,
           fill: 'red',
           stroke: 'yellow',
-          strokeWidth: 4
+          strokeWidth: 4,
+          anchor: 0.5
       });
       rect1.scale({x: 1.5, y: 1.5});
-      rect1.placeAnchor(0.5);
-      rect2.placeAnchor(0.5);
+      rect1.placeAnchor();
+      rect2.placeAnchor();
 
       rect0.on('click', function(){
         rect2.rotate(10);

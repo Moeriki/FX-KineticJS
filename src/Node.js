@@ -1312,14 +1312,14 @@
          * @memberof Kinetic.Node.prototype
          * @returns {Node}
          */
-        placeAnchor: function(anchor){
+        placeAnchor: function(){
             var x = this.x(),
                 y = this.y(),
                 sx = this.scaleX(),
                 sy = this.scaleY(),
                 w = this.width(),
                 h = this.height(),
-                a = anchor;
+                a = this.anchor();
             this._setAttr('x', x + w * sx * a);
             this._setAttr('y', y + h * sy * a);
             this._setAttr('offsetX', w * a);
@@ -1950,7 +1950,7 @@
      * node.transformsEnabled('all');
      */
 
-    // Kinetic.Factory.addGetterSetter(Kinetic.Node, 'anchor', 0, undefined, function(){this.placeAnchor();});
+    Kinetic.Factory.addGetterSetter(Kinetic.Node, 'anchor', 0);//, undefined, function(){this.placeAnchor();});
 
     /**
      * get/set anchor
