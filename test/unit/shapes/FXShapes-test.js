@@ -379,6 +379,47 @@ suite('FX Shapes', function(){
     var trace = layer.getContext().getTrace();
     assert.equal(trace, 'clearRect(0,0,578,200);clearRect(0,0,578,200);save();transform(1,0,0,1,10,80);beginPath();moveTo(0,0);lineTo(100,0);lineTo(75,-60);lineTo(25,-60);lineTo(0,0);closePath();fillStyle=yellow;fill();lineWidth=4;strokeStyle=red;stroke();restore();save();transform(1,0,0,-1,150,20);beginPath();moveTo(0,0);lineTo(100,0);lineTo(75,-60);lineTo(25,-60);lineTo(0,0);closePath();fillStyle=blue;fill();lineCap=round;setLineDash(0.1,10);lineWidth=4;strokeStyle=red;stroke();restore();save();transform(1,0,0,1,300,120);beginPath();moveTo(0,0);lineTo(200,0);lineTo(150,-100);lineTo(50,-100);lineTo(0,0);closePath();fillStyle=red;fill();lineWidth=4;strokeStyle=yellow;stroke();restore();');
   });
+  
+  // ======================================================
+
+  test('semi-circle', function(){
+    var stage = addStage();
+    var layer = new Kinetic.Layer();
+    var semiCircle1 = new Kinetic.SemiCircle({
+        x: 70,
+        y: 10,
+        fill: 'yellow',
+        stroke: 'red',
+        strokeWidth: 4,
+        radius: 50,
+        draggable: true 
+    });
+    var semiCircle2 = new Kinetic.SemiCircle({
+        x: 190,
+        y: 10,
+        fill: 'red',
+        stroke: 'yellow',
+        strokeWidth: 4,
+        height: 50,
+        draggable: true 
+    });
+    
+    stage.add(layer);
+    layer.add(semiCircle1);
+    layer.add(semiCircle2);
+    layer.draw();
+
+    assert.equal(semiCircle1.getClassName(), 'SemiCircle');
+    assert.equal(semiCircle1.getWidth(), 100);
+    assert.equal(semiCircle1.getHeight(), 50);
+
+    assert.equal(semiCircle2.getClassName(), 'SemiCircle');
+    assert.equal(semiCircle2.getWidth(), semiCircle1.getWidth());
+    assert.equal(semiCircle2.getHeight(), semiCircle1.getHeight());
+
+    var trace = layer.getContext().getTrace();
+    assert.equal(trace, 'clearRect(0,0,578,200);clearRect(0,0,578,200);save();transform(1,0,0,1,70,10);beginPath();arc(0,0,50,0,3.141,false);closePath();fillStyle=yellow;fill();lineWidth=4;strokeStyle=red;stroke();restore();save();transform(1,0,0,1,190,10);beginPath();arc(0,0,50,0,3.141,false);closePath();fillStyle=red;fill();lineWidth=4;strokeStyle=yellow;stroke();restore();');
+  });
 
   // ======================================================
 
