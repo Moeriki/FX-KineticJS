@@ -420,6 +420,52 @@ suite('FX Shapes', function(){
     var trace = layer.getContext().getTrace();
     assert.equal(trace, 'clearRect(0,0,578,200);clearRect(0,0,578,200);save();transform(1,0,0,1,70,10);beginPath();arc(0,0,50,0,3.141,false);closePath();fillStyle=yellow;fill();lineWidth=4;strokeStyle=red;stroke();restore();save();transform(1,0,0,1,190,10);beginPath();arc(0,0,50,0,3.141,false);closePath();fillStyle=red;fill();lineWidth=4;strokeStyle=yellow;stroke();restore();');
   });
+  
+  // ======================================================
+
+  test('arrow', function(){
+    var stage = addStage();
+    var layer = new Kinetic.Layer();
+    var arrow1 = new Kinetic.Arrow({
+        x: 10,
+        y: 80,
+        fill: 'yellow',
+        stroke: 'red',
+        strokeWidth: 4,
+        height: 60,
+        width: 100,
+        draggable: true
+    });
+
+    var arrow2 = new Kinetic.Arrow({
+        x: 280,
+        y: 70,
+        fill: 'blue',
+        stroke: 'red',
+        strokeWidth: 4,
+        height: 100,
+        width: 150,
+        draggable: true,
+        scale: {x:-1}
+    });
+    
+    stage.add(layer);
+    layer.add(arrow1);
+    layer.add(arrow2);
+    layer.draw();
+
+    assert.equal(arrow1.getClassName(), 'Arrow');
+    assert.equal(arrow2.getClassName(), 'Arrow');
+
+    assert.equal(arrow1.getWidth(), 100);
+    assert.equal(arrow1.getHeight(), 60);
+
+    assert.equal(arrow2.getWidth(), 150);
+    assert.equal(arrow2.getHeight(), 100);
+
+    var trace = layer.getContext().getTrace();
+    assert.equal(trace, 'clearRect(0,0,578,200);clearRect(0,0,578,200);save();transform(1,0,0,1,10,80);beginPath();moveTo(0,0);lineTo(60,0);lineTo(60,-15);lineTo(100,15);lineTo(60,45);lineTo(60,30);lineTo(0,30);closePath();fillStyle=yellow;fill();lineWidth=4;strokeStyle=red;stroke();restore();save();transform(-1,0,0,1,280,70);beginPath();moveTo(0,0);lineTo(90,0);lineTo(90,-25);lineTo(150,25);lineTo(90,75);lineTo(90,50);lineTo(0,50);closePath();fillStyle=blue;fill();lineWidth=4;strokeStyle=red;stroke();restore();');
+  });
 
   // ======================================================
 

@@ -56,6 +56,7 @@ module.exports = function(grunt) {
     'src/shapes/SemiCircle.js',
     'src/shapes/Parallelogram.js',
     'src/shapes/Trapezoid.js',
+    'src/shapes/Arrow.js',
     'src/shapes/SplitT.js',
 
     // plugins
