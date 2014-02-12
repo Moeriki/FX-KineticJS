@@ -12,8 +12,8 @@
      * @example
      * // create diamond
      * var diamond = new Kinetic.Diamond({<br>
-     *   height: 100,<br>
-     *   width: 50,<br>
+     *   height: 50,<br>
+     *   width: 100,<br>
      *   fill: 'red',<br>
      *   stroke: 'black'<br>
      *   strokeWidth: 5<br>
