@@ -189,7 +189,7 @@ suite('FX Shapes', function(){
         stroke: 'red',
         strokeWidth: 4,
         width: 100,
-        draggable: true 
+        draggable: true
     });
     
     stage.add(layer);
@@ -198,23 +198,14 @@ suite('FX Shapes', function(){
 
     assert.equal(square1.getClassName(), 'Square');
     assert.equal(square1.getWidth(), square1.getHeight());
-    assert.equal(square1.lockRatio(), true);
 
     square1.height(110);
     assert.equal(square1.getWidth(), 110);
 
-    square1.lockRatio(false);
-    square1.height(120);
-    assert.equal(square1.getWidth(), 110);
-
-    square1.lockRatio(true);
-    square1.height(150);
-    assert.equal(square1.getWidth(), 150);
-
     layer.draw();
 
     var trace = layer.getContext().getTrace();
-    assert.equal(trace, 'clearRect(0,0,578,200);clearRect(0,0,578,200);save();transform(1,0,0,1,10,10);beginPath();rect(0,0,150,150);closePath();fillStyle=yellow;fill();lineWidth=4;strokeStyle=red;stroke();restore();');
+    assert.equal(trace, 'clearRect(0,0,578,200);clearRect(0,0,578,200);save();transform(1,0,0,1,10,10);beginPath();rect(0,0,110,110);closePath();fillStyle=yellow;fill();lineWidth=4;strokeStyle=red;stroke();restore();');
   });
 
   // ======================================================
@@ -526,5 +517,67 @@ suite('FX Shapes', function(){
 
     var trace = layer.getContext().getTrace();
     assert.equal(trace, 'clearRect(0,0,578,200);clearRect(0,0,578,200);save();transform(1,0,0,1,10,10);beginPath();moveTo(0,0);lineTo(100,0);moveTo(50,0);lineTo(50,50);closePath();lineWidth=4;strokeStyle=red;stroke();restore();save();transform(1,0,0,1,150,10);beginPath();moveTo(0,0);lineTo(200,0);moveTo(100,0);lineTo(100,100);closePath();lineWidth=8;strokeStyle=yellow;stroke();restore();save();transform(1,0,0,1,370,10);beginPath();moveTo(0,0);lineTo(100,0);moveTo(50,0);lineTo(50,50);closePath();lineCap=round;setLineDash(0.001,10);lineWidth=8;strokeStyle=blue;stroke();restore();');
+  });
+  
+  // ======================================================
+
+  test('cube', function(){
+    var stage = addStage();
+    var layer = new Kinetic.Layer();
+    var cube1 = new Kinetic.Cube({
+        x: 30,
+        y: 80,
+        stroke: 'red',
+        strokeWidth: 4,
+        width: 100,
+        draggable: true
+    });
+
+    var cube2 = new Kinetic.Cube({
+        x: 190,
+        y: 100,
+        stroke: 'yellow',
+        strokeWidth: 4,
+        width: 75,
+        draggable: true
+    });
+
+    var cube3 = new Kinetic.Cube({
+        x: 320,
+        y: 120,
+        stroke: 'blue',
+        strokeWidth: 4,
+        width: 50,
+        draggable: true
+    });
+
+    var cube4 = new Kinetic.Cube({
+        x: 420,
+        y: 140,
+        stroke: 'green',
+        strokeWidth: 4,
+        width: 25,
+        draggable: true
+    });
+    
+    stage.add(layer);
+    layer.add(cube1);
+    layer.add(cube2);
+    layer.add(cube3);
+    layer.add(cube4);
+    layer.draw();
+
+    assert.equal(cube1.getClassName(), 'Cube');
+    assert.equal(cube2.getClassName(), 'Cube');
+    assert.equal(cube3.getClassName(), 'Cube');
+    assert.equal(cube4.getClassName(), 'Cube');
+
+    assert.equal(cube1.getWidth(), cube1.getHeight());
+    assert.equal(cube2.getWidth(), cube2.getHeight());
+    assert.equal(cube3.getWidth(), cube3.getHeight());
+    assert.equal(cube4.getWidth(), cube4.getHeight());
+
+    var trace = layer.getContext().getTrace();
+    assert.equal(trace, 'clearRect(0,0,578,200);clearRect(0,0,578,200);save();transform(1,0,0,1,30,80);beginPath();moveTo(0,0);lineTo(100,0);lineTo(100,100);lineTo(0,100);lineTo(0,0);moveTo(0,1);lineTo(50,-50);lineTo(150,-50);lineTo(150,50);lineTo(100,100);moveTo(100,0);lineTo(150,-50);closePath();lineWidth=4;strokeStyle=red;stroke();restore();save();transform(1,0,0,1,190,100);beginPath();moveTo(0,0);lineTo(75,0);lineTo(75,75);lineTo(0,75);lineTo(0,0);moveTo(0,1);lineTo(38,-38);lineTo(113,-38);lineTo(113,37);lineTo(75,75);moveTo(75,0);lineTo(113,-38);closePath();lineWidth=4;strokeStyle=yellow;stroke();restore();save();transform(1,0,0,1,320,120);beginPath();moveTo(0,0);lineTo(50,0);lineTo(50,50);lineTo(0,50);lineTo(0,0);moveTo(0,1);lineTo(25,-25);lineTo(75,-25);lineTo(75,25);lineTo(50,50);moveTo(50,0);lineTo(75,-25);closePath();lineWidth=4;strokeStyle=blue;stroke();restore();save();transform(1,0,0,1,420,140);beginPath();moveTo(0,0);lineTo(25,0);lineTo(25,25);lineTo(0,25);lineTo(0,0);moveTo(0,1);lineTo(13,-13);lineTo(38,-13);lineTo(38,12);lineTo(25,25);moveTo(25,0);lineTo(38,-13);closePath();lineWidth=4;strokeStyle=green;stroke();restore();');
   });
 });

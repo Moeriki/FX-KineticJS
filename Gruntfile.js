@@ -58,6 +58,7 @@ module.exports = function(grunt) {
     'src/shapes/Trapezoid.js',
     'src/shapes/Arrow.js',
     'src/shapes/SplitT.js',
+    'src/shapes/Cube.js',
 
     // plugins
     'src/plugins/Path.js', 
