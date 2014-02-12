@@ -59,6 +59,7 @@ module.exports = function(grunt) {
     'src/shapes/Arrow.js',
     'src/shapes/SplitT.js',
     'src/shapes/Cube.js',
+    'src/shapes/SpeechBubble.js',
 
     // plugins
     'src/plugins/Path.js', 

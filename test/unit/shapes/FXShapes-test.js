@@ -580,4 +580,81 @@ suite('FX Shapes', function(){
     var trace = layer.getContext().getTrace();
     assert.equal(trace, 'clearRect(0,0,578,200);clearRect(0,0,578,200);save();transform(1,0,0,1,30,80);beginPath();moveTo(0,0);lineTo(100,0);lineTo(100,100);lineTo(0,100);lineTo(0,0);lineTo(50,-50);lineTo(150,-50);lineTo(150,50);lineTo(100,100);moveTo(100,0);lineTo(150,-50);closePath();lineWidth=4;strokeStyle=red;stroke();restore();save();transform(1,0,0,1,190,100);beginPath();moveTo(0,0);lineTo(75,0);lineTo(75,75);lineTo(0,75);lineTo(0,0);lineTo(38,-38);lineTo(113,-38);lineTo(113,37);lineTo(75,75);moveTo(75,0);lineTo(113,-38);closePath();lineWidth=4;strokeStyle=yellow;stroke();restore();save();transform(1,0,0,1,320,120);beginPath();moveTo(0,0);lineTo(50,0);lineTo(50,50);lineTo(0,50);lineTo(0,0);lineTo(25,-25);lineTo(75,-25);lineTo(75,25);lineTo(50,50);moveTo(50,0);lineTo(75,-25);closePath();lineWidth=4;strokeStyle=blue;stroke();restore();save();transform(1,0,0,1,420,140);beginPath();moveTo(0,0);lineTo(25,0);lineTo(25,25);lineTo(0,25);lineTo(0,0);lineTo(13,-13);lineTo(38,-13);lineTo(38,12);lineTo(25,25);moveTo(25,0);lineTo(38,-13);closePath();lineWidth=4;strokeStyle=green;stroke();restore();');
   });
+  
+  // ======================================================
+
+  test('speech bubble', function(){
+    var stage = addStage();
+    var layer = new Kinetic.Layer();
+    var rect1 = new Kinetic.Rect({
+        x: 20,
+        y: 5,
+        stroke: 'black',
+        strokeWidth: 1,
+        dash: [4,10],
+        width: 220,
+        height: 150
+    });
+    var speech1 = new Kinetic.SpeechBubble({
+        x: 20,
+        y: 80,
+        stroke: 'red',
+        strokeWidth: 4,
+        width: 220,
+        height: 150,
+        draggable: true
+    });
+
+    var speech2 = new Kinetic.SpeechBubble({
+        x: 250,
+        y: 70,
+        stroke: 'green',
+        strokeWidth: 4,
+        width: 140,
+        height: 80,
+        draggable: true
+    });
+
+    var speech3 = new Kinetic.SpeechBubble({
+        x: 400,
+        y: 65,
+        stroke: 'yellow',
+        strokeWidth: 4,
+        width: 100,
+        height: 50,
+        draggable: true
+    });
+
+    var speech4 = new Kinetic.SpeechBubble({
+        x: 510,
+        y: 65,
+        stroke: 'blue',
+        strokeWidth: 2,
+        width: 50,
+        height: 25,
+        draggable: true
+    });
+
+    stage.add(layer);
+    layer.add(rect1);
+    layer.add(speech1);
+    layer.add(speech2);
+    layer.add(speech3);
+    layer.add(speech4);
+    layer.draw();
+
+    assert.equal(speech1.getClassName(), 'SpeechBubble');
+    assert.equal(speech2.getClassName(), 'SpeechBubble');
+    assert.equal(speech3.getClassName(), 'SpeechBubble');
+    assert.equal(speech4.getClassName(), 'SpeechBubble');
+
+    assert.equal(rect1.getWidth(), speech1.getWidth());
+    assert.equal(rect1.getHeight(), speech1.getHeight());
+
+    assert.equal(speech3.getWidth() /2, speech4.getWidth());
+    assert.equal(speech3.getHeight() /2, speech4.getHeight());
+
+    var trace = layer.getContext().getTrace();
+    assert.equal(trace, 'clearRect(0,0,578,200);clearRect(0,0,578,200);save();transform(1,0,0,1,20,5);beginPath();rect(0,0,220,150);closePath();setLineDash(4,10);lineWidth=1;strokeStyle=black;stroke();restore();save();transform(1,0,0,1,20,80);beginPath();moveTo(0,0);quadraticCurveTo(0,-75,110,-75);quadraticCurveTo(220,-75,220,0);quadraticCurveTo(220,56.25,55,46.875);lineTo(22,75);lineTo(33,46.875);quadraticCurveTo(0,46.875,0,0);closePath();lineWidth=4;strokeStyle=red;stroke();restore();save();transform(1,0,0,1,250,70);beginPath();moveTo(0,0);quadraticCurveTo(0,-40,70,-40);quadraticCurveTo(140,-40,140,0);quadraticCurveTo(140,30,35,25);lineTo(14,40);lineTo(21,25);quadraticCurveTo(0,25,0,0);closePath();lineWidth=4;strokeStyle=green;stroke();restore();save();transform(1,0,0,1,400,65);beginPath();moveTo(0,0);quadraticCurveTo(0,-25,50,-25);quadraticCurveTo(100,-25,100,0);quadraticCurveTo(100,18.75,25,15.625);lineTo(10,25);lineTo(15,15.625);quadraticCurveTo(0,15.625,0,0);closePath();lineWidth=4;strokeStyle=yellow;stroke();restore();save();transform(1,0,0,1,510,65);beginPath();moveTo(0,0);quadraticCurveTo(0,-12.5,25,-12.5);quadraticCurveTo(50,-12.5,50,0);quadraticCurveTo(50,9.375,12.5,7.813);lineTo(5,12.5);lineTo(7.5,7.813);quadraticCurveTo(0,7.813,0,0);closePath();lineWidth=2;strokeStyle=blue;stroke();restore();');
+  });
 });
