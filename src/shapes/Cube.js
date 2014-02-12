@@ -1,7 +1,6 @@
 (function() {
     var CUBE = 'Cube',
-        RATIO = 1/2,
-        OFFSET = 1;
+        RATIO = 1/2;
     /**
      * Cube constructor
      * @constructor
@@ -36,8 +35,6 @@
             context.lineTo(w, w);
             context.lineTo(0, w);
             context.lineTo(0, 0);
-            // Avoid small visual bug ;)
-            context.moveTo(0, OFFSET);
             context.lineTo(wr, -wr);
             context.lineTo(wr + w, -wr);
             context.lineTo(wr + w, -wr + w);
