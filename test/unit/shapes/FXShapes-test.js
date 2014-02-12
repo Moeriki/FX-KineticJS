@@ -189,21 +189,32 @@ suite('FX Shapes', function(){
         stroke: 'red',
         strokeWidth: 4,
         width: 100,
-        draggable: true
+        draggable: true 
     });
     
     stage.add(layer);
     layer.add(square1);
-    layer.draw();
+    
 
     assert.equal(square1.getClassName(), 'Square');
     assert.equal(square1.getWidth(), square1.getHeight());
+    assert.equal(square1.lockRatio(), true);
 
     square1.height(110);
     assert.equal(square1.getWidth(), 110);
 
+    square1.lockRatio(false);
+    square1.height(120);
+    assert.equal(square1.getWidth(), 110);
+
+    square1.lockRatio(true);
+    square1.height(150);
+    assert.equal(square1.getWidth(), 150);
+
+    layer.draw();
+
     var trace = layer.getContext().getTrace();
-    assert.equal(trace, 'clearRect(0,0,578,200);clearRect(0,0,578,200);save();transform(1,0,0,1,10,10);beginPath();rect(0,0,100,100);closePath();fillStyle=yellow;fill();lineWidth=4;strokeStyle=red;stroke();restore();');
+    assert.equal(trace, 'clearRect(0,0,578,200);clearRect(0,0,578,200);save();transform(1,0,0,1,10,10);beginPath();rect(0,0,150,150);closePath();fillStyle=yellow;fill();lineWidth=4;strokeStyle=red;stroke();restore();');
   });
 
   // ======================================================
