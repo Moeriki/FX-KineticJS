@@ -379,7 +379,7 @@
      * shape.strokeAlpha(0.5);
      */
 
-    Kinetic.Factory.addGetterSetter(Kinetic.Shape, 'strokeWidth', 2, null, function(){this._calculateAdaptiveDash();});
+    Kinetic.Factory.addGetterSetter(Kinetic.Shape, 'strokeWidth', 2, undefined, function(){this._calculateAdaptiveDash();});
 
     /**
      * get/set stroke width
@@ -475,7 +475,7 @@
      * });
      */
 
-    Kinetic.Factory.addGetterSetter(Kinetic.Shape, 'dash', null, null, function(){this._calculateAdaptiveDash();});
+    Kinetic.Factory.addGetterSetter(Kinetic.Shape, 'dash', undefined, undefined, function(){this._calculateAdaptiveDash();});
 
     /**
      * get/set dash array for stroke.
@@ -494,7 +494,7 @@
      *  line.dash([10, 20, 0.001, 20]);
      */
 
-    Kinetic.Factory.addGetterSetter(Kinetic.Shape, ADAPTIVE_DASH, null, null, function(){this._calculateAdaptiveDash();});
+    Kinetic.Factory.addGetterSetter(Kinetic.Shape, ADAPTIVE_DASH, undefined, undefined, function(){this._calculateAdaptiveDash();});
 
     /**
      * get/set adaptive dash for stroke (dash changes with strokeWidth).
