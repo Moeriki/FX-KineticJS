@@ -66,7 +66,7 @@
                 delete this._cache[attr];
             }
             else {
-                this._cache = {};   
+                this._cache = {};
             }
         },
         _getCache: function(attr, privateGetter){
@@ -77,7 +77,7 @@
                 this._cache[attr] = privateGetter.call(this);
             }
 
-            return this._cache[attr];     
+            return this._cache[attr];
         },
         /*
          * when the logic for a cached result depends on ancestor propagation, use this
@@ -252,8 +252,8 @@
 
             context.save();
             context._applyTransform(this);
-            context.drawImage(hitCanvas._canvas, 0, 0); 
-            context.restore(); 
+            context.drawImage(hitCanvas._canvas, 0, 0);
+            context.restore();
         },
         /**
          * bind events to the node. KineticJS supports mouseover, mousemove,
@@ -323,7 +323,7 @@
 
                 // NOTE: this flag is set to true when any event handler is added, even non
                 // mouse or touch gesture events.  This improves performance for most
-                // cases where users aren't using events, but is still very light weight.  
+                // cases where users aren't using events, but is still very light weight.
                 // To ensure perfect accuracy, devs can explicitly set listening to false.
                 /*
                 if (name !== KINETIC) {
@@ -509,11 +509,11 @@
          * determine if node is listening for events by taking into account ancestors.
          *
          * Parent    | Self      | isListening
-         * listening | listening | 
+         * listening | listening |
          * ----------+-----------+------------
-         * T         | T         | T 
+         * T         | T         | T
          * T         | F         | F
-         * F         | T         | T 
+         * F         | T         | T
          * F         | F         | F
          * ----------+-----------+------------
          * T         | I         | T
@@ -549,11 +549,11 @@
          * determine if node is visible by taking into account ancestors.
          *
          * Parent    | Self      | isVisible
-         * visible   | visible   | 
+         * visible   | visible   |
          * ----------+-----------+------------
-         * T         | T         | T 
+         * T         | T         | T
          * T         | F         | F
-         * F         | T         | T 
+         * F         | T         | T
          * F         | F         | F
          * ----------+-----------+------------
          * T         | I         | T
@@ -1085,7 +1085,7 @@
                 transformsEnabled = node.transformsEnabled();
                 trans = node.getTransform();
 
-                if (transformsEnabled === 'all') { 
+                if (transformsEnabled === 'all') {
                     at.multiply(trans);
                 }
                 else if (transformsEnabled === 'position') {
@@ -1307,6 +1307,26 @@
             return this.className || this.nodeType;
         },
         /**
+         * place anchor for rotation
+         * @method
+         * @memberof Kinetic.Node.prototype
+         * @returns {Node}
+         */
+        placeAnchor: function(){
+            var x = this.x(),
+                y = this.y(),
+                sx = this.scaleX(),
+                sy = this.scaleY(),
+                w = this.width(),
+                h = this.height(),
+                a = this.anchor();
+            this._setAttr('x', x + w * sx * a);
+            this._setAttr('y', y + h * sy * a);
+            this._setAttr('offsetX', w * a);
+            this._setAttr('offsetY', h * a);
+            return this;
+        },
+        /**
          * get the node type, which may return Stage, Layer, Group, or Node
          * @method
          * @memberof Kinetic.Node.prototype
@@ -1419,7 +1439,7 @@
                     // set value to default value using getAttr
                     this.attrs[key] = this.getAttr(key);
                 }
-                
+
                 //this._fireBeforeChangeEvent(key, oldVal, val);
                 this.attrs[key][component] = val;
                 this._fireChangeEvent(key, oldVal, val);
@@ -1846,7 +1866,7 @@
     Kinetic.Factory.addGetterSetter(Kinetic.Node, 'listening', 'inherit');
     /**
      * get/set listenig attr.  If you need to determine if a node is listening or not
-     *   by taking into account its parents, use the isListening() method  
+     *   by taking into account its parents, use the isListening() method
      * @name listening
      * @method
      * @memberof Kinetic.Node.prototype
@@ -1895,7 +1915,7 @@
     /**
      * get/set visible attr.  Can be "inherit", true, or false.  The default is "inherit".
      *   If you need to determine if a node is visible or not
-     *   by taking into account its parents, use the isVisible() method  
+     *   by taking into account its parents, use the isVisible() method
      * @name visible
      * @method
      * @memberof Kinetic.Node.prototype
@@ -1933,7 +1953,7 @@
      * node.transformsEnabled('all');
      */
 
-     Kinetic.Factory.addGetterSetter(Kinetic.Node, 'locked', false);
+    Kinetic.Factory.addGetterSetter(Kinetic.Node, 'locked', false);
 
     /**
      * get/set locked
@@ -1948,6 +1968,22 @@
      *
      * // set locked<br>
      * node.locked(true);
+     */
+
+    Kinetic.Factory.addGetterSetter(Kinetic.Node, 'anchor', 0);//, undefined, function(){this.placeAnchor();});
+
+    /**
+     * get/set anchor
+     * @name anchor
+     * @memberof Kinetic.Node.prototype
+     * @param {Number} anchor
+     * @returns {Number}
+     * @example
+     * // get anchor<br>
+     * var anchor = node.anchor();<br><br>
+     *
+     * // set anchor <br>
+     * node.anchor(0.5);
      */
 
     Kinetic.Factory.backCompat(Kinetic.Node, {
