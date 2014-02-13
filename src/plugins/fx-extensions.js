@@ -16,6 +16,14 @@
 
     Kinetic.Util.addMethods(Kinetic.Node, {
 
+        isFirst: function() {
+            return this.getZIndex() === 0;
+        },
+
+        isLast: function() {
+            return this.getZIndex() === this.parent.children.length - 1;
+        },
+
         moveBefore: function(node) {
             this.moveTo(node.getParent());
             this.setZIndex(node.getZIndex());

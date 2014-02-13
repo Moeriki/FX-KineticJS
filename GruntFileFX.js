@@ -38,23 +38,37 @@ module.exports = function(grunt) {
         'src/Group.js',
 
         // shapes
-        'src/shapes/Rect.js',
-        'src/shapes/Circle.js',
-        'src/shapes/Ellipse.js',
-        // 'src/shapes/Ring.js',
-        'src/shapes/Wedge.js',
         'src/shapes/Arc.js',
+        'src/shapes/Arrow.js',
+        'src/shapes/Circle.js',
+        'src/shapes/Cube.js',
+        'src/shapes/Diamond.js',
+        'src/shapes/Ellipse.js',
         'src/shapes/Image.js',
-        'src/shapes/Text.js',
         'src/shapes/Line.js',
+        'src/shapes/Parallelogram.js',
+        'src/shapes/Rect.js',
+        // 'src/shapes/Ring.js',
+        'src/shapes/SimeCircle.js',
+        'src/shapes/SpeechBubble.js',
+        'src/shapes/SplitT.js',
+        'src/shapes/Square.js',
         // 'src/shapes/Sprite.js',
+        'src/shapes/Text.js',
+        'src/shapes/Trapezoid.js',
+        'src/shapes/TriangleEquilateral.js',
+        'src/shapes/TriangleIsosceles.js',
+        'src/shapes/TriangleRightAngled.js',
+        'src/shapes/Wedge.js',
 
         // plugins
+        'src/plugins/fs-extensions.js',
+        'src/plugins/Star.js',
+        // 'src/plugins/Label.js',
         // 'src/plugins/Path.js',
-        // 'src/plugins/TextPath.js',
         'src/plugins/RegularPolygon.js',
         'src/plugins/Star.js',
-        // 'src/plugins/Label.js'
+        // 'src/plugins/TextPath.js',
     ];
 
     // Project configuration.
