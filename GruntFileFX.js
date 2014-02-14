@@ -49,7 +49,7 @@ module.exports = function(grunt) {
         'src/shapes/Parallelogram.js',
         'src/shapes/Rect.js',
         // 'src/shapes/Ring.js',
-        'src/shapes/SimeCircle.js',
+        'src/shapes/SemiCircle.js',
         'src/shapes/SpeechBubble.js',
         'src/shapes/SplitT.js',
         'src/shapes/Square.js',
@@ -62,7 +62,7 @@ module.exports = function(grunt) {
         'src/shapes/Wedge.js',
 
         // plugins
-        'src/plugins/fs-extensions.js',
+        'src/plugins/fx-extensions.js',
         'src/plugins/Star.js',
         // 'src/plugins/Label.js',
         // 'src/plugins/Path.js',
