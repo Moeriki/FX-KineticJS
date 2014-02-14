@@ -1,18 +1,18 @@
 module.exports = function(grunt) {
   var sourceFiles = [
     // core
-    'src/Global.js', 
-    'src/Util.js', 
+    'src/Global.js',
+    'src/Util.js',
     'src/Canvas.js',
     'src/Context.js',
     'src/Factory.js',
-    'src/Node.js', 
+    'src/Node.js',
 
-    // filters 
-    'src/filters/Grayscale.js', 
-    'src/filters/Brighten.js', 
-    'src/filters/Invert.js', 
-    'src/filters/Blur.js', 
+    // filters
+    'src/filters/Grayscale.js',
+    'src/filters/Brighten.js',
+    'src/filters/Invert.js',
+    'src/filters/Blur.js',
     'src/filters/Mask.js',
     'src/filters/RGB.js',
     'src/filters/HSV.js',
@@ -26,27 +26,27 @@ module.exports = function(grunt) {
     'src/filters/Sepia.js',
     'src/filters/Solarize.js',
     'src/filters/Kaleidoscope.js',
-    
+
     // core
-    'src/Animation.js', 
-    'src/Tween.js', 
-    'src/DragAndDrop.js', 
-    'src/Container.js', 
-    'src/Shape.js', 
-    'src/Stage.js', 
-    'src/Layer.js', 
+    'src/Animation.js',
+    'src/Tween.js',
+    'src/DragAndDrop.js',
+    'src/Container.js',
+    'src/Shape.js',
+    'src/Stage.js',
+    'src/Layer.js',
     'src/Group.js',
 
     // shapes
-    'src/shapes/Rect.js', 
-    'src/shapes/Circle.js', 
+    'src/shapes/Rect.js',
+    'src/shapes/Circle.js',
     'src/shapes/Ellipse.js',
     'src/shapes/Ring.js',
-    'src/shapes/Wedge.js', 
+    'src/shapes/Wedge.js',
     'src/shapes/Arc.js',
-    'src/shapes/Image.js', 
-    'src/shapes/Text.js', 
-    'src/shapes/Line.js', 
+    'src/shapes/Image.js',
+    'src/shapes/Text.js',
+    'src/shapes/Line.js',
     'src/shapes/Sprite.js',
     'src/shapes/TriangleIsosceles.js',
     'src/shapes/TriangleRightAngled.js',
@@ -62,10 +62,10 @@ module.exports = function(grunt) {
     'src/shapes/SpeechBubble.js',
 
     // plugins
-    'src/plugins/Path.js', 
-    'src/plugins/TextPath.js', 
-    'src/plugins/RegularPolygon.js', 
-    'src/plugins/Star.js', 
+    'src/plugins/Path.js',
+    'src/plugins/TextPath.js',
+    'src/plugins/RegularPolygon.js',
+    'src/plugins/Star.js',
     'src/plugins/Label.js'
   ];
 
@@ -103,7 +103,7 @@ module.exports = function(grunt) {
         },
 
         files: [{
-          src: ['dist/kinetic-dev.js'], 
+          src: ['dist/kinetic-dev.js'],
           dest: 'dist/kinetic-dev.js'
         }]
       },
@@ -120,7 +120,7 @@ module.exports = function(grunt) {
         },
 
         files: [{
-          src: ['dist/kinetic-v<%= pkg.version %>-beta.js'], 
+          src: ['dist/kinetic-v<%= pkg.version %>-beta.js'],
           dest: 'dist/kinetic-v<%= pkg.version %>-beta.js'
         }]
       },
@@ -137,7 +137,7 @@ module.exports = function(grunt) {
         },
 
         files: [{
-          src: ['dist/kinetic-v<%= pkg.version %>.js'], 
+          src: ['dist/kinetic-v<%= pkg.version %>.js'],
           dest: 'dist/kinetic-v<%= pkg.version %>.js'
         }]
       },
@@ -149,7 +149,7 @@ module.exports = function(grunt) {
           prefix: '@@'
         },
         files: [{
-          src: ['dist/kinetic-Global-v<%= pkg.version %>.min.js'], 
+          src: ['dist/kinetic-Global-v<%= pkg.version %>.min.js'],
           dest: 'dist/kinetic-Global-v<%= pkg.version %>.min.js'
         }]
       },
@@ -161,7 +161,7 @@ module.exports = function(grunt) {
           prefix: '@@'
         },
         files: [{
-          src: ['dist/kinetic-v<%= pkg.version %>.min.js'], 
+          src: ['dist/kinetic-v<%= pkg.version %>.min.js'],
           dest: 'dist/kinetic-v<%= pkg.version %>.min.js'
         }]
       },
@@ -173,7 +173,7 @@ module.exports = function(grunt) {
           prefix: '@@'
         },
         files: [{
-          src: ['bower-template.json'], 
+          src: ['bower-template.json'],
           dest: 'bower.json'
         }]
       }
@@ -211,7 +211,7 @@ module.exports = function(grunt) {
     }
   };
 
-  
+
   for (var n=0; n<sourceFiles.length; n++) {
     var inputFile = sourceFiles[n];
     var className = (inputFile.match(/[-_\w]+[.][\w]+$/i)[0]).replace('.js', '');
@@ -219,7 +219,7 @@ module.exports = function(grunt) {
 
     config.uglify.build.files[outputFile] = [inputFile];
   }
-  
+
   grunt.initConfig(config);
 
   // Load plugins
@@ -234,14 +234,14 @@ module.exports = function(grunt) {
   grunt.registerTask('dev', ['clean', 'concat:dev', 'replace:dev']);
   grunt.registerTask('beta', ['clean', 'concat:beta', 'replace:beta']);
   grunt.registerTask('full', [
-    'clean', 
-    'concat:prod', 
-    'uglify', 
-    'replace:prod1', 
-    'replace:prod2', 
-    'replace:prod3', 
+    'clean',
+    'concat:prod',
+    'uglify',
+    'replace:prod1',
+    'replace:prod2',
+    'replace:prod3',
     'replace:prod4',
-    'copy:prod1', 
+    'copy:prod1',
     'copy:prod2'
   ]);
   grunt.registerTask('hint', ['clean', 'concat:dev', 'replace:dev', 'jshint']);

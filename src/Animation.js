@@ -215,12 +215,12 @@
         }
     };
     var RAF = (function() {
-        return window.requestAnimationFrame
-            || window.webkitRequestAnimationFrame
-            || window.mozRequestAnimationFrame
-            || window.oRequestAnimationFrame
-            || window.msRequestAnimationFrame
-            || FRAF;
+        return window.requestAnimationFrame ||
+                window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                window.oRequestAnimationFrame ||
+                window.msRequestAnimationFrame ||
+                FRAF;
     })();
 
     function FRAF(callback) {
@@ -247,9 +247,9 @@
 
         if (!this.batchAnim) {
             this.batchAnim = new Kinetic.Animation(function() {
-              if (that.lastBatchDrawTime && new Date().getTime() - that.lastBatchDrawTime > BATCH_DRAW_STOP_TIME_DIFF) {
-                that.batchAnim.stop();
-              }
+                if (that.lastBatchDrawTime && new Date().getTime() - that.lastBatchDrawTime > BATCH_DRAW_STOP_TIME_DIFF) {
+                    that.batchAnim.stop();
+                }
             }, this);
         }
 

@@ -6,38 +6,36 @@
         CLOSE_BRACKET_PAREN = '])',
         SEMICOLON = ';',
         DOUBLE_PAREN = '()',
-        EMPTY_STRING = '',
         EQUALS = '=',
-        SET = 'set',
         CONTEXT_METHODS = [
             'arc',
             'arcTo',
             'beginPath',
             'bezierCurveTo',
-            'clearRect', 
+            'clearRect',
             'clip',
             'closePath',
             'createLinearGradient',
             'createPattern',
             'createRadialGradient',
             'drawImage',
-            'fill', 
-            'fillText', 
+            'fill',
+            'fillText',
             'getImageData',
             'createImageData',
             'lineTo',
             'moveTo',
             'putImageData',
             'quadraticCurveTo',
-            'rect', 
-            'restore', 
+            'rect',
+            'restore',
             'rotate',
-            'save', 
+            'save',
             'scale',
             'setLineDash',
-            'setTransform', 
-            'stroke', 
-            'strokeText', 
+            'setTransform',
+            'stroke',
+            'strokeText',
             'transform',
             'translate'
         ];
@@ -124,7 +122,7 @@
                     str += method;
                     if (relaxed) {
                         str += DOUBLE_PAREN;
-                    } 
+                    }
                     else {
                         if (Kinetic.Util._isArray(args[0])) {
                             str += OPEN_PAREN_BRACKET + args.join(COMMA) + CLOSE_BRACKET_PAREN;
@@ -139,7 +137,7 @@
                     str += trace.property;
                     if (!relaxed) {
                         str += EQUALS + trace.val;
-                    }  
+                    }
                 }
 
                 str += SEMICOLON;
@@ -158,7 +156,7 @@
         _trace: function(str) {
             var traceArr = this.traceArr,
                 len;
- 
+
             traceArr.push(str);
             len = traceArr.length;
 
@@ -195,9 +193,7 @@
          * @param {Number} [bounds.height]
          */
         clear: function(bounds) {
-            var canvas = this.getCanvas(),
-                pos, size;
-            
+            var canvas = this.getCanvas();
             if (bounds) {
                 this.clearRect(bounds.x || 0, bounds.y || 0, bounds.width || 0, bounds.height || 0);
             }
@@ -234,7 +230,7 @@
             else if (transformsEnabled === 'position') {
                 // best performance for position only transforms
                 this.translate(shape.getX(), shape.getY());
-            }  
+            }
         },
         setAttr: function(attr, val) {
             this._context[attr] = val;
@@ -396,12 +392,12 @@
                     that[methodName] = function() {
                         args = _simplifyArray(Array.prototype.slice.call(arguments, 0));
                         ret = origMethod.apply(that, arguments);
-           
+
                         that._trace({
                             method: methodName,
                             args: args
                         });
-                 
+
                         return ret;
                     };
                 })(CONTEXT_METHODS[n]);
@@ -424,10 +420,10 @@
 
     Kinetic.SceneContext.prototype = {
         _fillColor: function(shape) {
-            var fill = shape.fill()   
-                || Kinetic.Util._getRGBAString({
-                    red: shape.fillRed(), 
-                    green: shape.fillGreen(), 
+            var fill = shape.fill() ||
+                Kinetic.Util._getRGBAString({
+                    red: shape.fillRed(),
+                    green: shape.fillGreen(),
                     blue: shape.fillBlue(),
                     alpha: shape.fillAlpha()
                 });
@@ -480,9 +476,9 @@
                 end = shape.getFillRadialGradientEndPoint(),
                 startRadius = shape.getFillRadialGradientStartRadius(),
                 endRadius = shape.getFillRadialGradientEndRadius(),
-                colorStops = shape.getFillRadialGradientColorStops(),  
+                colorStops = shape.getFillRadialGradientColorStops(),
                 grd = this.createRadialGradient(start.x, start.y, startRadius, end.x, end.y, endRadius);
-           
+
             // build color stops
             for(var n = 0; n < colorStops.length; n += 2) {
                 grd.addColorStop(colorStops[n], colorStops[n + 1]);
@@ -543,16 +539,16 @@
                 }
 
                 this.setAttr('lineWidth', shape.strokeWidth());
-                this.setAttr('strokeStyle', shape.stroke() 
-                    || Kinetic.Util._getRGBAString({
-                        red: shape.strokeRed(), 
-                        green: shape.strokeGreen(), 
+                this.setAttr('strokeStyle', shape.stroke() ||
+                    Kinetic.Util._getRGBAString({
+                        red: shape.strokeRed(),
+                        green: shape.strokeGreen(),
                         blue: shape.strokeBlue(),
                         alpha: shape.strokeAlpha()
                     }));
 
                 shape._strokeFunc(this);
-                
+
                 if (!strokeScaleEnabled) {
                     this.restore();
                 }
@@ -577,7 +573,7 @@
             this.setAttr('shadowBlur', blur);
             this.setAttr('shadowOffsetX', offset.x);
             this.setAttr('shadowOffsetY', offset.y);
-        
+
         }
     };
     Kinetic.Util.extend(Kinetic.SceneContext, Kinetic.Context);
