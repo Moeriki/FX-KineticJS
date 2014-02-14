@@ -194,7 +194,7 @@ module.exports = function(grunt) {
             build: ['dist/*']
         },
         jshint: {
-            jshintrc: '.jshintrx',
+            jshintrc: '.jshintrc',
             all: ['src/{,*/}*.js']
         },
         copy: {
