@@ -8,6 +8,10 @@ module.exports = function(grunt) {
         'src/Factory.js',
         'src/Node.js',
 
+        // core plugins
+        'src/plugins/fx-extensions.js',
+        'src/plugins/fx-classes.js',
+
         // filters
         // 'src/filters/Grayscale.js',
         // 'src/filters/Brighten.js',
@@ -62,7 +66,6 @@ module.exports = function(grunt) {
         'src/shapes/Wedge.js',
 
         // plugins
-        'src/plugins/fx-extensions.js',
         'src/plugins/Star.js',
         // 'src/plugins/Label.js',
         // 'src/plugins/Path.js',
