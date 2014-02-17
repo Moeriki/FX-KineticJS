@@ -6,15 +6,15 @@
 
     var ClassList = function(node) {
         this.node = node;
+
+        if(!this.node.attrs.classes) {
+            this.node.attrs.classes = [];
+        }
     };
 
     ClassList.prototype = {
 
         add: function(name) {
-            if(!this.node.attrs.classes) {
-                this.node.attrs.classes = [];
-            }
-
             if(!this.contains(name)) {
                 this.node.attrs.classes.push(name);
             }
@@ -48,8 +48,7 @@
         },
 
         contains: function(name) {
-            var classes = this.node.attrs.classes;
-            return classes && classes.indexOf(name) !== -1;
+            return this.node.attrs.classes.indexOf(name) !== -1;
         },
 
     };
