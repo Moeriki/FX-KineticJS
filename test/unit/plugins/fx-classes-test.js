@@ -8,7 +8,7 @@
 
 'use strict';
 
-suite('Node', function() {
+suite('FX Extensions', function() {
 
     suite('classList', function() {
 
