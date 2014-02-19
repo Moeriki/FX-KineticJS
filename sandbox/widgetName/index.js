@@ -1,36 +1,45 @@
 'use strict';
 
-require(['lodash', 'kinetic'], function(_, Kinetic) {
+define(['lodash', 'kinetic','include/components/button'], function(_, Kinetic, Button) {
 
-    var stage = new Kinetic.Stage({
-        container: 'container',
-        width: window.innerWidth,
-        height: window.innerHeight
-    });
+    function initCircle() {
+        var circle = new Kinetic.Circle({
+            radius: 50,
+            fill: '#F00'
+        });
+        var circleButton = Button.wrapButton(circle,400,400,{
+            x: 100,
+            y: 100,
+            draggable: true,
+            dragBoundFunc: function(pos) {
+                pos.x = 100;
+                return pos;
+            }
+        });
 
-    var layer = new Kinetic.Layer({
-        width: stage.getWidth(),
-        height: stage.getHeight(),
-    });
+        circle.on('click', function () {
+            circle.setFill('green');
+            circle.getLayer().batchDraw();
+        });
 
-    stage.add(layer);
+        return circleButton;
+    }
 
-    var group = new Kinetic.Group({
-        width: layer.getWidth(),
-        height: layer.getHeight(),
-    });
 
-    layer.add(group);
 
-    var circle = new Kinetic.Circle({
-        x: 100,
-        y: 100,
-        radius: 50,
-        fill: '#F00',
-    });
 
-    group.add(circle);
 
-    stage.draw();
 
+    return {
+        init: function (attrs) {
+            this.node = new Kinetic.Group(attrs);
+            this.node.add(initCircle());
+        },
+        placed: function () {
+
+        },
+        destroy: function () {
+
+        }
+    }
 });

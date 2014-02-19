@@ -1,0 +1,78 @@
+{
+	"metal types": {
+		"alkali metal": {
+			"singular": "Alkalimetaal",
+			"plural": "Alkalimetalen"
+		},
+		"alkaline earth metal": {
+			"singular": "Aardalkalimetaal",
+			"plural": "Aardalkalimetalen"
+		},
+		"lanthanide": {
+			"singular": "Lanthanide",
+			"plural": "Lanthaniden"
+		},
+		"actinide": {
+			"singular": "Actinide",
+			"plural": "Actiniden"
+		},
+		"transition metal": {
+			"singular": "Overgangsmetaal",
+			"plural": "Overgangsmetalen"
+		},
+		"poor metal": {
+			"singular": "Hoofdgroepmetaal",
+			"plural": "Hoofdgroepmetalen"
+		},
+		"metalloid": {
+			"singular": "Metalloïde",
+			"plural": "Metalloïden"
+		},
+		"other nonmetal": {
+			"singular": "Niet-metaal",
+			"plural": "Niet-metalen"
+		},
+		"halogen": {
+			"singular": "Halogeen",
+			"plural": "Halogenen"
+		},
+		"noble gas": {
+			"singular": "Edel gas",
+			"plural": "Edele gassen"
+		}
+	},
+	"element names": {
+		"H": "waterstof",
+		"B": "boor",
+		"C": "koolstof",
+		"N": "stikstof",
+		"O": "zuurstof",
+		"F": "fluor",
+		"P": "fosfor",
+		"S": "zwavel",
+		"Cl": "chloor",
+		"Cr": "chroom",
+		"Mn": "mangaan",
+		"Fe": "ijzer",
+		"Co": "kobalt",
+		"Ni": "nikkel",
+		"Cu": "koper",
+		"Zn": "zink",
+		"As": "arseen",
+		"Se": "seleen",
+		"Br": "broom",
+		"Ag": "zilver",
+		"Sb": "antimoon",
+		"Te": "telluur",
+		"I": "jodium",
+		"La": "lanthaan",
+		"Ta": "tantaal",
+		"W": "wolfraam",
+		"Pt": "platina",
+		"Au": "goud",
+		"Hg": "kwik",
+		"Pb": "lood",
+		"Bi": "bismut",
+		"At": "astaat"
+	}
+}

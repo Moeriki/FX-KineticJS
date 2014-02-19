@@ -24,7 +24,29 @@
             }
         })
 
-        require(['./widgetName/index']);
+
+        require(['kinetic','./widgetName/index'], function (Kinetic,w) {
+            var stage = new Kinetic.Stage({
+                container: 'container',
+                width: window.innerWidth,
+                height: window.innerHeight
+            });
+
+            var layer = new Kinetic.Layer({
+                width: stage.getWidth(),
+                height: stage.getHeight(),
+            });
+
+            stage.add(layer);
+
+            w.init({
+                x: 500,
+                y: 500
+            });
+            layer.add(w.node);
+            w.placed();
+            stage.draw();
+        });
     </script>
 
   </body>

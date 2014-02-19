@@ -1,0 +1,47 @@
+{
+	"metal types": {
+		"alkali metal": {
+			"singular": "Alkali Metal",
+			"plural": "Alkali Metals"
+		},
+		"alkaline earth metal": {
+			"singular": "Alkaline Earth Metal",
+			"plural": "Alkaline Earth Metals"
+		},
+		"lanthanide": {
+			"singular": "Lanthanide",
+			"plural": "Lanthanides"
+		},
+		"actinide": {
+			"singular": "Actinide",
+			"plural": "Actinides"
+		},
+		"transition metal": {
+			"singular": "Transition metal",
+			"plural": "Transition metals"
+		},
+		"poor metal": {
+			"singular": "Poor metal",
+			"plural": "Poor metals"
+		},
+		"metalloid": {
+			"singular": "Metalloid",
+			"plural": "Metalloids"
+		},
+		"other nonmetal": {
+			"singular": "Other nonmetal",
+			"plural": "Other nonmetals"
+		},
+		"halogen": {
+			"singular": "Halogen",
+			"plural": "Halogens"
+		},
+		"noble gas": {
+			"singular": "Noble gas",
+			"plural": "Noble gases"
+		}
+	},
+	"element names": {
+
+	}
+}
