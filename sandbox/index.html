@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+  <head>
+    <meta charset="utf-8">
+    <title>KineticJS sandbox</title>
+
+    <script src="./require.js"></script>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+
+    <!-- used for KineticJS container -->
+    <div id="container"></div>
+
+    <script type="text/javascript">
+        require.config({
+            paths: {
+                kinetic: '../dist/kinetic-dev',
+                lodash: 'lodash.custom',
+            },
+            shim: {
+                kinetic: {
+                    exports: 'Kinetic',
+                },
+            }
+        })
+
+        require(['./widgetName/index']);
+    </script>
+
+  </body>
+</html>
