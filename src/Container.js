@@ -111,21 +111,38 @@
             var retArr = [],
                 selectorArr = selector.replace(/ /g, '').split(','),
                 len = selectorArr.length,
-                n, i, sel, arr, node, children, clen;
+                n, i, sel, arr, node, children, grandChildren, clen,
+                classListStart, classList, classListCheck;
+
+            function nodeHasAnyClass(classList) {
+                return function(node) {
+                    return node.classList().containsAny(classList);
+                };
+            }
 
             for (n = 0; n < len; n++) {
                 sel = selectorArr[n];
 
+                classListStart = sel.indexOf('[');
+                if(classListStart !== -1) {
+                    classList = sel.substring(classListStart, sel.length - 2).split(',');
+                    classListCheck = nodeHasAnyClass(classList);
+                    sel = sel.substring(0, classListStart - 1);
+                }
+
                 // id selector
                 if(sel.charAt(0) === '#') {
                     node = this._getNodeById(sel.slice(1));
-                    if(node) {
+                    if(node && (!classListCheck || classListCheck(node))) {
                         retArr.push(node);
                     }
                 }
                 // name selector
                 else if(sel.charAt(0) === '.') {
-                    arr = this._getNodesByName(sel.slice(1));
+                    arr = this._getNodesByName(sel.slice(1), classList);
+                    if(classList) {
+                        arr = arr.filter(classListCheck);
+                    }
                     retArr = retArr.concat(arr);
                 }
                 // unrecognized selector, pass to children
@@ -133,7 +150,11 @@
                     children = this.getChildren();
                     clen = children.length;
                     for(i = 0; i < clen; i++) {
-                        retArr = retArr.concat(children[i]._get(sel));
+                        grandChildren = children[i]._get(sel);
+                        if(classList) {
+                            grandChildren = grandChildren.filter(classListCheck);
+                        }
+                        retArr = retArr.concat(grandChildren);
                     }
                 }
             }
@@ -294,7 +315,7 @@
                 context.beginPath();
                 context.rect(clipX, clipY, clipWidth, clipHeight);
                 context.clip();
-                context.reset();   
+                context.reset();
             }
 
             this.children.each(function(child) {

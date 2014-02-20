@@ -52,6 +52,46 @@
             return classes && classes.indexOf(name) !== -1;
         },
 
+        containsAny: function() {
+            var classes, checkList, len, i;
+
+            classes = this.node.attrs.classes;
+            if(!classes) {
+                return false;
+            }
+
+            checkList = Array.prototype.slice.call(arguments);
+            len = checkList.length;
+
+            for(i = 0; i < len; i++) {
+                if(classes.indexOf(checkList[i]) !== -1) {
+                    return true;
+                }
+            }
+
+            return false;
+        },
+
+        containsAll: function() {
+            var classes, checkList, len, i;
+
+            classes = this.node.attrs.classes;
+            if(!classes) {
+                return false;
+            }
+
+            checkList = Array.prototype.slice.call(arguments);
+            len = checkList.length;
+
+            for(i = 0; i < len; i++) {
+                if(classes.indexOf(checkList[i].trim()) === -1) {
+                    return false;
+                }
+            }
+
+            return true;
+        },
+
     };
 
     Kinetic.Util.addMethods(Kinetic.Node, {

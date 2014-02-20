@@ -51,6 +51,20 @@ suite('Node', function() {
             assert.equal(node.classList().contains('testClassName'), true);
         });
 
+        test('#containsAny');
+
+        test('#containsAll');
+
+    });
+
+});
+
+suite('Container', function() {
+
+    suite('find', function() {
+
+        test('findByClass');
+
     });
 
 });
