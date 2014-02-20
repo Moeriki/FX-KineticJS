@@ -7,7 +7,7 @@
 
         insert: function(node, zIndex) {
             node.moveTo(this);
-            node.setZIndex(zIndex);
+            node.setZIndex(zIndex || 0);
         },
 
     });
@@ -17,21 +17,25 @@
     Kinetic.Util.addMethods(Kinetic.Node, {
 
         isFirst: function() {
-            return this.getZIndex() === 0;
+            return this.index === 0;
         },
 
         isLast: function() {
-            return this.getZIndex() === this.parent.children.length - 1;
+            return this.index === this.parent.children.length - 1;
+        },
+
+        isOrphan: function() {
+            return !this.parent;
         },
 
         moveBefore: function(node) {
-            this.moveTo(node.getParent());
-            this.setZIndex(node.getZIndex());
+            this.moveTo(node.parent);
+            this.setZIndex(node.index);
         },
 
         moveAfter: function(node) {
-            this.moveTo(node.getParent());
-            this.setZIndex(node.getZIndex() + 1);
+            this.moveTo(node.parent);
+            this.setZIndex(node.index + 1);
         },
 
         /**
@@ -41,7 +45,7 @@
         * @returns {Kinetic.Node}
         */
         next: function() {
-            return this.parent.children[this.getZIndex() + 1];
+            return this.parent.children[this.index + 1];
         },
 
         /**
@@ -51,7 +55,7 @@
         * @returns {Kinetic.Node}
         */
         previous: function() {
-            return this.parent.children[this.getZIndex() - 1];
+            return this.parent.children[this.index - 1];
         },
 
         /**
