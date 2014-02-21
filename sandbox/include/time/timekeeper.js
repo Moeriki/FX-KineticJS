@@ -2,7 +2,7 @@
  * @author: Ruben Tytgat
  */
 
-define(['include/patterns/observer'], function(Observer) {
+define(['lodash','include/patterns/observer'], function (_,Observer) {
     'use strict';
 
     var ProtoTimeKeeper = {
@@ -54,11 +54,47 @@ define(['include/patterns/observer'], function(Observer) {
 
     Observer.mixinSubject(ProtoTimeKeeper);
 
+
+    var ProtoRemainingTimeKeeper = Object.create(ProtoTimeKeeper);
+    _.mixin(ProtoRemainingTimeKeeper, {
+        _init: function () {
+            this._targetTime = new Date()
+            ProtoTimeKeeper._init.apply(this);
+        },
+        sync: function () {
+            // When resyncing, set the remaining seconds back
+            var rem = this.remainingSeconds
+            ProtoTimeKeeper.sync.apply(this);
+            this.remainingSeconds = rem
+        }
+    });
+
+    Object.defineProperty(ProtoRemainingTimeKeeper, 'remainingSeconds', {
+        get: function () {
+            var r = this._targetTime.getTime() - this.time.getTime();
+            return r < 0 ? 0 : Math.round(r / 1000);
+        },
+        set: function (s) {
+            this._targetTime = new Date(this.time.getTime() + s * 1000);
+            this.notifyObservers(false);
+        }
+    });
+
+
     return {
-        create: function () {
-            var t = Object.create(ProtoTimeKeeper);
-            t._init();
-            return t;
+        TimeKeeper: {
+            create: function () {
+                var t = Object.create(ProtoTimeKeeper);
+                t._init();
+                return t;
+            }
+        },
+        RemainingTimeKeeper: {
+            create: function () {
+                var t = Object.create(ProtoRemainingTimeKeeper);
+                t._init();
+                return t;
+            }
         }
     }
 });

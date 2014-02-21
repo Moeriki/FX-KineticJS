@@ -57,13 +57,14 @@
             w.placed();
             stage.draw();
 
-            var t = TimeKeeper.create();
+            var t = TimeKeeper.RemainingTimeKeeper.create();
+            t.remainingSeconds = 120;
             t.registerObserver(function () {
                 var p = GeoMath.Vector.create(Math.cos(t.time.getSeconds() / 60 * GeoMath.TAU),Math.sin(t.time.getSeconds() / 60 * GeoMath.TAU)).mulScalar(200);
                 var middle = GeoMath.Vector.create({x:500,y:500});
                 var result = middle.add(p);
                 xc.setText(p.x);
-                yc.setText(p.y);
+                yc.setText(t.remainingSeconds);
                 w.node.setPosition(result);
                 stage.draw();
             });
