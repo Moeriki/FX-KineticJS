@@ -2,11 +2,11 @@
  * @author: Ruben Tytgat
  */
 
-define(['widgets/include/patterns/observer','class'], function(Observer,Class) {
+define(['include/patterns/observer'], function(Observer) {
     'use strict';
 
-    var TimeKeeper = Class.extend({
-        init: function() {
+    var ProtoTimeKeeper = {
+        _init: function() {
             this._isSynced = false;
             this._time = new Date();
             this._interval = null;
@@ -37,9 +37,9 @@ define(['widgets/include/patterns/observer','class'], function(Observer,Class) {
         dispose: function() {
             this.unsync();
         }
-    });
+    };
     
-    Object.defineProperty(TimeKeeper.prototype, 'time', {
+    Object.defineProperty(ProtoTimeKeeper, 'time', {
         get: function() {
             if(this._isSynced) {
                 this._time = new Date();
@@ -52,7 +52,13 @@ define(['widgets/include/patterns/observer','class'], function(Observer,Class) {
         }
     });
 
-    Observer.mixinSubject(TimeKeeper.prototype);
+    Observer.mixinSubject(ProtoTimeKeeper);
 
-    return TimeKeeper;
+    return {
+        create: function () {
+            var t = Object.create(ProtoTimeKeeper);
+            t._init();
+            return t;
+        }
+    }
 });

@@ -1,6 +1,6 @@
 'use strict';
 
-define(['lodash', 'kinetic','include/components/button'], function(_, Kinetic, Button) {
+define(['lodash', 'kinetic','include/components/button'], function (_, Kinetic, Button) {
 
     function initCircle() {
         var circle = new Kinetic.Circle({
@@ -9,12 +9,7 @@ define(['lodash', 'kinetic','include/components/button'], function(_, Kinetic, B
         });
         var circleButton = Button.wrapButton(circle,400,400,{
             x: 100,
-            y: 100,
-            draggable: true,
-            dragBoundFunc: function(pos) {
-                pos.x = 100;
-                return pos;
-            }
+            y: 100
         });
 
         circle.on('click', function () {
@@ -25,21 +20,27 @@ define(['lodash', 'kinetic','include/components/button'], function(_, Kinetic, B
         return circleButton;
     }
 
+    function placed() {
 
+    }
 
+    function destroy() {
 
+    }
 
+    var ProtoWidget = {
+        placed: placed,
+        destroy: destroy
+    };
+
+    function create(attrs) {
+        var w = Object.create(ProtoWidget);
+        w.node = new Kinetic.Group(attrs);
+        w.node.add(initCircle());
+        return w;
+    }
 
     return {
-        init: function (attrs) {
-            this.node = new Kinetic.Group(attrs);
-            this.node.add(initCircle());
-        },
-        placed: function () {
-
-        },
-        destroy: function () {
-
-        }
-    }
+        create: create
+    };
 });

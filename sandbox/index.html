@@ -25,7 +25,7 @@
         })
 
 
-        require(['kinetic','./widgetName/index'], function (Kinetic,w) {
+        require(['kinetic','./widgetName/index','include/math/geometry','include/time/timekeeper'], function (Kinetic,Widget,GeoMath,TimeKeeper) {
             var stage = new Kinetic.Stage({
                 container: 'container',
                 width: window.innerWidth,
@@ -39,13 +39,34 @@
 
             stage.add(layer);
 
-            w.init({
+            var xc = new Kinetic.Text({
+                fill: 'black'
+            });
+            var yc = new Kinetic.Text({
+                fill: 'black',
+                y: 20
+            });
+
+            var w = Widget.create({
                 x: 500,
                 y: 500
             });
+            layer.add(xc);
+            layer.add(yc);
             layer.add(w.node);
             w.placed();
             stage.draw();
+
+            var t = TimeKeeper.create();
+            t.registerObserver(function () {
+                var p = GeoMath.Vector.create(Math.cos(t.time.getSeconds() / 60 * GeoMath.TAU),Math.sin(t.time.getSeconds() / 60 * GeoMath.TAU)).mulScalar(200);
+                var middle = GeoMath.Vector.create({x:500,y:500});
+                var result = middle.add(p);
+                xc.setText(p.x);
+                yc.setText(p.y);
+                w.node.setPosition(result);
+                stage.draw();
+            });
         });
     </script>
 
