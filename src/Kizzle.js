@@ -14,6 +14,8 @@
             return new Kinetic.Kizzle(selector);
         }
 
+        this.kizzle = true;
+
         if(typeof selector !== 'string') {
             throw new Error('Kizzle selector must be a string');
         }
