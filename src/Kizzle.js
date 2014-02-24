@@ -140,6 +140,14 @@
             return this.matchAttrs(node);
         },
 
+        matchAll: function(node) {
+            return this.match(node, {
+                id: true,
+                name: true,
+                nodeType: true,
+            });
+        },
+
         filter: function(nodes) {
             var newArr = [],
                 len, i, node;
@@ -174,6 +182,14 @@
             }
 
             return nodes;
+        },
+
+        getChildren: function(selector) {
+            if(selector) {
+                return Kinetic.Kizzle(selector).filter(this.children);
+            } else {
+                return this.children;
+            }
         },
 
         find: function(selector) {
@@ -217,6 +233,21 @@
             return nodes;
         },
 
+        getClosest: function(selector) {
+            var kizz, closest;
+
+            kizz = Kinetic.Kizzle(selector);
+            closest = this;
+
+            while(closest) {
+                if(kizz.matchAll(closest)) {
+                    break;
+                }
+                closest = closest.parent;
+            }
+
+            return closest;
+        }
     });
 
     Kinetic.Util.addMethods(Kinetic.Shape, {
