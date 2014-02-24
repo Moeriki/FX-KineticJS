@@ -33,6 +33,26 @@
         }
     };
     /**
+     */
+    Kinetic.Collection.filter = function(filterOrSelector) {
+        var len, n, nodes;
+
+        if(typeof filter !== 'function') {
+            return Kinetic.Kizzle(filterOrSelector).filter(this);
+        }
+
+        nodes = [];
+        len = this.length;
+
+        for(n = 0; n < len; n++) {
+            if(filterOrSelector(this[n], n)) {
+                nodes.push(this[n]);
+            }
+        }
+
+        return nodes;
+    };
+    /**
      * convert collection into an array
      * @method
      * @memberof Kinetic.Collection.prototype
