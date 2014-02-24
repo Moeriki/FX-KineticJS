@@ -37,6 +37,7 @@ module.exports = function(grunt) {
         'src/DragAndDrop.js',
         'src/Container.js',
         'src/Shape.js',
+        'src/Kizzle.js',//must be after Node, Shape and Container, and before anything that extends either of those
         'src/Stage.js',
         'src/Layer.js',
         'src/Group.js',
