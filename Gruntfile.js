@@ -28,6 +28,7 @@ module.exports = function(grunt) {
     'src/filters/Kaleidoscope.js',
 
     // core
+
     'src/Animation.js',
     'src/Tween.js',
     'src/DragAndDrop.js',
@@ -35,6 +36,7 @@ module.exports = function(grunt) {
     'src/Shape.js',
     'src/Stage.js',
     'src/Layer.js',
+    'src/Kizzle.js',//must be after Node, Shape and Container, and before anything that extends either of those
     'src/Group.js',
 
     // shapes
