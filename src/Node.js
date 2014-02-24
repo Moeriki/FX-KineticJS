@@ -1004,6 +1004,27 @@
             return this.parent;
         },
         /**
+         * Get closest node matching a @{link Kinetic.Kizzle} selector going up the hierarchy starting from the current node.
+         * @method
+         * @memberf Kinetic.Node.prototype
+         * @returns {Kinetic.Node}
+         */
+        getClosest: function(selector) {
+            var kizz, closest;
+
+            kizz = Kinetic.Kizzle(selector);
+            closest = this;
+
+            while(closest) {
+                if(kizz.matchAll(closest)) {
+                    break;
+                }
+                closest = closest.parent;
+            }
+
+            return closest;
+        },
+        /**
          * get layer ancestor
          * @method
          * @memberof Kinetic.Node.prototype
