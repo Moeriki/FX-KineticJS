@@ -5,10 +5,6 @@
 (function() {
     'use strict';
 
-    // function concatNodes(nodesArr1, nodesArr2) {
-    //     Array.prototype.push.apply(nodesArr1, nodesArr2);
-    // }
-
     Kinetic.Kizzle = function(selector) {
         if(selector.kizzle) {
             return selector;
