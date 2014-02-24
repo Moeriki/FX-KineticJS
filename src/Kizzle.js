@@ -233,21 +233,6 @@
             return nodes;
         },
 
-        getClosest: function(selector) {
-            var kizz, closest;
-
-            kizz = Kinetic.Kizzle(selector);
-            closest = this;
-
-            while(closest) {
-                if(kizz.matchAll(closest)) {
-                    break;
-                }
-                closest = closest.parent;
-            }
-
-            return closest;
-        }
     });
 
     Kinetic.Util.addMethods(Kinetic.Shape, {
