@@ -8,6 +8,9 @@ module.exports = function(grunt) {
     'src/Factory.js',
     'src/Node.js',
 
+    // core plugins
+    'src/plugins/fx-extensions.js',
+
     // filters
     'src/filters/Grayscale.js',
     'src/filters/Brighten.js',
@@ -26,8 +29,6 @@ module.exports = function(grunt) {
     'src/filters/Sepia.js',
     'src/filters/Solarize.js',
     'src/filters/Kaleidoscope.js',
-
-    // core
 
     'src/Animation.js',
     'src/Tween.js',
@@ -68,7 +69,7 @@ module.exports = function(grunt) {
     'src/plugins/TextPath.js',
     'src/plugins/RegularPolygon.js',
     'src/plugins/Star.js',
-    'src/plugins/Label.js'
+    'src/plugins/Label.js',
   ];
 
   // Project configuration.
