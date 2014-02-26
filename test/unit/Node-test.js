@@ -222,7 +222,7 @@ suite('Node', function() {
         stage.add(layer);
 
         // listening cache
-        
+
         // prime the cache
         circle.isListening();
 
@@ -819,7 +819,7 @@ suite('Node', function() {
                         156, 109, 70, 98,
                         229, 109, 60, 98,
                         287, 109, 41, 98
-                    ]              
+                    ]
                 },
                 frameRate: 10,
                 draggable: true,
@@ -2748,10 +2748,10 @@ suite('Node', function() {
     assert.equal(circle.opacity(), 0.5);
 
     circle.name('foo');
-    assert.equal(circle.name(), 'foo'); 
+    assert.equal(circle.name(), 'foo');
 
     circle.id('bar');
-    assert.equal(circle.id(), 'bar'); 
+    assert.equal(circle.id(), 'bar');
 
     circle.rotation(2);
     assert.equal(circle.rotation(), 2);
@@ -2787,19 +2787,19 @@ suite('Node', function() {
     assert.equal(circle.offsetY(), 8);
 
     circle.width(23);
-    assert.equal(circle.width(), 23); 
+    assert.equal(circle.width(), 23);
 
     circle.height(11);
-    assert.equal(circle.height(), 11); 
+    assert.equal(circle.height(), 11);
 
     circle.listening(false);
     assert.equal(circle.listening(), false);
 
     circle.visible(false);
-    assert.equal(circle.visible(), false); 
+    assert.equal(circle.visible(), false);
 
     circle.transformsEnabled(false);
-    assert.equal(circle.transformsEnabled(), false);  
+    assert.equal(circle.transformsEnabled(), false);
 
     circle.position({x: 6, y: 8});
     assert.equal(circle.position().x, 6);
@@ -2850,7 +2850,7 @@ suite('Node', function() {
 
 
     //console.log(layer.getContext().getTrace());
-                                                 
+
     assert.equal(layer.getContext().getTrace(), 'clearRect(0,0,578,200);save();transform(1,0,0,1,74,74);beginPath();arc(0,0,70,0,6.283,false);closePath();fillStyle=green;fill();lineWidth=4;strokeStyle=black;stroke();restore();clearRect(0,0,578,200);save();transform(1,0,0,1,0,0);drawImage([object HTMLCanvasElement],0,0);restore();');
 
     //console.log(circle._cache.canvas.scene.getContext().getTrace());
@@ -3230,8 +3230,6 @@ suite('Node', function() {
           anchor: 0.5
       });
       rect1.scale({x: 1.5, y: 1.5});
-      rect1.placeAnchor();
-      rect2.placeAnchor();
 
       rect0.on('click', function(){
         rect2.rotate(10);
@@ -3244,7 +3242,7 @@ suite('Node', function() {
       layer.add(rect0);
       layer.add(rect1);
       layer.add(rect2);
-      
+
       stage.add(layer);
   });
 });
