@@ -1995,8 +1995,38 @@
     Kinetic.Factory.addComponentsGetterSetter(Kinetic.Node, 'anchor', ['x', 'y']);
     Kinetic.Factory.addGetter(Kinetic.Node, 'anchorX', 0);
     Kinetic.Factory.addGetter(Kinetic.Node, 'anchorY', 0);
+
     Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node, 'anchorX');
+    /**
+     * get/set anchor x
+     * @name anchorX
+     * @param {Number} x
+     * @method
+     * @memberof Kinetic.Node.prototype
+     * @returns {Number}
+     * @example
+     * // get anchor x<br>
+     * var anchorX = node.anchorX();<br><br>
+     *
+     * // set anchor x<br>
+     * node.anchorX(0.5);
+     */
+
     Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node, 'anchorY');
+    /**
+     * get/set anchor y
+     * @name anchorX
+     * @param {Number} y
+     * @method
+     * @memberof Kinetic.Node.prototype
+     * @returns {Number}
+     * @example
+     * // get anchor x<br>
+     * var anchorX = node.anchorX();<br><br>
+     *
+     * // set anchor x<br>
+     * node.anchorX(0.5);
+     */
 
     /**
      * get/set anchor
