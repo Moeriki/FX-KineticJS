@@ -1311,6 +1311,7 @@
         },
         setWidth: function(newWidth) {
             var anchorX = this.getAnchorX();
+
             if(anchorX) {
                 this._setAttr('offsetX',
                     this.getOffsetX() +
@@ -1318,10 +1319,12 @@
                         this.getScaleX() * anchorX
                 );
             }
+
             this._setAttr('width', newWidth);
         },
         setHeight: function(newHeight) {
             var anchorY = this.getAnchorX();
+
             if(anchorY) {
                 this._setAttr('offsetY',
                     this.getOffsetY() +
@@ -1329,20 +1332,25 @@
                         this.getScaleY() * anchorY
                 );
             }
+
             this._setAttr('height', newHeight);
         },
         setOffsetX: function(newOffsetX) {
             var anchorX = this.getAnchorX();
+
             if(anchorX) {
                 newOffsetX += anchorX * this.getWidth();
             }
+
             this._setAttr('offsetX', newOffsetX);
         },
         setOffsetY: function(newOffsetY) {
             var anchorY = this.getAnchorY();
+
             if(anchorY) {
                 newOffsetY += anchorY * this.getHeight();
             }
+
             this._setAttr('offsetY', newOffsetY);
         },
         /**
@@ -1352,17 +1360,17 @@
          * @returns {Node}
          */
         setAnchorX: function(newAnchorX) {
-            var scaleX, scaledWidth, anchorOffsetX, newAnchorOffsetX, offsetXDiff;
+            var scaleX, width, offsetDiff;
 
             scaleX = this.getScaleX();
-            scaledWidth = this.getWidth() * scaleX;
+            width = this.getWidth();
 
-            anchorOffsetX = this.getAnchorX() * scaledWidth;
-            newAnchorOffsetX = newAnchorX * scaledWidth;
-            offsetXDiff = -anchorOffsetX +newAnchorOffsetX;
+            if(width) {
+                offsetDiff = (-this.getAnchorX() +newAnchorX) * width * scaleX;
+                this._setAttr('x', this.getX() + offsetDiff * scaleX);
+                this._setAttr('offsetX', this.getOffsetX() + offsetDiff);
+            }
 
-            this._setAttr('x', this.getX() + offsetXDiff * scaleX);
-            this._setAttr('offsetX', this.getOffsetX() + offsetXDiff);
             this._setAttr('anchorX', newAnchorX);
 
             return this;
@@ -1374,17 +1382,17 @@
          * @returns {Node}
          */
         setAnchorY: function(newAnchorY) {
-            var scaleY, scaledHeight, anchorOffsetY, newAnchorOffsetY, offsetYDiff;
+            var scaleY, height, offsetDiff;
 
             scaleY = this.getScaleX();
-            scaledHeight = this.getWidth() * scaleY;
+            height = this.getHeight();
 
-            anchorOffsetY = this.getAnchorY() * scaledHeight;
-            newAnchorOffsetY = newAnchorY * scaledHeight;
-            offsetYDiff = -anchorOffsetY +newAnchorOffsetY;
+            if(height) {
+                offsetDiff = (-this.getAnchorY() +newAnchorY) * height * scaleY;
+                this._setAttr('y', this.getY() + offsetDiff * scaleY);
+                this._setAttr('offsetY', this.getOffsetY() + offsetDiff);
+            }
 
-            this._setAttr('y', this.getY() + scaleY * offsetYDiff);
-            this._setAttr('offsetY', this.getOffsetY() + offsetYDiff);
             this._setAttr('anchorY', newAnchorY);
 
             return this;
