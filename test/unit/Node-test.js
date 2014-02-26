@@ -3316,8 +3316,6 @@ suite('Node', function() {
           anchor: 0.5
       });
       rect1.scale({x: 1.5, y: 1.5});
-      rect1.placeAnchor();
-      rect2.placeAnchor();
 
       rect0.on('click', function(){
         rect2.rotate(10);

@@ -1301,24 +1301,6 @@
             };
         },
         /**
-         * get width
-         * @method
-         * @memberof Kinetic.Node.prototype
-         * @returns {Integer}
-         */
-        getWidth: function() {
-            return this.attrs.width || 0;
-        },
-        /**
-         * get height
-         * @method
-         * @memberof Kinetic.Node.prototype
-         * @returns {Integer}
-         */
-        getHeight: function() {
-            return this.attrs.height || 0;
-        },
-        /**
          * get class name, which may return Stage, Layer, Group, or shape class names like Rect, Circle, Text, etc.
          * @method
          * @memberof Kinetic.Node.prototype
@@ -1327,24 +1309,84 @@
         getClassName: function() {
             return this.className || this.nodeType;
         },
+        setWidth: function(newWidth) {
+            var anchorX = this.getAnchorX();
+            if(anchorX) {
+                this._setAttr('offsetX',
+                    this.getOffsetX() +
+                        (-this.getWidth() +newWidth) *
+                        this.getScaleX() * anchorX
+                );
+            }
+            this._setAttr('width', newWidth);
+        },
+        setHeight: function(newHeight) {
+            var anchorY = this.getAnchorX();
+            if(anchorY) {
+                this._setAttr('offsetY',
+                    this.getOffsetY() +
+                        (-this.getHeight() +newHeight) *
+                        this.getScaleY() * anchorY
+                );
+            }
+            this._setAttr('height', newHeight);
+        },
+        setOffsetX: function(newOffsetX) {
+            var anchorX = this.getAnchorX();
+            if(anchorX) {
+                newOffsetX += anchorX * this.getWidth();
+            }
+            this._setAttr('offsetX', newOffsetX);
+        },
+        setOffsetY: function(newOffsetY) {
+            var anchorY = this.getAnchorY();
+            if(anchorY) {
+                newOffsetY += anchorY * this.getHeight();
+            }
+            this._setAttr('offsetY', newOffsetY);
+        },
         /**
-         * place anchor for rotation
+         * Setting anchorX will update your X and offsetX without visually moving your node.
          * @method
          * @memberof Kinetic.Node.prototype
          * @returns {Node}
          */
-        placeAnchor: function(){
-            var x = this.x(),
-                y = this.y(),
-                sx = this.scaleX(),
-                sy = this.scaleY(),
-                w = this.width(),
-                h = this.height(),
-                a = this.anchor();
-            this._setAttr('x', x + w * sx * a);
-            this._setAttr('y', y + h * sy * a);
-            this._setAttr('offsetX', w * a);
-            this._setAttr('offsetY', h * a);
+        setAnchorX: function(newAnchorX) {
+            var scaleX, scaledWidth, anchorOffsetX, newAnchorOffsetX, offsetXDiff;
+
+            scaleX = this.getScaleX();
+            scaledWidth = this.getWidth() * scaleX;
+
+            anchorOffsetX = this.getAnchorX() * scaledWidth;
+            newAnchorOffsetX = newAnchorX * scaledWidth;
+            offsetXDiff = -anchorOffsetX +newAnchorOffsetX;
+
+            this._setAttr('x', this.getX() + offsetXDiff * scaleX);
+            this._setAttr('offsetX', this.getOffsetX() + offsetXDiff);
+            this._setAttr('anchorX', newAnchorX);
+
+            return this;
+        },
+        /**
+         * Setting anchorY will update your Y and offsetY without visually moving your node.
+         * @method
+         * @memberof Kinetic.Node.prototype
+         * @returns {Node}
+         */
+        setAnchorY: function(newAnchorY) {
+            var scaleY, scaledHeight, anchorOffsetY, newAnchorOffsetY, offsetYDiff;
+
+            scaleY = this.getScaleX();
+            scaledHeight = this.getWidth() * scaleY;
+
+            anchorOffsetY = this.getAnchorY() * scaledHeight;
+            newAnchorOffsetY = newAnchorY * scaledHeight;
+            offsetYDiff = -anchorOffsetY +newAnchorOffsetY;
+
+            this._setAttr('y', this.getY() + scaleY * offsetYDiff);
+            this._setAttr('offsetY', this.getOffsetY() + offsetYDiff);
+            this._setAttr('anchorY', newAnchorY);
+
             return this;
         },
         /**
@@ -1850,7 +1892,7 @@
      * node.offsetY(3);
      */
 
-    Kinetic.Factory.addSetter(Kinetic.Node, 'width', 0);
+    Kinetic.Factory.addGetter(Kinetic.Node, 'width', 0);
     Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node, 'width');
     /**
      * get/set width
@@ -1867,7 +1909,7 @@
      * node.width(100);
      */
 
-    Kinetic.Factory.addSetter(Kinetic.Node, 'height', 0);
+    Kinetic.Factory.addGetter(Kinetic.Node, 'height', 0);
     Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node, 'height');
     /**
      * get/set height
@@ -1991,7 +2033,11 @@
      * node.locked(true);
      */
 
-    Kinetic.Factory.addGetterSetter(Kinetic.Node, 'anchor', 0);//, undefined, function(){this.placeAnchor();});
+    Kinetic.Factory.addComponentsGetterSetter(Kinetic.Node, 'anchor', ['x', 'y']);
+    Kinetic.Factory.addGetter(Kinetic.Node, 'anchorX', 0);
+    Kinetic.Factory.addGetter(Kinetic.Node, 'anchorY', 0);
+    Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node, 'anchorX');
+    Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node, 'anchorY');
 
     /**
      * get/set anchor
