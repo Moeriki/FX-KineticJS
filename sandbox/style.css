@@ -1,4 +1,6 @@
 html, body {
-    margin: 0;
-    padding: 0;
-}
+  margin: 0;
+  padding: 0; }
+
+table.widgets-charts-datatable > tbody > tr > td:first-child, table.widgets-charts-datatable > tbody > tr > td:nth-child(3) {
+  text-align: right; }

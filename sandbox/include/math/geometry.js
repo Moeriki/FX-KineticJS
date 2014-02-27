@@ -14,135 +14,145 @@ define([
     /*
      Vector math in an Euclidian vector space
     */
-    function createVector() {
-        var coords, dim;
 
-        function init(args) {
+    var ProtoVector = {
+        init: function (args) {
             if(args.length == 0)
                 throw "Vector must at least have dimension 1";
             
             var first = args[0];
 
             if(_.isArray(first))
-                coords = first.slice();
+                this.coords = first.slice();
             else if(_.isObject(first))
-                loadCoordsFromObject(first);
+                this._loadCoordsFromObject(first);
             else if(_.isNumber(first))
-                coords = args;
+                this.coords = args;
 
-            dim = coords.length;
-        }
+            this.dim = this.coords.length;
+        },
 
-        function loadCoordsFromObject(obj) {
+        _loadCoordsFromObject: function (obj) {
             if(obj.z != null)
-                coords = [obj.x,obj.y,obj.z];
+                this.coords = [obj.x,obj.y,obj.z];
             else
-                coords = [obj.x,obj.y];
-        }
+                this.coords = [obj.x,obj.y];
+        },
 
-        function dup() {
-            return createVector(this);
-        }
+        dup: function () {
+            return Vector.create(this);
+        },
 
-        function add(other) {
-            return createVector(_.range(0,dim).map(function (i) {
-                return coords[i] + other.coords[i];
+        add: function (other) {
+            return Vector.create(_.range(0,this.dim).map(function (i) {
+                return this.coords[i] + other.coords[i];
             }));
-        }
+        },
 
-        function addScalar(scal) {
-            return createVector(_(coords).map(function (coord) {
+        addScalar: function (scal) {
+            return Vector.create(_(this.coords).map(function (coord) {
                 return scal + coord;
             }).value());
-        }
+        },
 
-        function mulScalar(scal) {
-            return createVector(_(coords).map(function (coord) {
+        mulScalar: function (scal) {
+            return Vector.create(_(this.coords).map(function (coord) {
                 return scal * coord;
             }).value());
-        }
+        },
 
-        function mulInner(other) {
-            if(dim != other.dim)
+        mulInner: function (other) {
+            if(this.dim != other.dim)
                 throw "Cannot apply inner product on vectors of different dimensions!";
 
-            return BasicMath.sum(_.range(0,dim).map(function (i) {
-                return coords[i] * other.coords[i];
+            return BasicMath.sum(_.range(0,this.dim).map(function (i) {
+                return this.coords[i] * other.coords[i];
             }));
-        }
+        },
 
-        function equals(other) {
-            if(dim != other.dim)
+        equals: function (other) {
+            if(this.dim != other.dim)
                 return false;
 
-            return _(coords).every(function (coord, i) {
+            return _(this.coords).every(function (coord, i) {
                 return coord == other.coords[i];
             });
-        }
+        },
 
         // Derived operations
-        function sub(other) {
-            return add(other.neg);
-        }
+        sub: function (other) {
+            return this.add(other.neg);
+        },
 
-        function subScalar(scal) {
-            return addScalar(-scal);
-        }
+        subScalar: function (scal) {
+            return this.addScalar(-scal);
+        },
 
-        function divScalar(scal) {
-            return mulScalar(1/scal);
-        }
+        divScalar: function (scal) {
+            return this.mulScalar(1/scal);
+        },
 
-        function scalarProjection(other) {
-            return mulInner(other.unit);
-        }
+        scalarProjection: function (other) {
+            return this.mulInner(other.unit);
+        },
 
-        function projection(other) {
+        projection: function (other) {
             return other.unit.mulScalar(scalarProjection(other));
-        }
+        },
 
-        function rejection(other) {
-            return sub(projection(other));
-        }
+        rejection: function (other) {
+            return this.sub(this.projection(other));
+        },
 
-        function distance(other) {
-            return sub(other).norm;
-        }
+        distance: function (other) {
+            return this.sub(other).norm;
+        },
 
-        init(Array.prototype.slice.apply(arguments));
+        get neg() {
+            return this.mulScalar(-1);
+        },
 
-        return {
-            get coords () { return coords; },
-            get dim () { return dim; },
-            dup: dup,
-            add: add,
-            addScalar: addScalar,
-            mulScalar: mulScalar,
-            mulInner: mulInner,
-            equals: equals,
-            sub: sub,
-            subScalar: subScalar,
-            divScalar: divScalar,
-            scalarProjection: scalarProjection,
-            projection: projection,
-            rejection: rejection,
-            distance: distance,
-            get neg () { return mulScalar(-1); },
-            get norm () { return Math.sqrt(mulInner(this)); },
-            get unit () { return divScalar(this.norm); },
-            get x () { return coords[0]; },
-            set x (v) { coords[0] = v; },
-            get y () { return coords[1]; },
-            set y (v) { coords[1] = v; },
-            get z () { return coords[2]; },
-            set z (v) { coords[2] = v; }
-        };
-    }
+        get norm () { 
+            return Math.sqrt(this.mulInner(this));
+        },
+
+        get unit () { 
+            return this.divScalar(this.norm);
+        },
+
+        get x () { 
+            return this.coords[0];
+        },
+
+        set x (v) { 
+            this.coords[0] = v;
+        },
+
+        get y () { 
+            return this.coords[1];
+        },
+
+        set y (v) { 
+            this.coords[1] = v;
+        },
+
+        get z () { 
+            return this.coords[2];
+        },
+
+        set z (v) { 
+            this.coords[2] = v;
+        } 
+    };
 
     var Vector = {
-        create: createVector,
+        create: function () {
+            var v = Object.create(ProtoVector);
+            v.init(Array.prototype.slice.apply(arguments));
+            return v;
+        },
         origin: function (dim) {
-            return createVector(_.range(0,dim).map(function () {
+            return Vector.create(_.range(0,dim).map(function () {
                 return 0;
             }));
         }

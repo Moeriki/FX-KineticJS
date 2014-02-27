@@ -4,6 +4,8 @@
     <title>KineticJS sandbox</title>
 
     <script src="./require.js"></script>
+
+    <script src="./include/math/testobjs.js"></script>
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
@@ -15,6 +17,7 @@
         require.config({
             paths: {
                 kinetic: '../dist/kinetic-dev',
+                jquery: 'jquery-2.1.0',
                 lodash: 'lodash.custom',
             },
             shim: {
@@ -25,7 +28,7 @@
         })
 
 
-        require(['kinetic','./widgetName/index','include/math/geometry','include/time/timekeeper'], function (Kinetic,Widget,GeoMath,TimeKeeper) {
+        require(['kinetic','./charts/index'], function (Kinetic,Widget,GeoMath,TimeKeeper) {
             var stage = new Kinetic.Stage({
                 container: 'container',
                 width: window.innerWidth,
@@ -57,17 +60,6 @@
             w.placed();
             stage.draw();
 
-            var t = TimeKeeper.RemainingTimeKeeper.create();
-            t.remainingSeconds = 120;
-            t.registerObserver(function () {
-                var p = GeoMath.Vector.create(Math.cos(t.time.getSeconds() / 60 * GeoMath.TAU),Math.sin(t.time.getSeconds() / 60 * GeoMath.TAU)).mulScalar(200);
-                var middle = GeoMath.Vector.create({x:500,y:500});
-                var result = middle.add(p);
-                xc.setText(p.x);
-                yc.setText(t.remainingSeconds);
-                w.node.setPosition(result);
-                stage.draw();
-            });
         });
     </script>
 

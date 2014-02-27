@@ -2,8 +2,9 @@ define([,
 	'kinetic',
     'lodash',
 	'widgets/include/math/misc',
-    'widgets/include/components/button'
-], function (Kinetic, $, MiscMath, Button) {
+    'widgets/include/components/button',
+    'include/code'
+], function (Kinetic, $, MiscMath, Button, Code) {
     var barHeight = 44;
     var toggleWidth = 50;
 
@@ -24,7 +25,7 @@ define([,
     }
 
     ControlBar.prototype._initNode = function (attrs) {
-        this.node = new Kinetic.Group(_.mixin(attrs, {
+        this.node = new Kinetic.Group(Code.mixin(attrs, {
             scaleX: 0.7 / this.widget.node.getScaleX(),
             scaleY: 0.7 / this.widget.node.getScaleY()
         }));

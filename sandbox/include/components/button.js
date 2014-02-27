@@ -1,11 +1,12 @@
 define([
     'kinetic',
-    'lodash'
-], function (Kinetic, _) {
+    'lodash',
+    'include/code'
+], function (Kinetic, _, Code) {
 
     function wrapButton(elem,w,h,attrs) {
         // Extend our group with the button class. This prevent collisions with the select tool.
-        grp = new Kinetic.Group(_.mixin(attrs, {
+        grp = new Kinetic.Group(Code.mixin(attrs, {
             classes: ['button']
         }));
         hitDetector = new Kinetic.Rect({

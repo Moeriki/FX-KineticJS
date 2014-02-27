@@ -11,6 +11,7 @@ module.exports = function(grunt) {
         // core plugins
         'src/plugins/fx-extensions.js',
         'src/plugins/fx-classes.js',
+        'src/plugins/fx-widgets.js',
 
         // filters
         // 'src/filters/Grayscale.js',
@@ -33,7 +34,7 @@ module.exports = function(grunt) {
 
         // core
         'src/Animation.js',
-        // 'src/Tween.js',
+        'src/Tween.js',
         'src/DragAndDrop.js',
         'src/Container.js',
         'src/Shape.js',
@@ -211,6 +212,17 @@ module.exports = function(grunt) {
                 src: 'dist/kinetic-v<%= pkg.version %>.js',
                 dest: 'kinetic.js',
             }
+        },
+        sass: {
+            dist: {
+                files: [{
+                    expand: true,
+                    cwd: 'sandbox',
+                    src: ['*.scss'],
+                    dest: 'sandbox',
+                    ext: '.css'
+                }]
+            }
         }
     };
 
@@ -232,6 +244,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-sass');
 
     // Tasks
     grunt.registerTask('dev', ['clean', 'concat:dev', 'replace:dev']);

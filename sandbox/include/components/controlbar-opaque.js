@@ -2,8 +2,9 @@ define([,
 	'kinetic',
     'lodash',
 	'widgets/include/math/misc',
-    'widgets/include/components/button'
-], function (Kinetic, $, MiscMath, Button) {
+    'widgets/include/components/button',
+    'include/code'
+], function (Kinetic, $, MiscMath, Button, Code) {
     var barHeight = 44;
     var toggleWidth = 50;
 
@@ -11,7 +12,7 @@ define([,
         var barWidth = toggles.length * toggleWidth;
         var partitions = MiscMath.partitionRange(-barWidth / 2, barWidth / 2, toggles.length);
         var resizeSubscription;
-        var node = new Kinetic.Group(_.mixin(attrs, {
+        var node = new Kinetic.Group(Code.mixin(attrs, {
             scaleX: 0.7 / widget.node.getScaleX(),
             scaleY: 0.7 / widget.node.getScaleY()
         }));

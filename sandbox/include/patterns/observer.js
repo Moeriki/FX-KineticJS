@@ -3,19 +3,22 @@
 */
 
 define([
-    'lodash'
-], function (_) {
+    'lodash',
+    'include/code'
+], function (_,Code) {
     'use strict';
 
     // Mixin to add Observer subject logic
     return {
         mixinSubject: function (target) {
-            _.mixin(target, {
-                initSubject: function () {
+            Code.mixin(target, {
+                initSubject: function (internalObj) {
                     this._observers = [];
+                    this._observerInternalObj = internalObj || this;
                 },
                 registerObserver: function (o) {
                     this._observers.push(o);
+                    return o;
                 },
 
                 unregisterObserver: function (o) {
@@ -35,26 +38,26 @@ define([
         },
 
         defineNotifyingProperty: function (obj,name) {
-            var args = Array.prototype.slice.apply(arguments,2);
+            var args = Array.prototype.slice.call(arguments);
 
             Object.defineProperty(obj, name, {
                 get: function () {
-                    this["_#{name}"];
+                    return this._observerInternalObj["_" + name];
                 },
                 set: function (n) {
-                    this["_#{name}"] = n;
+                    this._observerInternalObj["_" + name] = n;
                     this.notifyObservers.apply(this,args);
                 }
             });
         },
 
         defineWriteOnlyNotifyingProperty: function (obj,name) {
-            var args = Array.prototype.slice.apply(arguments,2);
+            var args = Array.prototype.slice.call(arguments);
 
             Object.defineProperty(obj, name, {
                 set: function (n) {
-                    this["_#{name}"] = n;
-                    this.notifyObservers.apply(args);
+                    this._observerInternalObj["_" + name] = n;
+                    this.notifyObservers.apply(this,args);
                 }
             });
         }

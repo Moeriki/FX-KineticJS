@@ -10,75 +10,83 @@ define([
         return true;
     }
 
-    function createState() {
-        var transitions = [],
-            onEnter = arguments[0],
-            onLeave = arguments[1];
-
-        return {
-            enter: function () {
-                if(onEnter != null)
-                    onEnter();
-            },
-            leave: function () {
-                if(onLeave != null)
-                    onLeave();
-            },
-            getAvailableTransition: function () {
-                var transitionables = _(transitions).filter('canTransition');
-                return transitionables.length == 0 ? null : transitionables.first();
-            }
-        };
+    var ProtoState = {
+        enter: function () {
+            if(this.onEnter != null)
+                this.onEnter();
+        },
+        leave: function () {
+            if(this.onLeave != null)
+                this.onLeave();
+        },
+        getAvailableTransition: function () {
+            var transitionables = _(this.transitions).filter('canTransition');
+            return transitionables.length == 0 ? null : transitionables.first();
+        }
     }
+
     var State = {
-        create: createState
+        create: function (onEnter, onLeave) {
+            var s = Object.create(ProtoState);
+
+            s.transitions = [];
+            s.onEnter = onEnter;
+            s.onLeave = onLeave;
+
+            return s;
+        }
     };
 
 
-    function createTransition() {
-        var targetState = arguments[0],
-            condition = arguments[1],
-            onTransition = arguments[2];
+    var ProtoTransition = {
+        get canTransition () {
+            return this.condition();
+        },
+        transition: function () {
+            if(!this.canTransition())
+                throw "Transition condition not met!";
 
-        return {
-            get canTransition () {
-                return condition();
-            },
-            transition: function () {
-                if(!canTransition())
-                    throw "Transition condition not met!";
+            if(this.onTransition != null)
+                this.onTransition();
 
-                if(onTransition != null)
-                    onTransition();
+            return this.targetState;
+        }
+    };
 
-                return targetState;
-            }
-        };
-    }
     var Transition = {
-        create: createTransition
+        create: function (targetState, condition, onTransition) {
+            var t = Object.create(ProtoTransition);
+
+            t.targetState  = targetState;
+            t.condition    = condition;
+            t.onTransition = onTransition;
+
+            return t;
+        }
     };
 
 
-    function createFiniteStateMachine() {
-        var currentState = arguments[0];
-
-        if(enterFirst)
-            currentState.enter();
-
-        return {
-            transition: function () {
-                transition = currentState.getAvailableTransition();
-                if(transition != null) {
-                    currentState.leave();
-                    currentState = transition.transition();
-                    currentState.enter();
-                }
+    var ProtoFiniteStateMachine = {
+        transition: function () {
+            var transition = this.currentState.getAvailableTransition();
+            if(transition != null) {
+                this.currentState.leave();
+                this.currentState = transition.transition();
+                this.currentState.enter();
             }
-        };
-    }
+        }
+    };
+
     var FiniteStateMachine = {
-        create: createFiniteStateMachine
+        create: function (currentState, enterFirst) {
+            var f = Object.create(ProtoFiniteStateMachine);
+
+            f.currentState = currentState;
+            if(enterFirst)
+                f.currentState.enter();
+
+            return f;
+        }
     };
 
     return {

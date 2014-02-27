@@ -2,7 +2,7 @@
  * @author: Ruben Tytgat
  */
 
-define(['lodash','include/patterns/observer'], function (_,Observer) {
+define(['lodash','include/patterns/observer', 'include/code'], function (_, Observer, Code) {
     'use strict';
 
     var ProtoTimeKeeper = {
@@ -56,7 +56,7 @@ define(['lodash','include/patterns/observer'], function (_,Observer) {
 
 
     var ProtoRemainingTimeKeeper = Object.create(ProtoTimeKeeper);
-    _.mixin(ProtoRemainingTimeKeeper, {
+    Code.mixin(ProtoRemainingTimeKeeper, {
         _init: function () {
             this._targetTime = new Date()
             ProtoTimeKeeper._init.apply(this);

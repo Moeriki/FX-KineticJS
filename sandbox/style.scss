@@ -1,0 +1,10 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+table.widgets-charts-datatable > tbody > tr > td {
+	&:first-child, &:nth-child(3) {
+		text-align: right;
+	}
+}

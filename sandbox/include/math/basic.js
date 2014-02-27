@@ -1,4 +1,4 @@
-define('lodash', function (_) {
+define(['lodash'], function (_) {
     'use strict';
 
     function sum (l) {
@@ -9,8 +9,16 @@ define('lodash', function (_) {
         return sum(arguments) / arguments.length;
     }
 
+    function gcd (a, b) {
+        if (b == 0)
+            return a;
+        else
+            return gcd(b, a % b);
+    }
+
     return {
         sum: sum,
-        average: average
+        average: average,
+        gcd: gcd
     };
 });
