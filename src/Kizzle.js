@@ -185,8 +185,17 @@
         },
 
         getChildren: function(selector) {
+            var nodes, s;
+
             if(selector) {
-                return Kinetic.Kizzle(selector).filter(this.children);
+                selector = selector.split(',').map(Kinetic.Kizzle);
+                nodes = [];
+
+                for(s = 0; s < selector.length; s++) {
+                    Array.prototype.push.apply(nodes, (Kinetic.Kizzle(selector[s]).filter(this.children)));
+                }
+
+                return nodes;
             } else {
                 return this.children;
             }
