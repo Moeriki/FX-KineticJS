@@ -180,4 +180,24 @@ suite('Kizzle', function() {
         assert.equal(k.match(node), false);
     });
 
+    test('getChildren with multiple selectors', function() {
+
+        var stage = addStage();
+        var layer = new Kinetic.Layer();
+
+        var group1 = new Kinetic.Group({
+            id: 'group1',
+        });
+        var group2 = new Kinetic.Group({
+            id: 'group2',
+        });
+
+        layer.add(group1);
+        layer.add(group2);
+        stage.add(layer);
+
+        assert.equal(layer.getChildren('#group1, group2').length, 2);
+    });
+
+
 });
