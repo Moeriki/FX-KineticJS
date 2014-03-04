@@ -1,3 +1,4 @@
+/*jshint unused:false */
 (function() {
     // CONSTANTS
     var STAGE = 'Stage',
@@ -48,9 +49,9 @@
         eventsLength = EVENTS.length;
 
     function addEvent(ctx, eventName) {
-      ctx.content.addEventListener(eventName, function(evt) {
-        ctx[UNDERSCORE + eventName](evt);
-      }, false);
+        ctx.content.addEventListener(eventName, function(evt) {
+            ctx[UNDERSCORE + eventName](evt);
+        }, false);
     }
 
     Kinetic.Util.addMethods(Kinetic.Stage, {
@@ -77,7 +78,11 @@
          */
         setContainer: function(container) {
             if( typeof container === STRING) {
-                container = document.getElementById(container);
+                var id = container;
+                container = Kinetic.document.getElementById(container);
+                if (!container) {
+                    throw 'Can not find container in document with id ' + id;
+                }
             }
             this._setAttr(CONTAINER, container);
             return this;
@@ -152,6 +157,10 @@
             if(content && Kinetic.Util._isInDocument(content)) {
                 this.getContainer().removeChild(content);
             }
+            var index = Kinetic.stages.indexOf(this);
+            if (index > -1) {
+                Kinetic.stages.splice(index, 1);
+            }
         },
         /**
          * get pointer position which can be a touch position or mouse position
@@ -212,7 +221,7 @@
             function drawLayer(n) {
                 var layer = layers[n],
                     layerUrl = layer.toDataURL(),
-                    imageObj = new Image();
+                    imageObj = new Kinetic.window.Image();
 
                 imageObj.onload = function() {
                     _context.drawImage(imageObj, 0, 0);
@@ -336,66 +345,70 @@
             return this.getChildren();
         },
         _bindContentEvents: function() {
-            var that = this,
-                n;
-
-            for (n = 0; n < eventsLength; n++) {
-              addEvent(this, EVENTS[n]);
+            for (var n = 0; n < eventsLength; n++) {
+                addEvent(this, EVENTS[n]);
             }
         },
         _mouseover: function(evt) {
-            this._fire(CONTENT_MOUSEOVER, evt);
+            if (!Kinetic.UA.mobile) {
+                this._setPointerPosition(evt);
+                this._fire(CONTENT_MOUSEOVER, evt);
+            }
         },
         _mouseout: function(evt) {
-            this._setPointerPosition(evt);
-            var targetShape = this.targetShape;
+            if (!Kinetic.UA.mobile) {
+                this._setPointerPosition(evt);
+                var targetShape = this.targetShape;
 
-            if(targetShape && !Kinetic.isDragging()) {
-                targetShape._fireAndBubble(MOUSEOUT, evt);
-                targetShape._fireAndBubble(MOUSELEAVE, evt);
-                this.targetShape = null;
+                if(targetShape && !Kinetic.isDragging()) {
+                    targetShape._fireAndBubble(MOUSEOUT, evt);
+                    targetShape._fireAndBubble(MOUSELEAVE, evt);
+                    this.targetShape = null;
+                }
+                this.pointerPos = undefined;
+
+                this._fire(CONTENT_MOUSEOUT, evt);
             }
-            this.pointerPos = undefined;
-
-            this._fire(CONTENT_MOUSEOUT, evt);
         },
         _mousemove: function(evt) {
-            this._setPointerPosition(evt);
-            var dd = Kinetic.DD,
-                shape = this.getIntersection(this.getPointerPosition());
+            if (!Kinetic.UA.mobile) {
+                this._setPointerPosition(evt);
+                var dd = Kinetic.DD,
+                    shape = this.getIntersection(this.getPointerPosition());
 
-            if(shape && shape.isListening()) {
-                if(!Kinetic.isDragging() && (!this.targetShape || this.targetShape._id !== shape._id)) {
-                    if(this.targetShape) {
-                        this.targetShape._fireAndBubble(MOUSEOUT, evt, shape);
-                        this.targetShape._fireAndBubble(MOUSELEAVE, evt, shape);
+                if(shape && shape.isListening()) {
+                    if(!Kinetic.isDragging() && (!this.targetShape || this.targetShape._id !== shape._id)) {
+                        if(this.targetShape) {
+                            this.targetShape._fireAndBubble(MOUSEOUT, evt, shape);
+                            this.targetShape._fireAndBubble(MOUSELEAVE, evt, shape);
+                        }
+                        shape._fireAndBubble(MOUSEOVER, evt, this.targetShape);
+                        shape._fireAndBubble(MOUSEENTER, evt, this.targetShape);
+                        this.targetShape = shape;
                     }
-                    shape._fireAndBubble(MOUSEOVER, evt, this.targetShape);
-                    shape._fireAndBubble(MOUSEENTER, evt, this.targetShape);
-                    this.targetShape = shape;
+                    else {
+                        shape._fireAndBubble(MOUSEMOVE, evt);
+                    }
                 }
+                /*
+                 * if no shape was detected, clear target shape and try
+                 * to run mouseout from previous target shape
+                 */
                 else {
-                    shape._fireAndBubble(MOUSEMOVE, evt);
+                    if(this.targetShape && !Kinetic.isDragging()) {
+                        this.targetShape._fireAndBubble(MOUSEOUT, evt);
+                        this.targetShape._fireAndBubble(MOUSELEAVE, evt);
+                        this.targetShape = null;
+                    }
+
                 }
-            }
-            /*
-             * if no shape was detected, clear target shape and try
-             * to run mouseout from previous target shape
-             */
-            else {
-              if(this.targetShape && !Kinetic.isDragging()) {
-                this.targetShape._fireAndBubble(MOUSEOUT, evt);
-                this.targetShape._fireAndBubble(MOUSELEAVE, evt);
-                this.targetShape = null;
-              }
 
-            }
+                // content event
+                this._fire(CONTENT_MOUSEMOVE, evt);
 
-            // content event
-            this._fire(CONTENT_MOUSEMOVE, evt);
-
-            if(dd) {
-                dd._drag(evt);
+                if(dd) {
+                    dd._drag(evt);
+                }
             }
 
             // always call preventDefault for desktop events because some browsers
@@ -405,18 +418,20 @@
             }
         },
         _mousedown: function(evt) {
-            this._setPointerPosition(evt);
-            var shape = this.getIntersection(this.getPointerPosition());
+            if (!Kinetic.UA.mobile) {
+                this._setPointerPosition(evt);
+                var shape = this.getIntersection(this.getPointerPosition());
 
-            Kinetic.listenClickTap = true;
+                Kinetic.listenClickTap = true;
 
-            if (shape && shape.isListening()) {
-                this.clickStartShape = shape;
-                shape._fireAndBubble(MOUSEDOWN, evt);
+                if (shape && shape.isListening()) {
+                    this.clickStartShape = shape;
+                    shape._fireAndBubble(MOUSEDOWN, evt);
+                }
+
+                // content event
+                this._fire(CONTENT_MOUSEDOWN, evt);
             }
-
-            // content event
-            this._fire(CONTENT_MOUSEDOWN, evt);
 
             // always call preventDefault for desktop events because some browsers
             // try to drag and drop the canvas element
@@ -425,46 +440,48 @@
             }
         },
         _mouseup: function(evt) {
-            this._setPointerPosition(evt);
-            var that = this,
-                shape = this.getIntersection(this.getPointerPosition()),
-                clickStartShape = this.clickStartShape,
-                fireDblClick = false;
+            if (!Kinetic.UA.mobile) {
+                this._setPointerPosition(evt);
+                var that = this,
+                    shape = this.getIntersection(this.getPointerPosition()),
+                    clickStartShape = this.clickStartShape,
+                    fireDblClick = false;
 
-            if(Kinetic.inDblClickWindow) {
-                fireDblClick = true;
-                Kinetic.inDblClickWindow = false;
-            }
-            else {
-                Kinetic.inDblClickWindow = true;
-            }
+                if(Kinetic.inDblClickWindow) {
+                    fireDblClick = true;
+                    Kinetic.inDblClickWindow = false;
+                }
+                else {
+                    Kinetic.inDblClickWindow = true;
+                }
 
-            setTimeout(function() {
-                Kinetic.inDblClickWindow = false;
-            }, Kinetic.dblClickWindow);
+                setTimeout(function() {
+                    Kinetic.inDblClickWindow = false;
+                }, Kinetic.dblClickWindow);
 
-            if (shape && shape.isListening()) {
-                shape._fireAndBubble(MOUSEUP, evt);
+                if (shape && shape.isListening()) {
+                    shape._fireAndBubble(MOUSEUP, evt);
 
-                // detect if click or double click occurred
-                if(Kinetic.listenClickTap && clickStartShape && clickStartShape._id === shape._id) {
-                    shape._fireAndBubble(CLICK, evt);
+                    // detect if click or double click occurred
+                    if(Kinetic.listenClickTap && clickStartShape && clickStartShape._id === shape._id) {
+                        shape._fireAndBubble(CLICK, evt);
 
-                    if(fireDblClick) {
-                        shape._fireAndBubble(DBL_CLICK, evt);
+                        if(fireDblClick) {
+                            shape._fireAndBubble(DBL_CLICK, evt);
+                        }
                     }
                 }
-            }
-            // content events
-            this._fire(CONTENT_MOUSEUP, evt);
-            if (Kinetic.listenClickTap) {
-                this._fire(CONTENT_CLICK, evt);
-                if(fireDblClick) {
-                    this._fire(CONTENT_DBL_CLICK, evt);
+                // content events
+                this._fire(CONTENT_MOUSEUP, evt);
+                if (Kinetic.listenClickTap) {
+                    this._fire(CONTENT_CLICK, evt);
+                    if(fireDblClick) {
+                        this._fire(CONTENT_DBL_CLICK, evt);
+                    }
                 }
-            }
 
-            Kinetic.listenClickTap = false;
+                Kinetic.listenClickTap = false;
+            }
 
             // always call preventDefault for desktop events because some browsers
             // try to drag and drop the canvas element
@@ -492,21 +509,20 @@
         },
         _touchend: function(evt) {
             this._setPointerPosition(evt);
-            var that = this,
-                shape = this.getIntersection(this.getPointerPosition());
+            var shape = this.getIntersection(this.getPointerPosition()),
                 fireDblClick = false;
 
-                if(Kinetic.inDblClickWindow) {
-                    fireDblClick = true;
-                    Kinetic.inDblClickWindow = false;
-                }
-                else {
-                    Kinetic.inDblClickWindow = true;
-                }
+            if(Kinetic.inDblClickWindow) {
+                fireDblClick = true;
+                Kinetic.inDblClickWindow = false;
+            }
+            else {
+                Kinetic.inDblClickWindow = true;
+            }
 
-                setTimeout(function() {
-                    Kinetic.inDblClickWindow = false;
-                }, Kinetic.dblClickWindow);
+            setTimeout(function() {
+                Kinetic.inDblClickWindow = false;
+            }, Kinetic.dblClickWindow);
 
             if (shape && shape.isListening()) {
                 shape._fireAndBubble(TOUCHEND, evt);
@@ -555,13 +571,13 @@
             }
         },
         _setPointerPosition: function(evt) {
-            var evt = evt ? evt : window.event,
-                contentPosition = this._getContentPosition(),
+            var contentPosition = this._getContentPosition(),
                 offsetX = evt.offsetX,
                 clientX = evt.clientX,
                 x = null,
                 y = null,
                 touch;
+            evt = evt ? evt : window.event;
 
             // touch events
             if(evt.touches !== undefined) {
@@ -613,12 +629,19 @@
         },
         _buildDOM: function() {
             var container = this.getContainer();
-
+            if (!container) {
+                if (Kinetic.Util.isBrowser()) {
+                    throw 'Stage has not container. But container is required';
+                } else {
+                    // automatically create element for jsdom in nodejs env
+                container = Kinetic.document.createElement(DIV);
+                }
+            }
             // clear content inside container
             container.innerHTML = EMPTY_STRING;
 
             // content
-            this.content = document.createElement(DIV);
+            this.content = Kinetic.document.createElement(DIV);
             this.content.style.position = RELATIVE;
             this.content.style.display = INLINE_BLOCK;
             this.content.className = KINETICJS_CONTENT;

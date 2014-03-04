@@ -39,6 +39,9 @@
                 Kinetic.Util.error('You may only add groups and shapes to a layer.');
             }
         },
+        createPNGStream : function() {
+            return this.canvas._canvas.createPNGStream();
+        },
         /**
          * get visible intersection shape. This is the preferred
          * method for determining if a point intersects a shape or not
@@ -53,7 +56,7 @@
         getIntersection: function(pos) {
             var obj, i, intersectionOffset, shape;
 
-            if(this.isVisible()) {
+            if(this.hitGraphEnabled() && this.isVisible()) {
                 for (i=0; i<INTERSECTION_OFFSETS_LEN; i++) {
                     intersectionOffset = INTERSECTION_OFFSETS[i];
                     obj = this._getIntersection({
@@ -155,7 +158,7 @@
         /**
          * clear scene and hit canvas contexts tied to the layer
          * @method
-         * @memberof Kinetic.Node.prototype
+         * @memberof Kinetic.Layer.prototype
          * @param {Object} [bounds]
          * @param {Number} [bounds.x]
          * @param {Number} [bounds.y]
@@ -334,5 +337,5 @@
      * layer.hitGraphEnabled(true);
      */
 
-     Kinetic.Collection.mapMethods(Kinetic.Layer);
+    Kinetic.Collection.mapMethods(Kinetic.Layer);
 })();

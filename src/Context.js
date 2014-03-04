@@ -6,7 +6,9 @@
         CLOSE_BRACKET_PAREN = '])',
         SEMICOLON = ';',
         DOUBLE_PAREN = '()',
+        // EMPTY_STRING = '',
         EQUALS = '=',
+        // SET = 'set',
         CONTEXT_METHODS = [
             'arc',
             'arcTo',
@@ -194,6 +196,7 @@
          */
         clear: function(bounds) {
             var canvas = this.getCanvas();
+
             if (bounds) {
                 this.clearRect(bounds.x || 0, bounds.y || 0, bounds.width || 0, bounds.height || 0);
             }
@@ -383,9 +386,8 @@
                 origSetter = this.setAttr,
                 n, args;
 
-            // methods
-            for (n=0; n<len; n++) {
-                (function(methodName) {
+            // to prevent creating scope function at each loop
+            var func = function(methodName) {
                     var origMethod = that[methodName],
                         ret;
 
@@ -400,7 +402,10 @@
 
                         return ret;
                     };
-                })(CONTEXT_METHODS[n]);
+            };
+            // methods
+            for (n=0; n<len; n++) {
+                func(CONTEXT_METHODS[n]);
             }
 
             // attrs
@@ -420,8 +425,8 @@
 
     Kinetic.SceneContext.prototype = {
         _fillColor: function(shape) {
-            var fill = shape.fill() ||
-                Kinetic.Util._getRGBAString({
+            var fill = shape.fill()
+                || Kinetic.Util._getRGBAString({
                     red: shape.fillRed(),
                     green: shape.fillGreen(),
                     blue: shape.fillBlue(),
@@ -539,8 +544,8 @@
                 }
 
                 this.setAttr('lineWidth', shape.strokeWidth());
-                this.setAttr('strokeStyle', shape.stroke() ||
-                    Kinetic.Util._getRGBAString({
+                this.setAttr('strokeStyle', shape.stroke()
+                    || Kinetic.Util._getRGBAString({
                         red: shape.strokeRed(),
                         green: shape.strokeGreen(),
                         blue: shape.strokeBlue(),

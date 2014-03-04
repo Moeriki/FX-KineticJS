@@ -1,3 +1,4 @@
+/*jshint unused:false */
 (function() {
     // CONSTANTS
     var GET = 'get',
@@ -11,6 +12,7 @@
         },
         addGetter: function(constructor, attr, def) {
             var method = GET + Kinetic.Util._capitalize(attr);
+
             constructor.prototype[method] = function() {
                 var val = this.attrs[attr];
                 return val === undefined ? def : val;

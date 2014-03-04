@@ -8,9 +8,29 @@
          * returns a {@link Kinetic.Collection} of direct descendant nodes
          * @method
          * @memberof Kinetic.Container.prototype
+         * @param {Function} [filterFunc] filter function
+         * @returns {Kinetic.Collection}
+         * @example
+         * // get all children<br>
+         * var children = layer.getChildren();<br><br>
+         *
+         * // get only circles<br>
+         * var circles = layer.getChildren(function(node){<br>
+         *    return node.getClassName() === 'Circle';<br>
+         * });
          */
-        getChildren: function() {
-            return this.children;
+        getChildren: function(predicate) {
+            if (!predicate) {
+                return this.children;
+            } else {
+                var results = new Kinetic.Collection();
+                this.children.each(function(child){
+                    if (predicate(child)) {
+                        results.push(child);
+                    }
+                });
+                return results;
+            }
         },
         /**
          * determine if node has children
@@ -27,18 +47,20 @@
          * @memberof Kinetic.Container.prototype
          */
         removeChildren: function() {
-            var children = this.children,
-                child, nrChildren;
-
-            nrChildren = children.length;
-            while(nrChildren > 0) {
-                child = children[--nrChildren];
+            var children = Kinetic.Collection.toCollection(this.children);
+            var child;
+            for (var i = 0; i < children.length; i++) {
+                child = children[i];
+                // reset parent to prevent many _setChildrenIndices calls
+                delete child.parent;
+                child.index = 0;
                 if (child.hasChildren()) {
                     child.removeChildren();
                 }
                 child.remove();
             }
-
+            children = null;
+            this.children = new Kinetic.Collection();
             return this;
         },
         /**
@@ -47,11 +69,17 @@
          * @memberof Kinetic.Container.prototype
          */
         destroyChildren: function() {
-            var children = this.getChildren(),
-                i = children.length - 1;
-            while(i >= 0) {
-                children[i--].destroy();
+           var children = Kinetic.Collection.toCollection(this.children);
+            var child;
+            for (var i = 0; i < children.length; i++) {
+                child = children[i];
+                // reset parent to prevent many _setChildrenIndices calls
+                delete child.parent;
+                child.index = 0;
+                child.destroy();
             }
+            children = null;
+            this.children = new Kinetic.Collection();
             return this;
         },
         /**
@@ -62,8 +90,11 @@
          * @returns {Container}
          */
         add: function(child) {
+            if (child.getParent()) {
+                child.moveTo(this);
+                return;
+            }
             var children = this.children;
-
             this._validateAdd(child);
             child.index = children.length;
             child.parent = this;
@@ -294,7 +325,7 @@
                 context.beginPath();
                 context.rect(clipX, clipY, clipWidth, clipHeight);
                 context.clip();
-                context.reset();   
+                context.reset();
             }
 
             this.children.each(function(child) {
@@ -401,5 +432,5 @@
      * container.clipHeight(100);
      */
 
-     Kinetic.Collection.mapMethods(Kinetic.Container);
+    Kinetic.Collection.mapMethods(Kinetic.Container);
 })();

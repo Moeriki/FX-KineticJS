@@ -1,6 +1,5 @@
 {
   "curly": true,
-  "eqeqeq": true,
   "immed": true,
   "latedef": true,
   "newcap": true,
@@ -10,12 +9,20 @@
   "boss": true,
   "eqnull": true,
   "node": true,
-  "indent": 4,
+  "latedef": true,
   "quotmark": "single",
   "unused": true,
-  "strict": false,
+  "trailing" : true,
+  "laxbreak" : true,
   "globals": {
     "Kinetic": false,
-    "document": false
+    "document": false,
+    "window" : false,
+    "navigator" : false,
+    "define" : false,
+    "Image" : false,
+    "assert" : false,
+    "test": false,
+    "addStage" : false
   }
 }
