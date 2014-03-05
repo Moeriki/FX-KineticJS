@@ -9,7 +9,7 @@
      * @param {Array} config.points
      * @param {Number} [config.tension] Higher values will result in a more curvy line.  A value of 0 will result in no interpolation.
      *   The default is 0
-     * @param {Boolean} [config.closed] defines whether or not the line shape is closed, creating a polygon or blob 
+     * @param {Boolean} [config.closed] defines whether or not the line shape is closed, creating a polygon or blob
      * @@shapeParams
      * @@nodeParams
      * @example
@@ -134,7 +134,7 @@
                     p[0],
                     p[1]
                 ]);
-                    
+
             return tp;
         }
     };

@@ -325,7 +325,7 @@
 
                 // NOTE: this flag is set to true when any event handler is added, even non
                 // mouse or touch gesture events.  This improves performance for most
-                // cases where users aren't using events, but is still very light weight.  
+                // cases where users aren't using events, but is still very light weight.
                 // To ensure perfect accuracy, devs can explicitly set listening to false.
                 /*
                 if (name !== KINETIC) {
@@ -403,7 +403,7 @@
 
             if(parent && parent.children) {
                 parent.children.splice(this.index, 1);
-                parent._setChildrenIndices();
+                parent._setChildrenIndices(this.index);
                 delete this.parent;
             }
 
@@ -519,11 +519,11 @@
          * determine if node is listening for events by taking into account ancestors.
          *
          * Parent    | Self      | isListening
-         * listening | listening | 
+         * listening | listening |
          * ----------+-----------+------------
-         * T         | T         | T 
+         * T         | T         | T
          * T         | F         | F
-         * F         | T         | T 
+         * F         | T         | T
          * F         | F         | F
          * ----------+-----------+------------
          * T         | I         | T
@@ -559,11 +559,11 @@
          * determine if node is visible by taking into account ancestors.
          *
          * Parent    | Self      | isVisible
-         * visible   | visible   | 
+         * visible   | visible   |
          * ----------+-----------+------------
-         * T         | T         | T 
+         * T         | T         | T
          * T         | F         | F
-         * F         | T         | T 
+         * F         | T         | T
          * F         | F         | F
          * ----------+-----------+------------
          * T         | I         | T
@@ -869,7 +869,7 @@
             var index = this.index;
             this.parent.children.splice(index, 1);
             this.parent.children.push(this);
-            this.parent._setChildrenIndices();
+            this.parent._setChildrenIndices(index);
             return true;
         },
         /**
@@ -888,7 +888,7 @@
             if(index < len - 1) {
                 this.parent.children.splice(index, 1);
                 this.parent.children.splice(index + 1, 0, this);
-                this.parent._setChildrenIndices();
+                this.parent._setChildrenIndices(index);
                 return true;
             }
             return false;
@@ -908,7 +908,7 @@
             if(index > 0) {
                 this.parent.children.splice(index, 1);
                 this.parent.children.splice(index - 1, 0, this);
-                this.parent._setChildrenIndices();
+                this.parent._setChildrenIndices(index - 1);
                 return true;
             }
             return false;
@@ -948,7 +948,7 @@
             var index = this.index;
             this.parent.children.splice(index, 1);
             this.parent.children.splice(zIndex, 0, this);
-            this.parent._setChildrenIndices();
+            this.parent._setChildrenIndices(Math.min(index, zIndex));
             return this;
         },
         /**
@@ -1336,24 +1336,6 @@
             };
         },
         /**
-         * get width
-         * @method
-         * @memberof Kinetic.Node.prototype
-         * @returns {Integer}
-         */
-        getWidth: function() {
-            return this.attrs.width || 0;
-        },
-        /**
-         * get height
-         * @method
-         * @memberof Kinetic.Node.prototype
-         * @returns {Integer}
-         */
-        getHeight: function() {
-            return this.attrs.height || 0;
-        },
-        /**
          * get class name, which may return Stage, Layer, Group, or shape class names like Rect, Circle, Text, etc.
          * @method
          * @memberof Kinetic.Node.prototype
@@ -1361,6 +1343,94 @@
          */
         getClassName: function() {
             return this.className || this.nodeType;
+        },
+        setWidth: function(newWidth) {
+            var anchorX = this.getAnchorX();
+
+            if(anchorX) {
+                this._setAttr('offsetX',
+                    this.getOffsetX() +
+                        (-this.getWidth() +newWidth) *
+                        this.getScaleX() * anchorX
+                );
+            }
+
+            this._setAttr('width', newWidth);
+        },
+        setHeight: function(newHeight) {
+            var anchorY = this.getAnchorX();
+
+            if(anchorY) {
+                this._setAttr('offsetY',
+                    this.getOffsetY() +
+                        (-this.getHeight() +newHeight) *
+                        this.getScaleY() * anchorY
+                );
+            }
+
+            this._setAttr('height', newHeight);
+        },
+        setOffsetX: function(newOffsetX) {
+            var anchorX = this.getAnchorX();
+
+            if(anchorX) {
+                newOffsetX += anchorX * this.getWidth();
+            }
+
+            this._setAttr('offsetX', newOffsetX);
+        },
+        setOffsetY: function(newOffsetY) {
+            var anchorY = this.getAnchorY();
+
+            if(anchorY) {
+                newOffsetY += anchorY * this.getHeight();
+            }
+
+            this._setAttr('offsetY', newOffsetY);
+        },
+        /**
+         * Setting anchorX will update your X and offsetX without visually moving your node.
+         * @method
+         * @memberof Kinetic.Node.prototype
+         * @returns {Node}
+         */
+        setAnchorX: function(newAnchorX) {
+            var scaleX, width, offsetDiff;
+
+            scaleX = this.getScaleX();
+            width = this.getWidth();
+
+            if(width) {
+                offsetDiff = (-this.getAnchorX() +newAnchorX) * width * scaleX;
+                this._setAttr('x', this.getX() + offsetDiff * scaleX);
+                this._setAttr('offsetX', this.getOffsetX() + offsetDiff);
+            }
+
+            this._setAttr('anchorX', newAnchorX);
+
+            return this;
+        },
+        /**
+         * Setting anchorY will update your Y and offsetY without visually moving your node.
+         * @method
+         * @memberof Kinetic.Node.prototype
+         * @returns {Node}
+         */
+        setAnchorY: function(newAnchorY) {
+            var scaleY, height, offsetDiff;
+
+            scaleY = this.getScaleX();
+            height = this.getHeight();
+
+            if(height) {
+                offsetDiff = (-this.getAnchorY() +newAnchorY) * height * scaleY;
+                this._setAttr('y', this.getY() + offsetDiff * scaleY);
+                this._setAttr('offsetY', this.getOffsetY() + offsetDiff);
+            }
+
+            this._setAttr('anchorY', newAnchorY);
+
+            return this;
         },
         /**
          * get the node type, which may return Stage, Layer, Group, or Node
@@ -1440,24 +1510,27 @@
          * node.setAttr('x', 5);
          */
         setAttr: function() {
-            var args = Array.prototype.slice.call(arguments),
-                attr = args[0],
-                val = args[1],
-                method = SET + Kinetic.Util._capitalize(attr),
-                func = this[method];
+            if(!this.locked())
+            {
+                var args = Array.prototype.slice.call(arguments),
+                    attr = args[0],
+                    val = args[1],
+                    method = SET + Kinetic.Util._capitalize(attr),
+                    func = this[method];
 
-            if(Kinetic.Util._isFunction(func)) {
-                func.call(this, val);
-            }
-            // otherwise set directly
-            else {
-                this._setAttr(attr, val);
+                if(Kinetic.Util._isFunction(func)) {
+                    func.call(this, val);
+                }
+                // otherwise set directly
+                else {
+                    this._setAttr(attr, val);
+                }
             }
             return this;
         },
         _setAttr: function(key, val) {
             var oldVal;
-            if(val !== undefined) {
+            if(val !== undefined && !this.locked()) {
                 oldVal = this.attrs[key];
                 this.attrs[key] = val;
                 this._fireChangeEvent(key, oldVal, val);
@@ -1472,7 +1545,7 @@
                     // set value to default value using getAttr
                     this.attrs[key] = this.getAttr(key);
                 }
-                
+
                 //this._fireBeforeChangeEvent(key, oldVal, val);
                 this.attrs[key][component] = val;
                 this._fireChangeEvent(key, oldVal, val);
@@ -1862,7 +1935,7 @@
      * node.offsetY(3);
      */
 
-    Kinetic.Factory.addSetter(Kinetic.Node, 'width', 0);
+    Kinetic.Factory.addGetter(Kinetic.Node, 'width', 0);
     Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node, 'width');
     /**
      * get/set width
@@ -1879,7 +1952,7 @@
      * node.width(100);
      */
 
-    Kinetic.Factory.addSetter(Kinetic.Node, 'height', 0);
+    Kinetic.Factory.addGetter(Kinetic.Node, 'height', 0);
     Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node, 'height');
     /**
      * get/set height
@@ -1899,7 +1972,7 @@
     Kinetic.Factory.addGetterSetter(Kinetic.Node, 'listening', 'inherit');
     /**
      * get/set listenig attr.  If you need to determine if a node is listening or not
-     *   by taking into account its parents, use the isListening() method  
+     *   by taking into account its parents, use the isListening() method
      * @name listening
      * @method
      * @memberof Kinetic.Node.prototype
@@ -1948,7 +2021,7 @@
     /**
      * get/set visible attr.  Can be "inherit", true, or false.  The default is "inherit".
      *   If you need to determine if a node is visible or not
-     *   by taking into account its parents, use the isVisible() method  
+     *   by taking into account its parents, use the isVisible() method
      * @name visible
      * @method
      * @memberof Kinetic.Node.prototype
@@ -1984,6 +2057,73 @@
      *
      * // enable all transforms<br>
      * node.transformsEnabled('all');
+     */
+
+    Kinetic.Factory.addGetterSetter(Kinetic.Node, 'locked', false);
+
+    /**
+     * get/set locked
+     * @name locked
+     * @method
+     * @memberof Kinetic.Node.prototype
+     * @param {Boolean} locked
+     * @returns {Boolean}
+     * @example
+     * // get locked<br>
+     * var locked = node.locked();<br><br>
+     *
+     * // set locked<br>
+     * node.locked(true);
+     */
+
+    Kinetic.Factory.addComponentsGetterSetter(Kinetic.Node, 'anchor', ['x', 'y']);
+    Kinetic.Factory.addGetter(Kinetic.Node, 'anchorX', 0);
+    Kinetic.Factory.addGetter(Kinetic.Node, 'anchorY', 0);
+
+    Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node, 'anchorX');
+    /**
+     * get/set anchor x
+     * @name anchorX
+     * @param {Number} x
+     * @method
+     * @memberof Kinetic.Node.prototype
+     * @returns {Number}
+     * @example
+     * // get anchor x<br>
+     * var anchorX = node.anchorX();<br><br>
+     *
+     * // set anchor x<br>
+     * node.anchorX(0.5);
+     */
+
+    Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node, 'anchorY');
+    /**
+     * get/set anchor y
+     * @name anchorX
+     * @param {Number} y
+     * @method
+     * @memberof Kinetic.Node.prototype
+     * @returns {Number}
+     * @example
+     * // get anchor x<br>
+     * var anchorX = node.anchorX();<br><br>
+     *
+     * // set anchor x<br>
+     * node.anchorX(0.5);
+     */
+
+    /**
+     * get/set anchor
+     * @name anchor
+     * @memberof Kinetic.Node.prototype
+     * @param {Number} anchor
+     * @returns {Number}
+     * @example
+     * // get anchor<br>
+     * var anchor = node.anchor();<br><br>
+     *
+     * // set anchor <br>
+     * node.anchor(0.5);
      */
 
     Kinetic.Factory.backCompat(Kinetic.Node, {

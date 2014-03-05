@@ -1,5 +1,6 @@
 (function() {
-    var HAS_SHADOW = 'hasShadow';
+    var HAS_SHADOW = 'hasShadow',
+        ADAPTIVE_DASH = 'adaptiveDash';
 
     function _fillFunc(context) {
         context.fill();
@@ -101,6 +102,18 @@
         },
         _get: function(selector) {
             return this.className === selector || this.nodeType === selector ? [this] : [];
+        },
+        _calculateAdaptiveDash: function(){
+            if(this.adaptiveDash() && this.dash())
+            {   
+                var strokeWidth = this.strokeWidth(),
+                    adaptedDash = this.dash().map(function(x){return x * strokeWidth;});
+                this._setAttr(ADAPTIVE_DASH, adaptedDash);
+            } 
+            else if (this.adaptiveDash())
+            {
+                this._setAttr(ADAPTIVE_DASH, []);
+            }
         },
         /**
          * determines if point is in the shape, regardless if other shapes are on top of it.  Note: because
@@ -366,7 +379,7 @@
      * shape.strokeAlpha(0.5);
      */
 
-    Kinetic.Factory.addGetterSetter(Kinetic.Shape, 'strokeWidth', 2);
+    Kinetic.Factory.addGetterSetter(Kinetic.Shape, 'strokeWidth', 2, undefined, function(){this._calculateAdaptiveDash();});
 
     /**
      * get/set stroke width
@@ -462,7 +475,7 @@
      * });
      */
 
-    Kinetic.Factory.addGetterSetter(Kinetic.Shape, 'dash');
+    Kinetic.Factory.addGetterSetter(Kinetic.Shape, 'dash', undefined, undefined, function(){this._calculateAdaptiveDash();});
 
     /**
      * get/set dash array for stroke.
@@ -479,6 +492,23 @@
      *  // lines that are 10px long and 20px apart, and dots that have<br> 
      *  // a radius of 5px and are 20px apart<br>
      *  line.dash([10, 20, 0.001, 20]);
+     */
+
+    Kinetic.Factory.addGetterSetter(Kinetic.Shape, ADAPTIVE_DASH, undefined, undefined, function(){this._calculateAdaptiveDash();});
+
+    /**
+     * get/set adaptive dash for stroke (dash changes with strokeWidth).
+     * @name adaptive dash
+     * @method
+     * @memberof Kinetic.Shape.prototype
+     * @param {Boolean} adaptiveDash
+     * @returns {Boolean}
+     * @example
+     *  // set adaptive dash<br>
+     *  line.adaptiveDash(true);<br><br>
+     *  
+     *  // get adaptive dash<br>
+     *  line.adaptiveDash();
      */
 
 

@@ -30,7 +30,7 @@
     function requestAnimFrame() {
         return RAF.apply(Kinetic.root, arguments);
     }
-    
+
     /**
      * Animation constructor.  A stage is used to contain multiple layers and handle
      * @constructor

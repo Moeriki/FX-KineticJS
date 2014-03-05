@@ -9,7 +9,7 @@
          * |       |
          * 1 - 0   5
          *         |
-         * 8 - 7 - 6     
+         * 8 - 7 - 6
          */
         INTERSECTION_OFFSETS = [
             {x:  0, y:  0}, // 0
@@ -52,6 +52,7 @@
          * @param {Number} pos.y
          * @returns {Kinetic.Shape}
          */
+
         getIntersection: function(pos) {
             var obj, i, intersectionOffset, shape;
 
@@ -110,7 +111,7 @@
             if(this.getClearBeforeDraw()) {
                 canvas.getContext().clear();
             }
-            
+
             Kinetic.Container.prototype.drawScene.call(this, canvas);
 
             this._fire(DRAW, {

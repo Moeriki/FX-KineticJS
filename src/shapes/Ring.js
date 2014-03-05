@@ -1,7 +1,7 @@
 (function() {
     // the 0.0001 offset fixes a bug in Chrome 27
     var PIx2 = (Math.PI * 2) - 0.0001;
-    
+
     /**
      * Ring constructor
      * @constructor
@@ -78,7 +78,7 @@
      * // set inner radius<br>
      * ring.innerRadius(20);
      */
-     
+
     Kinetic.Factory.addGetterSetter(Kinetic.Ring, 'outerRadius', 0);
 
     /**

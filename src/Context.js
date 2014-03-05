@@ -158,7 +158,7 @@
         _trace: function(str) {
             var traceArr = this.traceArr,
                 len;
- 
+
             traceArr.push(str);
             len = traceArr.length;
 
@@ -196,7 +196,7 @@
          */
         clear: function(bounds) {
             var canvas = this.getCanvas();
-            
+
             if (bounds) {
                 this.clearRect(bounds.x || 0, bounds.y || 0, bounds.width || 0, bounds.height || 0);
             }
@@ -394,12 +394,12 @@
                     that[methodName] = function() {
                         args = _simplifyArray(Array.prototype.slice.call(arguments, 0));
                         ret = origMethod.apply(that, arguments);
-           
+
                         that._trace({
                             method: methodName,
                             args: args
                         });
-                 
+
                         return ret;
                     };
             };
@@ -483,7 +483,7 @@
                 endRadius = shape.getFillRadialGradientEndRadius(),
                 colorStops = shape.getFillRadialGradientColorStops(),
                 grd = this.createRadialGradient(start.x, start.y, startRadius, end.x, end.y, endRadius);
-           
+
             // build color stops
             for(var n = 0; n < colorStops.length; n += 2) {
                 grd.addColorStop(colorStops[n], colorStops[n + 1]);
@@ -527,6 +527,7 @@
         },
         _stroke: function(shape) {
             var dash = shape.dash(),
+                adaptiveDash = shape.adaptiveDash(),
                 strokeScaleEnabled = shape.getStrokeScaleEnabled();
 
             if(shape.hasStroke()) {
@@ -536,8 +537,10 @@
                 }
 
                 this._applyLineCap(shape);
-                if(dash && shape.dashEnabled()) {
+                if(dash && shape.dashEnabled() && !adaptiveDash) {
                     this.setLineDash(dash);
+                } else if (dash && shape.dashEnabled() && adaptiveDash){
+                    this.setLineDash(adaptiveDash);
                 }
 
                 this.setAttr('lineWidth', shape.strokeWidth());
@@ -550,7 +553,7 @@
                     }));
 
                 shape._strokeFunc(this);
-                
+
                 if (!strokeScaleEnabled) {
                     this.restore();
                 }
@@ -575,7 +578,7 @@
             this.setAttr('shadowBlur', blur);
             this.setAttr('shadowOffsetX', offset.x);
             this.setAttr('shadowOffsetY', offset.y);
-        
+
         }
     };
     Kinetic.Util.extend(Kinetic.SceneContext, Kinetic.Context);

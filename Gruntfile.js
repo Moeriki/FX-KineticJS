@@ -8,6 +8,9 @@ module.exports = function(grunt) {
     'src/Factory.js',
     'src/Node.js',
 
+    // core plugins
+    'src/plugins/fx-extensions.js',
+
     // filters
     'src/filters/Grayscale.js',
     'src/filters/Brighten.js',
@@ -49,6 +52,18 @@ module.exports = function(grunt) {
     'src/shapes/Text.js',
     'src/shapes/Line.js',
     'src/shapes/Sprite.js',
+    'src/shapes/TriangleIsosceles.js',
+    'src/shapes/TriangleRightAngled.js',
+    'src/shapes/TriangleEquilateral.js',
+    'src/shapes/Square.js',
+    'src/shapes/Diamond.js',
+    'src/shapes/SemiCircle.js',
+    'src/shapes/Parallelogram.js',
+    'src/shapes/Trapezoid.js',
+    'src/shapes/Arrow.js',
+    'src/shapes/SplitT.js',
+    'src/shapes/Cube.js',
+    'src/shapes/SpeechBubble.js',
 
     // plugins
     'src/plugins/Path.js',

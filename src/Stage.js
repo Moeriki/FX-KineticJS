@@ -648,7 +648,7 @@
             this.content.setAttribute('role', 'presentation');
             container.appendChild(this.content);
 
-            // the buffer canvas pixel ratio must be 1 because it is used as an 
+            // the buffer canvas pixel ratio must be 1 because it is used as an
             // intermediate canvas before copying the result onto a scene canvas.
             // not setting it to 1 will result in an over compensation
             this.bufferCanvas = new Kinetic.SceneCanvas({
@@ -684,7 +684,7 @@
      * @example
      * // get container<br>
      * var container = stage.container();<br><br>
-     * 
+     *
      * // set container<br>
      * var container = document.createElement('div');<br>
      * body.appendChild(container);<br>
