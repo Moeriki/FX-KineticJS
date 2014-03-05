@@ -6,7 +6,9 @@
         CLOSE_BRACKET_PAREN = '])',
         SEMICOLON = ';',
         DOUBLE_PAREN = '()',
+        // EMPTY_STRING = '',
         EQUALS = '=',
+        // SET = 'set',
         CONTEXT_METHODS = [
             'arc',
             'arcTo',
@@ -156,7 +158,7 @@
         _trace: function(str) {
             var traceArr = this.traceArr,
                 len;
-
+ 
             traceArr.push(str);
             len = traceArr.length;
 
@@ -194,6 +196,7 @@
          */
         clear: function(bounds) {
             var canvas = this.getCanvas();
+            
             if (bounds) {
                 this.clearRect(bounds.x || 0, bounds.y || 0, bounds.width || 0, bounds.height || 0);
             }
@@ -383,24 +386,26 @@
                 origSetter = this.setAttr,
                 n, args;
 
-            // methods
-            for (n=0; n<len; n++) {
-                (function(methodName) {
+            // to prevent creating scope function at each loop
+            var func = function(methodName) {
                     var origMethod = that[methodName],
                         ret;
 
                     that[methodName] = function() {
                         args = _simplifyArray(Array.prototype.slice.call(arguments, 0));
                         ret = origMethod.apply(that, arguments);
-
+           
                         that._trace({
                             method: methodName,
                             args: args
                         });
-
+                 
                         return ret;
                     };
-                })(CONTEXT_METHODS[n]);
+            };
+            // methods
+            for (n=0; n<len; n++) {
+                func(CONTEXT_METHODS[n]);
             }
 
             // attrs
@@ -420,8 +425,8 @@
 
     Kinetic.SceneContext.prototype = {
         _fillColor: function(shape) {
-            var fill = shape.fill() ||
-                Kinetic.Util._getRGBAString({
+            var fill = shape.fill()
+                || Kinetic.Util._getRGBAString({
                     red: shape.fillRed(),
                     green: shape.fillGreen(),
                     blue: shape.fillBlue(),
@@ -478,7 +483,7 @@
                 endRadius = shape.getFillRadialGradientEndRadius(),
                 colorStops = shape.getFillRadialGradientColorStops(),
                 grd = this.createRadialGradient(start.x, start.y, startRadius, end.x, end.y, endRadius);
-
+           
             // build color stops
             for(var n = 0; n < colorStops.length; n += 2) {
                 grd.addColorStop(colorStops[n], colorStops[n + 1]);
@@ -522,7 +527,6 @@
         },
         _stroke: function(shape) {
             var dash = shape.dash(),
-                adaptiveDash = shape.adaptiveDash(),
                 strokeScaleEnabled = shape.getStrokeScaleEnabled();
 
             if(shape.hasStroke()) {
@@ -532,15 +536,13 @@
                 }
 
                 this._applyLineCap(shape);
-                if(dash && shape.dashEnabled() && !adaptiveDash) {
+                if(dash && shape.dashEnabled()) {
                     this.setLineDash(dash);
-                } else if (dash && shape.dashEnabled() && adaptiveDash){
-                    this.setLineDash(adaptiveDash);
                 }
 
                 this.setAttr('lineWidth', shape.strokeWidth());
-                this.setAttr('strokeStyle', shape.stroke() ||
-                    Kinetic.Util._getRGBAString({
+                this.setAttr('strokeStyle', shape.stroke()
+                    || Kinetic.Util._getRGBAString({
                         red: shape.strokeRed(),
                         green: shape.strokeGreen(),
                         blue: shape.strokeBlue(),
@@ -548,7 +550,7 @@
                     }));
 
                 shape._strokeFunc(this);
-
+                
                 if (!strokeScaleEnabled) {
                     this.restore();
                 }
@@ -573,7 +575,7 @@
             this.setAttr('shadowBlur', blur);
             this.setAttr('shadowOffsetX', offset.x);
             this.setAttr('shadowOffsetY', offset.y);
-
+        
         }
     };
     Kinetic.Util.extend(Kinetic.SceneContext, Kinetic.Context);

@@ -8,9 +8,29 @@
          * returns a {@link Kinetic.Collection} of direct descendant nodes
          * @method
          * @memberof Kinetic.Container.prototype
+         * @param {Function} [filterFunc] filter function
+         * @returns {Kinetic.Collection}
+         * @example
+         * // get all children<br>
+         * var children = layer.getChildren();<br><br>
+         *
+         * // get only circles<br>
+         * var circles = layer.getChildren(function(node){<br>
+         *    return node.getClassName() === 'Circle';<br>
+         * });
          */
-        getChildren: function() {
-            return this.children;
+        getChildren: function(predicate) {
+            if (!predicate) {
+                return this.children;
+            } else {
+                var results = new Kinetic.Collection();
+                this.children.each(function(child){
+                    if (predicate(child)) {
+                        results.push(child);
+                    }
+                });
+                return results;
+            }
         },
         /**
          * determine if node has children
@@ -27,18 +47,20 @@
          * @memberof Kinetic.Container.prototype
          */
         removeChildren: function() {
-            var children = this.children,
-                child, nrChildren;
-
-            nrChildren = children.length;
-            while(nrChildren > 0) {
-                child = children[--nrChildren];
+            var children = Kinetic.Collection.toCollection(this.children);
+            var child;
+            for (var i = 0; i < children.length; i++) {
+                child = children[i];
+                // reset parent to prevent many _setChildrenIndices calls
+                delete child.parent;
+                child.index = 0;
                 if (child.hasChildren()) {
                     child.removeChildren();
                 }
                 child.remove();
             }
-
+            children = null;
+            this.children = new Kinetic.Collection();
             return this;
         },
         /**
@@ -47,11 +69,17 @@
          * @memberof Kinetic.Container.prototype
          */
         destroyChildren: function() {
-            var children = this.getChildren(),
-                i = children.length - 1;
-            while(i >= 0) {
-                children[i--].destroy();
+           var children = Kinetic.Collection.toCollection(this.children);
+            var child;
+            for (var i = 0; i < children.length; i++) {
+                child = children[i];
+                // reset parent to prevent many _setChildrenIndices calls
+                delete child.parent;
+                child.index = 0;
+                child.destroy();
             }
+            children = null;
+            this.children = new Kinetic.Collection();
             return this;
         },
         /**
@@ -62,8 +90,11 @@
          * @returns {Container}
          */
         add: function(child) {
+            if (child.getParent()) {
+                child.moveTo(this);
+                return;
+            }
             var children = this.children;
-
             this._validateAdd(child);
             child.index = children.length;
             child.parent = this;
@@ -111,38 +142,21 @@
             var retArr = [],
                 selectorArr = selector.replace(/ /g, '').split(','),
                 len = selectorArr.length,
-                n, i, sel, arr, node, children, grandChildren, clen,
-                classListStart, classList, classListCheck;
-
-            function nodeHasAnyClass(classList) {
-                return function(node) {
-                    return node.classList().containsAny(classList);
-                };
-            }
+                n, i, sel, arr, node, children, clen;
 
             for (n = 0; n < len; n++) {
                 sel = selectorArr[n];
 
-                classListStart = sel.indexOf('[');
-                if(classListStart !== -1) {
-                    classList = sel.substring(classListStart, sel.length - 2).split(',');
-                    classListCheck = nodeHasAnyClass(classList);
-                    sel = sel.substring(0, classListStart - 1);
-                }
-
                 // id selector
                 if(sel.charAt(0) === '#') {
                     node = this._getNodeById(sel.slice(1));
-                    if(node && (!classListCheck || classListCheck(node))) {
+                    if(node) {
                         retArr.push(node);
                     }
                 }
                 // name selector
                 else if(sel.charAt(0) === '.') {
-                    arr = this._getNodesByName(sel.slice(1), classList);
-                    if(classList) {
-                        arr = arr.filter(classListCheck);
-                    }
+                    arr = this._getNodesByName(sel.slice(1));
                     retArr = retArr.concat(arr);
                 }
                 // unrecognized selector, pass to children
@@ -150,11 +164,7 @@
                     children = this.getChildren();
                     clen = children.length;
                     for(i = 0; i < clen; i++) {
-                        grandChildren = children[i]._get(sel);
-                        if(classList) {
-                            grandChildren = grandChildren.filter(classListCheck);
-                        }
-                        retArr = retArr.concat(grandChildren);
+                        retArr = retArr.concat(children[i]._get(sel));
                     }
                 }
             }
@@ -259,11 +269,10 @@
 
             return arr;
         },
-        _setChildrenIndices: function(fromIndex) {
-            var i, len = this.children.length;
-            for(i = fromIndex || 0; i < len; i++) {
-                this.children[i].index = i;
-            }
+        _setChildrenIndices: function() {
+            this.children.each(function(child, n) {
+                child.index = n;
+            });
         },
         drawScene: function(can) {
             var layer = this.getLayer(),
@@ -422,5 +431,5 @@
      * container.clipHeight(100);
      */
 
-     Kinetic.Collection.mapMethods(Kinetic.Container);
+    Kinetic.Collection.mapMethods(Kinetic.Container);
 })();

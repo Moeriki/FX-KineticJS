@@ -77,7 +77,7 @@
          * @returns {Boolean}
          */
         hasShadow: function() {
-            return this._getCache(HAS_SHADOW, this._hasShadow);  
+            return this._getCache(HAS_SHADOW, this._hasShadow);
         },
         _hasShadow: function() {
             return this.getShadowEnabled() && (this.getShadowOpacity() !== 0 && !!(this.getShadowColor() || this.getShadowBlur() || this.getShadowOffsetX() || this.getShadowOffsetY()));
@@ -153,7 +153,7 @@
                 hasShadow = this.hasShadow(),
                 stage, bufferCanvas, bufferContext;
 
-            if(this.isVisible()) { 
+            if(this.isVisible()) {
                 if (cachedCanvas) {
                     this._drawCachedSceneCanvas(context);
                 }
@@ -175,7 +175,7 @@
                         if (hasShadow) {
                             context.save();
                             context._applyShadow(this);
-                            context.drawImage(bufferCanvas._canvas, 0, 0); 
+                            context.drawImage(bufferCanvas._canvas, 0, 0);
                             context.restore();
                         }
 
@@ -192,12 +192,12 @@
                             context._applyShadow(this);
                             drawFunc.call(this, context);
                             context.restore();
-                        }   
+                        }
 
                         context._applyOpacity(this);
                         drawFunc.call(this, context);
-                    }   
-                    context.restore(); 
+                    }
+                    context.restore();
                 }
             }
 
@@ -220,7 +220,7 @@
                     context._applyLineJoin(this);
                     context._applyTransform(this);
                    
-                    drawFunc.call(this, context);   
+                    drawFunc.call(this, context);
                     context.restore();
                 }
                 

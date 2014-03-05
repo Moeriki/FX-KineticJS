@@ -8,7 +8,7 @@ module.exports = function(grunt) {
     'src/Factory.js',
     'src/Node.js',
 
-    // filters
+    // filters 
     'src/filters/Grayscale.js',
     'src/filters/Brighten.js',
     'src/filters/Invert.js',
@@ -26,7 +26,7 @@ module.exports = function(grunt) {
     'src/filters/Sepia.js',
     'src/filters/Solarize.js',
     'src/filters/Kaleidoscope.js',
-
+    
     // core
     'src/Animation.js',
     'src/Tween.js',
@@ -48,18 +48,6 @@ module.exports = function(grunt) {
     'src/shapes/Text.js',
     'src/shapes/Line.js',
     'src/shapes/Sprite.js',
-    'src/shapes/TriangleIsosceles.js',
-    'src/shapes/TriangleRightAngled.js',
-    'src/shapes/TriangleEquilateral.js',
-    'src/shapes/Square.js',
-    'src/shapes/Diamond.js',
-    'src/shapes/SemiCircle.js',
-    'src/shapes/Parallelogram.js',
-    'src/shapes/Trapezoid.js',
-    'src/shapes/Arrow.js',
-    'src/shapes/SplitT.js',
-    'src/shapes/Cube.js',
-    'src/shapes/SpeechBubble.js',
 
     // plugins
     'src/plugins/Path.js',
@@ -70,6 +58,7 @@ module.exports = function(grunt) {
   ];
 
   // Project configuration.
+  var hintConf = grunt.file.readJSON('.jshintrc');
   var config = {
     pkg: grunt.file.readJSON('package.json'),
     concat: {
@@ -192,9 +181,7 @@ module.exports = function(grunt) {
       build: ['dist/*']
     },
     jshint: {
-      options: {
-        laxbreak: true
-      },
+      options: hintConf,
       all: ['src/**/*.js']
     },
     copy: {
@@ -208,10 +195,32 @@ module.exports = function(grunt) {
         src: 'dist/kinetic-v<%= pkg.version %>.js',
         dest: 'kinetic.js',
       }
-    }
+    },
+    shell: {
+        jsdoc: {
+            options: {
+                stdout: true,
+                stderr : true,
+                failOnError : true
+            },
+            command: './node_modules/.bin/jsdoc ./dist/kinetic-v<%= pkg.version %>.js -d ./documentation'
+        }
+    },
+    mocha_phantomjs: {
+      all: ['test/runner.html']
+    },
+    watch: {
+      dev: {
+        files: ['src/**/*.js'],
+        tasks: ['dev'],
+        options: {
+          spawn: false,
+        },
+      },
+    },
   };
 
-
+  
   for (var n=0; n<sourceFiles.length; n++) {
     var inputFile = sourceFiles[n];
     var className = (inputFile.match(/[-_\w]+[.][\w]+$/i)[0]).replace('.js', '');
@@ -219,21 +228,14 @@ module.exports = function(grunt) {
 
     config.uglify.build.files[outputFile] = [inputFile];
   }
-
+  
   grunt.initConfig(config);
 
-  // Load plugins
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-replace');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-copy');
 
   // Tasks
-  grunt.registerTask('dev', ['clean', 'concat:dev', 'replace:dev']);
-  grunt.registerTask('beta', ['clean', 'concat:beta', 'replace:beta']);
-  grunt.registerTask('full', [
+  grunt.registerTask('dev', 'Create dev version', ['clean', 'concat:dev', 'replace:dev']);
+  grunt.registerTask('beta', 'Create beta version', ['clean', 'concat:beta', 'replace:beta']);
+  grunt.registerTask('full', 'Build full version and create min files', [
     'clean',
     'concat:prod',
     'uglify',
@@ -244,5 +246,33 @@ module.exports = function(grunt) {
     'copy:prod1',
     'copy:prod2'
   ]);
-  grunt.registerTask('hint', ['clean', 'concat:dev', 'replace:dev', 'jshint']);
+
+  grunt.registerTask('docs', 'Generate documentation to documentation folder', [
+    'full',
+    'shell:jsdoc',
+  ]);
+
+  grunt.registerTask('hint', 'Check hint errors', ['jshint']);
+  grunt.registerTask('test', 'Run tests', ['dev', 'mocha_phantomjs']);
+
+  grunt.registerTask('server', 'run local server and create dev version', function() {
+
+    grunt.task.run('dev');
+    grunt.log.writeln('Tests server starts on http://localhost:8080/test/runner.html');
+    var connect = require('connect');
+    connect.createServer(
+        connect.static(__dirname)
+    ).listen(8080);
+    grunt.task.run('watch:dev');
+  });
+
+  grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-replace');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-shell');
+  grunt.loadNpmTasks('grunt-mocha-phantomjs');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 };
