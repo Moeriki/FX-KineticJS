@@ -8,7 +8,10 @@ module.exports = function(grunt) {
     'src/Factory.js',
     'src/Node.js',
 
-    // filters 
+    // core plugins
+    'src/plugins/fx-extensions.js',
+
+    // filters
     'src/filters/Grayscale.js',
     'src/filters/Brighten.js',
     'src/filters/Invert.js',
@@ -26,13 +29,14 @@ module.exports = function(grunt) {
     'src/filters/Sepia.js',
     'src/filters/Solarize.js',
     'src/filters/Kaleidoscope.js',
-    
+
     // core
     'src/Animation.js',
     'src/Tween.js',
     'src/DragAndDrop.js',
     'src/Container.js',
     'src/Shape.js',
+    'src/Kizzle.js',//must be after Node, Shape and Container, and before anything that extends either of those
     'src/Stage.js',
     'src/Layer.js',
     'src/Group.js',
@@ -54,7 +58,69 @@ module.exports = function(grunt) {
     'src/plugins/TextPath.js',
     'src/plugins/RegularPolygon.js',
     'src/plugins/Star.js',
-    'src/plugins/Label.js'
+    'src/plugins/Label.js',
+  ];
+
+  var sourceFilesFX = [
+    // core
+    'src/Global.js',
+    'src/Util.js',
+    'src/Canvas.js',
+    'src/Context.js',
+    'src/Factory.js',
+    'src/Node.js',
+
+    // core plugins
+    'src/plugins/fx-extensions.js',
+
+    // filters
+    // 'src/filters/Grayscale.js',
+    // 'src/filters/Brighten.js',
+    // 'src/filters/Invert.js',
+    // 'src/filters/Blur.js',
+    // 'src/filters/Mask.js',
+    // 'src/filters/RGB.js',
+    // 'src/filters/HSV.js',
+    // 'src/filters/HSL.js',
+    // 'src/filters/Emboss.js',
+    // 'src/filters/Enhance.js',
+    // 'src/filters/Posterize.js',
+    // 'src/filters/Noise.js',
+    // 'src/filters/Pixelate.js',
+    // 'src/filters/Threshold.js',
+    // 'src/filters/Sepia.js',
+    // 'src/filters/Solarize.js',
+    // 'src/filters/Kaleidoscope.js',
+
+    // core
+    'src/Animation.js',
+    'src/Tween.js',
+    'src/DragAndDrop.js',
+    'src/Container.js',
+    'src/Shape.js',
+    'src/Kizzle.js',//must be after Node, Shape and Container, and before anything that extends either of those
+    'src/Stage.js',
+    'src/Layer.js',
+    'src/Group.js',
+
+    // shapes
+    'src/shapes/Rect.js',
+    'src/shapes/Circle.js',
+    'src/shapes/Ellipse.js',
+    // 'src/shapes/Ring.js',
+    'src/shapes/Wedge.js',
+    'src/shapes/Arc.js',
+    'src/shapes/Image.js',
+    'src/shapes/Text.js',
+    'src/shapes/Line.js',
+    // 'src/shapes/Sprite.js',
+
+    // plugins
+    // 'src/plugins/Path.js',
+    // 'src/plugins/TextPath.js',
+    'src/plugins/RegularPolygon.js',
+    'src/plugins/Star.js',
+    // 'src/plugins/Label.js',
   ];
 
   // Project configuration.
@@ -74,7 +140,7 @@ module.exports = function(grunt) {
         dest: 'dist/kinetic-v<%= pkg.version %>-beta.js'
       },
       prod: {
-        src: sourceFiles,
+        src: sourceFilesFX,
         dest: 'dist/kinetic-v<%= pkg.version %>.js'
       }
     },
@@ -220,7 +286,7 @@ module.exports = function(grunt) {
     },
   };
 
-  
+
   for (var n=0; n<sourceFiles.length; n++) {
     var inputFile = sourceFiles[n];
     var className = (inputFile.match(/[-_\w]+[.][\w]+$/i)[0]).replace('.js', '');
@@ -228,7 +294,7 @@ module.exports = function(grunt) {
 
     config.uglify.build.files[outputFile] = [inputFile];
   }
-  
+
   grunt.initConfig(config);
 
 
