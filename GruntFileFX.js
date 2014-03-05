@@ -10,7 +10,6 @@ module.exports = function(grunt) {
 
         // core plugins
         'src/plugins/fx-extensions.js',
-        'src/plugins/fx-classes.js',
 
         // filters
         // 'src/filters/Grayscale.js',
