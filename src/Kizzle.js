@@ -187,7 +187,9 @@
         getChildren: function(selector) {
             var nodes, s;
 
-            if(selector) {
+            if(typeof selector === 'function') {
+                return this.children.filter(selector);
+            } else if(typeof select === 'string') {
                 selector = selector.split(',').map(Kinetic.Kizzle);
                 nodes = [];
 
