@@ -58,13 +58,8 @@
      * @memberof Kinetic.Collection.prototype
      */
     Kinetic.Collection.prototype.toArray = function() {
-        var arr = [],
-            len = this.length,
-            n;
-
-        for(n = 0; n < len; n++) {
-            arr.push(this[n]);
-        }
+        var arr = [];
+        Array.prototype.push.apply(arr, this);
         return arr;
     };
     /**
@@ -74,13 +69,8 @@
      * @param {Array} arr
      */
     Kinetic.Collection.toCollection = function(arr) {
-        var collection = new Kinetic.Collection(),
-            len = arr.length,
-            n;
-
-        for(n = 0; n < len; n++) {
-            collection.push(arr[n]);
-        }
+        var collection = new Kinetic.Collection();
+        Array.prototype.push.apply(collection, arr);
         return collection;
     };
 

@@ -228,9 +228,97 @@
             return Kinetic.Collection.toCollection(nodes);
         },
 
+        /**
+        */
+        first: function(selector, startAt) {
+            var kizz, len, c;
+
+            if(!selector) {
+                return this.children[0];
+            }
+
+            kizz = Kinetic.Kizzle(selector);
+            if(!startAt) {
+                startAt = 0;
+            }
+
+            len = this.children.length;
+            for(c = startAt; c < len; c++) {
+                if(kizz.matchAll(this.children[c])) {
+                    return this.children[c];
+                }
+            }
+        },
+
+        /**
+        */
+        last: function(selector, startAt) {
+            var kizz, c;
+
+            if(!selector) {
+                return this.children[this.children.length - 1];
+            }
+
+            kizz = Kinetic.Kizzle(selector);
+            if(startAt === undefined) {
+                startAt = this.length;
+            }
+
+            for(c = startAt; c >= 0; c++) {
+                if(kizz.matchAll(this.children[c])) {
+                    return this.children[c];
+                }
+            }
+        },
+
     });
 
     Kinetic.Util.addMethods(Kinetic.Node, {
+
+        /**
+        * Get the next node from its siblings. Returns undefined if this node is the last.
+        * @method
+        * @memberof Kinetic.Node.prototype
+        * @param {number|string} selector - pass a number to get the next n node, or a kizzle selector to find the next node matching a certain condition
+        * @returns {Kinetic.Node|undefined}
+        */
+        next: function(selector) {
+            if(!selector) {
+                selector = 1;
+            }
+
+            if(typeof selector === 'number') {
+                return this.parent.children[this.index + selector];
+            } else {
+                return this.parent.first(selector, this.index + 1);
+            }
+        },
+
+        /**
+        * Get the previous node from its siblings. Returns undefined if this node is the first.
+        * @method
+        * @memberof Kinetic.Node.prototype
+        * @returns {Kinetic.Node|undefined}
+        */
+        previous: function(selector) {
+            if(!selector) {
+                selector = 1;
+            }
+
+            if(typeof selector === 'number') {
+                return this.parent.children[this.index - selector];
+            } else {
+                return this.parent.last(selector, this.index - 1);
+            }
+        },
+
+        /**
+        * Get all nodes that have the same parent as the current {@link Kinetic.Node}, (include the node itself.
+        * @returns {[Kinetic.Node]}
+        */
+        siblings: function(selector) {
+            return selector ? this.parent.getChildren(selector) : this.parent.children;
+        },
 
         _get: function(kizz) {
             var nodes = [];

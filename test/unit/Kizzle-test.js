@@ -199,5 +199,14 @@ suite('Kizzle', function() {
         assert.equal(layer.getChildren('#group1, group2').length, 2);
     });
 
+    test('#next');
+
+    test('#previous');
+
+    test('#first');
+
+    test('#last');
+
+    test('#siblings');
 
 });
