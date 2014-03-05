@@ -199,14 +199,33 @@ suite('Kizzle', function() {
         assert.equal(layer.getChildren('#group1, group2').length, 2);
     });
 
-    test('#next');
+    test('#next / #previous', function() {
+        var layer = new Kinetic.Layer();
 
-    test('#previous');
+        var circle = new Kinetic.Circle();
+        layer.add(circle);
+
+        var rect = new Kinetic.Rect();
+        layer.add(rect);
+
+        assert.equal(circle.next(), rect);
+        assert.equal(rect.previous(), circle);
+    });
+
+    test('#siblings', function() {
+        var layer = new Kinetic.Layer();
+        for(var i = 0; i < 10; i++) {
+            layer.add(new Kinetic.Shape());
+        }
+
+        var circle = new Kinetic.Circle();
+        layer.add(circle);
+
+        assert.equal(circle.siblings().length, 11);
+    });
 
     test('#first');
 
     test('#last');
-
-    test('#siblings');
 
 });

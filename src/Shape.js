@@ -101,15 +101,21 @@
             return !!(this.stroke() || this.strokeRed() || this.strokeGreen() || this.strokeBlue());
         },
         _get: function(selector) {
-            return this.className === selector || this.nodeType === selector ? [this] : [];
+            var nodes = [];
+
+            if((!selector.nodeType || selector.nodeType === this.nodeType || selector.nodeType === this.className) && selector.matchAttrs(this)) {
+                nodes.push(this);
+            }
+
+            return nodes;
         },
         _calculateAdaptiveDash: function(){
             if(this.adaptiveDash() && this.dash())
-            {   
+            {
                 var strokeWidth = this.strokeWidth(),
                     adaptedDash = this.dash().map(function(x){return x * strokeWidth;});
                 this._setAttr(ADAPTIVE_DASH, adaptedDash);
-            } 
+            }
             else if (this.adaptiveDash())
             {
                 this._setAttr(ADAPTIVE_DASH, []);
@@ -122,7 +128,7 @@
          *  because it performs much better
          * @method
          * @memberof Kinetic.Shape.prototype
-         * @param {Object} point 
+         * @param {Object} point
          * @param {Number} point.x
          * @param {Number} point.y
          * @returns {Boolean}
@@ -137,7 +143,7 @@
             p = bufferHitCanvas.context.getImageData(pos.x | 0, pos.y | 0, 1, 1).data;
             return p[3] > 0;
         },
-        // extends Node.prototype.destroy 
+        // extends Node.prototype.destroy
         destroy: function() {
             Kinetic.Node.prototype.destroy.call(this);
             delete Kinetic.shapes[this.colorKey];
@@ -168,7 +174,7 @@
                         bufferContext.save();
                         bufferContext._applyLineJoin(this);
                         bufferContext._applyTransform(this);
-                     
+
                         drawFunc.call(this, bufferContext);
                         bufferContext.restore();
 
@@ -186,7 +192,7 @@
                     else {
                         context._applyLineJoin(this);
                         context._applyTransform(this);
-               
+
                         if (hasShadow) {
                             context.save();
                             context._applyShadow(this);
@@ -211,7 +217,7 @@
                 cachedHitCanvas = cachedCanvas && cachedCanvas.hit;
 
             if(this.shouldDrawHit()) {
-                
+
                 if (cachedHitCanvas) {
                     this._drawCachedHitCanvas(context);
                 }
@@ -219,11 +225,11 @@
                     context.save();
                     context._applyLineJoin(this);
                     context._applyTransform(this);
-                   
+
                     drawFunc.call(this, context);
                     context.restore();
                 }
-                
+
             }
 
             return this;
@@ -233,7 +239,7 @@
         * @method
         * @memberof Kinetic.Shape.prototype
         * @param {Integer} alphaThreshold alpha channel threshold that determines whether or not
-        *  a pixel should be drawn onto the hit graph.  Must be a value between 0 and 255.  
+        *  a pixel should be drawn onto the hit graph.  Must be a value between 0 and 255.
         *  The default is 0
         * @returns {Kinetic.Shape}
         * @example
@@ -487,9 +493,9 @@
      * @example
      *  // apply dashed stroke that is 10px long and 5 pixels apart<br>
      *  line.dash([10, 5]);<br><br>
-     *  
-     *  // apply dashed stroke that is made up of alternating dashed<br> 
-     *  // lines that are 10px long and 20px apart, and dots that have<br> 
+     *
+     *  // apply dashed stroke that is made up of alternating dashed<br>
+     *  // lines that are 10px long and 20px apart, and dots that have<br>
      *  // a radius of 5px and are 20px apart<br>
      *  line.dash([10, 20, 0.001, 20]);
      */
@@ -506,7 +512,7 @@
      * @example
      *  // set adaptive dash<br>
      *  line.adaptiveDash(true);<br><br>
-     *  
+     *
      *  // get adaptive dash<br>
      *  line.adaptiveDash();
      */
@@ -606,7 +612,7 @@
      * // set shadow alpha component<br>
      * shape.shadowAlpha(0.5);
      */
-     
+
     Kinetic.Factory.addGetterSetter(Kinetic.Shape, 'shadowBlur');
 
     /**
@@ -826,7 +832,7 @@
      * @example
      * // get fill pattern x<br>
      * var fillPatternX = shape.fillPatternX();<br><br>
-     * 
+     *
      * // set fill pattern x<br>
      * shape.fillPatternX(20);
      */
@@ -843,7 +849,7 @@
      * @example
      * // get fill pattern y<br>
      * var fillPatternY = shape.fillPatternY();<br><br>
-     * 
+     *
      * // set fill pattern y<br>
      * shape.fillPatternY(20);
      */

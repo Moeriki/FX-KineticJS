@@ -7,6 +7,7 @@ module.exports = function(grunt) {
     'src/Context.js',
     'src/Factory.js',
     'src/Node.js',
+    'src/Kizzle.js',
 
     // core plugins
     'src/plugins/fx-extensions.js',
@@ -36,7 +37,6 @@ module.exports = function(grunt) {
     'src/DragAndDrop.js',
     'src/Container.js',
     'src/Shape.js',
-    'src/Kizzle.js',//must be after Node, Shape and Container, and before anything that extends either of those
     'src/Stage.js',
     'src/Layer.js',
     'src/Group.js',
@@ -52,6 +52,20 @@ module.exports = function(grunt) {
     'src/shapes/Text.js',
     'src/shapes/Line.js',
     'src/shapes/Sprite.js',
+
+    // custom shapes
+    'src/shapes/Arrow.js',
+    'src/shapes/Cube.js',
+    'src/shapes/Diamond.js',
+    'src/shapes/Parallelogram.js',
+    'src/shapes/SemiCircle.js',
+    'src/shapes/SpeechBubble.js',
+    'src/shapes/SplitT.js',
+    'src/shapes/Square.js',
+    'src/shapes/Trapezoid.js',
+    'src/shapes/TriangleEquilateral.js',
+    'src/shapes/TriangleIsosceles.js',
+    'src/shapes/TriangleRightAngled.js',
 
     // plugins
     'src/plugins/Path.js',
@@ -69,6 +83,7 @@ module.exports = function(grunt) {
     'src/Context.js',
     'src/Factory.js',
     'src/Node.js',
+    'src/Kizzle.js',
 
     // core plugins
     'src/plugins/fx-extensions.js',
@@ -98,7 +113,6 @@ module.exports = function(grunt) {
     'src/DragAndDrop.js',
     'src/Container.js',
     'src/Shape.js',
-    'src/Kizzle.js',//must be after Node, Shape and Container, and before anything that extends either of those
     'src/Stage.js',
     'src/Layer.js',
     'src/Group.js',

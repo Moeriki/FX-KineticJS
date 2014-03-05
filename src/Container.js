@@ -19,17 +19,22 @@
          *    return node.getClassName() === 'Circle';<br>
          * });
          */
-        getChildren: function(predicate) {
-            if (!predicate) {
-                return this.children;
+        getChildren: function(selector) {
+            var nodes, s;
+
+            if(typeof selector === 'function') {
+                return this.children.filter(selector);
+            } else if(typeof select === 'string') {
+                selector = selector.split(',').map(Kinetic.Kizzle);
+                nodes = [];
+
+                for(s = 0; s < selector.length; s++) {
+                    Array.prototype.push.apply(nodes, (Kinetic.Kizzle(selector[s]).filter(this.children)));
+                }
+
+                return nodes;
             } else {
-                var results = new Kinetic.Collection();
-                this.children.each(function(child){
-                    if (predicate(child)) {
-                        results.push(child);
-                    }
-                });
-                return results;
+                return this.children;
             }
         },
         /**
@@ -139,37 +144,30 @@
          * var nodes = layer.find('#foo, .bar');
          */
         find: function(selector) {
-            var retArr = [],
-                selectorArr = selector.replace(/ /g, '').split(','),
-                len = selectorArr.length,
-                n, i, sel, arr, node, children, clen;
+            var s, nodes, kizz, node, clen, c;
 
-            for (n = 0; n < len; n++) {
-                sel = selectorArr[n];
+            selector = selector.split(',').map(Kinetic.Kizzle);
+            nodes = [];
 
-                // id selector
-                if(sel.charAt(0) === '#') {
-                    node = this._getNodeById(sel.slice(1));
+            for(s = 0; s < selector.length; s++) {
+                kizz = selector[s];
+
+                if(kizz.id) {
+                    node = this._getNodeById(kizz.id);
                     if(node) {
-                        retArr.push(node);
+                        Array.prototype.push.apply(nodes, node._get(kizz));
                     }
-                }
-                // name selector
-                else if(sel.charAt(0) === '.') {
-                    arr = this._getNodesByName(sel.slice(1));
-                    retArr = retArr.concat(arr);
-                }
-                // unrecognized selector, pass to children
-                else {
-                    children = this.getChildren();
-                    clen = children.length;
-                    for(i = 0; i < clen; i++) {
-                        retArr = retArr.concat(children[i]._get(sel));
+                } else if(kizz.name) {
+                    Array.prototype.push.apply(nodes, this._getNodesByName(kizz.name).filter(kizz.matchAttrs.bind(kizz)));
+                } else {
+                    clen = this.children.length;
+                    for(c = 0; c < clen; c++) {
+                        Array.prototype.push.apply(nodes, this.children[c]._get(kizz));
                     }
                 }
             }
 
-            return Kinetic.Collection.toCollection(retArr);
+            return Kinetic.Collection.toCollection(nodes);
         },
         _getNodeById: function(key) {
             var node = Kinetic.ids[key];
@@ -184,13 +182,20 @@
             return this._getDescendants(arr);
         },
         _get: function(selector) {
-            var retArr = Kinetic.Node.prototype._get.call(this, selector);
-            var children = this.getChildren();
-            var len = children.length;
-            for(var n = 0; n < len; n++) {
-                retArr = retArr.concat(children[n]._get(selector));
+            var nodes, clen, c;
+
+            nodes = [];
+
+            if(selector.match(this, {nodeType: true})) {
+                nodes.push(this);
             }
-            return retArr;
+
+            clen = this.children.length;
+            for(c = 0; c < clen; c++) {
+                Array.prototype.push.apply(nodes, this.children[c]._get(selector));
+            }
+
+            return nodes;
         },
         // extenders
         toObject: function() {

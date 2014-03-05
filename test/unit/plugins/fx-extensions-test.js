@@ -76,31 +76,6 @@ suite('FX Extensions', function() {
             assert.equal(rect.index, 5);
         });
 
-        test('#next / #previous', function() {
-            var layer = new Kinetic.Layer();
-
-            var circle = new Kinetic.Circle();
-            layer.add(circle);
-
-            var rect = new Kinetic.Rect();
-            layer.add(rect);
-
-            assert.equal(circle.next(), rect);
-            assert.equal(rect.previous(), circle);
-        });
-
-        test('#siblings', function() {
-            var layer = new Kinetic.Layer();
-            for(var i = 0; i < 10; i++) {
-                layer.add(new Kinetic.Shape());
-            }
-
-            var circle = new Kinetic.Circle();
-            layer.add(circle);
-
-            assert.equal(circle.siblings().length, 11);
-        });
-
     });
 
 });
