@@ -1434,4 +1434,20 @@ suite('Container', function() {
         layer.draw();
     });
 
+    test('#insert', function() {
+        var layer = new Kinetic.Layer();
+
+        for(var i = 0; i < 10; i++) {
+            layer.add(new Kinetic.Shape());
+        }
+
+        var circle = new Kinetic.Circle();
+        layer.insert(circle, 5);
+        assert.equal(circle.index, 5);
+
+        var rect = new Kinetic.Rect();
+        layer.insert(rect);
+        assert.equal(rect.index, 0);
+    });
+
 });

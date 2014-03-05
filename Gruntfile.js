@@ -9,9 +9,6 @@ module.exports = function(grunt) {
     'src/Node.js',
     'src/Kizzle.js',
 
-    // core plugins
-    'src/plugins/fx-extensions.js',
-
     // filters
     'src/filters/Grayscale.js',
     'src/filters/Brighten.js',
@@ -84,9 +81,6 @@ module.exports = function(grunt) {
     'src/Factory.js',
     'src/Node.js',
     'src/Kizzle.js',
-
-    // core plugins
-    'src/plugins/fx-extensions.js',
 
     // filters
     // 'src/filters/Grayscale.js',

@@ -934,6 +934,53 @@
             return false;
         },
         /**
+         * move node before another node
+         * @method
+         * @memberof Kinetic.Node.prototype
+         * @param {Node} node
+         */
+        moveBefore: function(node) {
+            this.moveTo(node.parent);
+            this.setZIndex(node.index);
+        },
+        /**
+         * move node after another node
+         * @method
+         * @memberof Kinetic.Node.prototype
+         * @param {Node} node
+         */
+        moveAfter: function(node) {
+            this.moveTo(node.parent);
+            this.setZIndex(node.index + 1);
+        },
+        /**
+         * check if the node is the first child of its parent
+         * @method
+         * @memberof Kinetic.Node.prototype
+         * @returns {boolean}
+         */
+        isFirst: function() {
+            return this.index === 0;
+        },
+        /**
+         * check if the node is the last child of its parent
+         * @method
+         * @memberof Kinetic.Node.prototype
+         * @returns {boolean}
+         */
+        isLast: function() {
+            return this.index === this.parent.children.length - 1;
+        },
+        /**
+         * check if the node has a parent
+         * @method
+         * @memberof Kinetic.Node.prototype
+         * @returns {boolean}
+         */
+        isOrphan: function() {
+            return !this.parent;
+        },
+        /**
          * set zIndex relative to siblings
          * @method
          * @memberof Kinetic.Node.prototype

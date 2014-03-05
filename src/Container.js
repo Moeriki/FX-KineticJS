@@ -111,6 +111,17 @@
             // chainable
             return this;
         },
+        /**
+         * insert a node at a specific position
+         * @method
+         * @memberof Kinetic.Container.prototype
+         * @param {Node} node
+         * @param {number} zIndex
+         */
+        insert: function(node, zIndex) {
+            node.moveTo(this);
+            node.setZIndex(zIndex || 0);
+        },
         destroy: function() {
             // destroy children
             if (this.hasChildren()) {
