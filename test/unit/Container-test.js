@@ -1355,4 +1355,83 @@ suite('Container', function() {
         layer.draw();
     });
 
+    // ======================================================
+    test('add and moveTo should work same way (depend on parent)', function() {
+        var stage = addStage();
+        var layer = new Kinetic.Layer();
+        var greenGroup = new Kinetic.Group();
+        var blueGroup = new Kinetic.Group();
+
+        var bluecircle = new Kinetic.Circle({
+            x: 200,
+            y: stage.getHeight() / 2,
+            radius: 70,
+            fill: 'blue',
+            stroke: 'black',
+            strokeWidth: 4
+        });
+
+        bluecircle.moveTo(blueGroup);
+
+        layer.add(blueGroup);
+        layer.add(greenGroup);
+        stage.add(layer);
+
+        assert.equal(blueGroup.getChildren().length, 1, 'blue group should have only one children');
+        blueGroup.add(bluecircle);
+        assert.equal(blueGroup.getChildren().length, 1, 'blue group should have only one children after adding node twice');
+
+        greenGroup.add(bluecircle);
+        assert.equal(blueGroup.getChildren().length, 0, 'blue group should not have children');
+        assert.equal(greenGroup.getChildren().length, 1, 'green group should have only one children');
+
+
+
+        layer.draw();
+    });
+
+    // ======================================================
+    test('getChildren may use filter function', function() {
+        var stage = addStage();
+        var layer = new Kinetic.Layer();
+        var group = new Kinetic.Group();
+
+        var circle1 = new Kinetic.Circle({
+            x: 200,
+            y: stage.getHeight() / 2,
+            radius: 70,
+            fill: 'blue',
+            stroke: 'black',
+            strokeWidth: 4
+        });
+        var circle2 = circle1.clone();
+        group.add(circle1).add(circle2);
+
+        var rect = new Kinetic.Rect({
+            name : 'test'
+        });
+        group.add(rect);
+
+        var circles = group.getChildren(function(node){
+            return node.getClassName() === 'Circle';
+        });
+        assert.equal(circles.length, 2, 'group has two circle children');
+        assert.equal(circles.indexOf(circle1) > -1, true);
+        assert.equal(circles.indexOf(circle2) > -1, true);
+
+        var testName = group.getChildren(function(node){
+            return node.name() === 'test';
+        });
+
+        assert.equal(testName.length, 1, 'group has one children with test name');
+
+
+        layer.add(group);
+
+
+
+
+        layer.draw();
+    });
+
 });

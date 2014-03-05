@@ -32,7 +32,7 @@
                 nodeType, layer;
 
             if(node) {
-                nodeType = node.nodeType,
+                nodeType = node.nodeType;
                 layer = node.getLayer();
                 dd.anim.stop();
 
@@ -58,7 +58,7 @@
             var dragEndNode = evt.dragEndNode;
 
             if (evt && dragEndNode) {
-              dragEndNode.fire('dragend', evt, true);
+                dragEndNode.fire('dragend', evt, true);
             }
         }
     };
@@ -95,11 +95,14 @@
     Kinetic.Node.prototype._setDragPosition = function(evt) {
         var dd = Kinetic.DD,
             pos = this.getStage().getPointerPosition(),
-            dbf = this.getDragBoundFunc(),
-            newNodePos = {
-                x: pos.x - dd.offset.x,
-                y: pos.y - dd.offset.y
-            };
+            dbf = this.getDragBoundFunc();
+        if (!pos) {
+            return;
+        }
+        var newNodePos = {
+            x: pos.x - dd.offset.x,
+            y: pos.y - dd.offset.y
+        };
 
         if(dbf !== undefined) {
             newNodePos = dbf.call(this, newNodePos, evt);
@@ -251,7 +254,7 @@
      * node.draggable(false);
      */
 
-    var html = document.documentElement;
+    var html = Kinetic.document.documentElement;
     html.addEventListener('mouseup', Kinetic.DD._endDragBefore, true);
     html.addEventListener('touchend', Kinetic.DD._endDragBefore, true);
 
