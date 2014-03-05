@@ -8,10 +8,7 @@ module.exports = function(grunt) {
     'src/Factory.js',
     'src/Node.js',
 
-    // core plugins
-    'src/plugins/fx-extensions.js',
-
-    // filters
+    // filters 
     'src/filters/Grayscale.js',
     'src/filters/Brighten.js',
     'src/filters/Invert.js',
@@ -29,7 +26,7 @@ module.exports = function(grunt) {
     'src/filters/Sepia.js',
     'src/filters/Solarize.js',
     'src/filters/Kaleidoscope.js',
-
+    
     // core
     'src/Animation.js',
     'src/Tween.js',
@@ -38,7 +35,6 @@ module.exports = function(grunt) {
     'src/Shape.js',
     'src/Stage.js',
     'src/Layer.js',
-    'src/Kizzle.js',//must be after Node, Shape and Container, and before anything that extends either of those
     'src/Group.js',
 
     // shapes
@@ -52,18 +48,6 @@ module.exports = function(grunt) {
     'src/shapes/Text.js',
     'src/shapes/Line.js',
     'src/shapes/Sprite.js',
-    'src/shapes/TriangleIsosceles.js',
-    'src/shapes/TriangleRightAngled.js',
-    'src/shapes/TriangleEquilateral.js',
-    'src/shapes/Square.js',
-    'src/shapes/Diamond.js',
-    'src/shapes/SemiCircle.js',
-    'src/shapes/Parallelogram.js',
-    'src/shapes/Trapezoid.js',
-    'src/shapes/Arrow.js',
-    'src/shapes/SplitT.js',
-    'src/shapes/Cube.js',
-    'src/shapes/SpeechBubble.js',
 
     // plugins
     'src/plugins/Path.js',
@@ -236,7 +220,7 @@ module.exports = function(grunt) {
     },
   };
 
-
+  
   for (var n=0; n<sourceFiles.length; n++) {
     var inputFile = sourceFiles[n];
     var className = (inputFile.match(/[-_\w]+[.][\w]+$/i)[0]).replace('.js', '');
@@ -244,7 +228,7 @@ module.exports = function(grunt) {
 
     config.uglify.build.files[outputFile] = [inputFile];
   }
-
+  
   grunt.initConfig(config);
 
 

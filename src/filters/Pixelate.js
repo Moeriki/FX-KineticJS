@@ -1,4 +1,4 @@
-(function(){
+(function () {
 
     /**
      * Pixelate Filter. Averages groups of pixels and redraws
@@ -25,7 +25,7 @@
 
         for (xBin = 0; xBin < nBinsX; xBin += 1) {
             for (yBin = 0; yBin < nBinsY; yBin += 1) {
-
+        
                 // Initialize the color accumlators to 0
                 red = 0;
                 green = 0;
@@ -72,7 +72,7 @@
                 }
             }
         }
-
+      
     };
 
     Kinetic.Factory.addGetterSetter(Kinetic.Node, 'pixelSize', 8, null, Kinetic.Factory.afterSetFilter);
