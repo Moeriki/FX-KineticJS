@@ -957,19 +957,21 @@
          * check if the node is the first child of its parent
          * @method
          * @memberof Kinetic.Node.prototype
+         * @param {number} [head = 1] - specify if a node should be either of the first N nodes
          * @returns {boolean}
          */
-        isFirst: function() {
-            return this.index === 0;
+        isFirst: function(head) {
+            return this.index <= (head ? head - 1 : 0);
         },
         /**
          * check if the node is the last child of its parent
          * @method
          * @memberof Kinetic.Node.prototype
+         * @param {number} [tail = 1] - specify if a node should be either of the last N nodes
          * @returns {boolean}
          */
-        isLast: function() {
-            return this.index === this.parent.children.length - 1;
+        isLast: function(tail) {
+            return this.index === this.parent.children.length - (tail || 1);
         },
         /**
          * check if the node has a parent
