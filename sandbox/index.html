@@ -19,11 +19,16 @@
                 kinetic: '../dist/kinetic-dev',
                 jquery: 'jquery-2.1.0',
                 lodash: 'lodash.custom',
+                dancer: 'dancer.min',
+                origin: 'origin'
             },
             shim: {
                 kinetic: {
                     exports: 'Kinetic',
                 },
+                dancer: {
+                    exports: 'Dancer'
+                }
             }
         })
 

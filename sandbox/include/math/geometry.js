@@ -214,13 +214,13 @@ define([
     */
     function makeTrigonometricRatioSolver(angFunc, numerator, denominator) {
         var obj = {};
-        obj["solveFor#{angFunc}"] = function (num, denom) {
+        obj["solveFor" + angFunc] = function (num, denom) {
             return num / denom;
         }
-        obj["solveFor#{numerator}"] = function (ang, denom) {
+        obj["solveFor" + numerator] = function (ang, denom) {
             return ang * denom;
         }
-        obj["solveFor#{denominator}"] = function (ang, num) {
+        obj["solveFor" + denominator] = function (ang, num) {
             return num / ang;
         }
         return obj;

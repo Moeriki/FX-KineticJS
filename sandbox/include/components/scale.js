@@ -1,9 +1,10 @@
 define([
 	'lodash',
 	'kinetic',
+    'origin',
     'include/code',
     'include/patterns/observer'
-], function (_,Kinetic,Code,Observer) {
+], function (_,Kinetic,Origin,Code,Observer) {
     'use strict';
 
     var standardScaleTickLength = function (scale, i) {
@@ -26,7 +27,7 @@ define([
             return scale.width / 2;
     };
 	
-    var ProtoScale = {
+    var Scale = Origin.extend({
         _init: function (width,min,max,density,style,attrs) {
             this._width = width;
             this._density = density;
@@ -80,7 +81,7 @@ define([
 
         _addTicks: function (minpos, maxpos) {
             // Potentially add a tick for each possible number. this.addTick will ignore invalid tick requests
-            _   .range(Math.round(Math.max(this.pos2TickIndex(minpos),this.num2TickIndex(this.min))), Math.round(Math.min(this.pos2TickIndex(maxpos),this.num2TickIndex(this.max))) + 1)
+            _   .range(Math.ceil(Math.max(this.pos2TickIndex(minpos),this.num2TickIndex(this.min))), Math.floor(Math.min(this.pos2TickIndex(maxpos),this.num2TickIndex(this.max))) + 1)
                 .forEach(_.bind(function (i) {
                     this._addTick(i);
                 }, this));
@@ -118,18 +119,18 @@ define([
         get maxPos () {
             return this.num2Pos(this.max);
         }
-    };
+    });
 
-    Observer.mixinSubject(ProtoScale);
-    Observer.defineNotifyingProperty(ProtoScale, 'min');
-    Observer.defineNotifyingProperty(ProtoScale, 'max');
-    Observer.defineNotifyingProperty(ProtoScale, 'density');
-    Observer.defineNotifyingProperty(ProtoScale, 'style');
-    Observer.defineNotifyingProperty(ProtoScale, 'width');
+    Observer.mixinSubject(Scale);
+    Observer.defineNotifyingProperty(Scale, 'min');
+    Observer.defineNotifyingProperty(Scale, 'max');
+    Observer.defineNotifyingProperty(Scale, 'density');
+    Observer.defineNotifyingProperty(Scale, 'style');
+    Observer.defineNotifyingProperty(Scale, 'width');
 
     return {
         standardScaleTickLength: standardScaleTickLength,
         standardRulerTickLength: standardRulerTickLength,
-        ProtoScale: ProtoScale
+        Scale: Scale
     };
 });
