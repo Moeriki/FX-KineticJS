@@ -1,6 +1,27 @@
 (function() {
     'use strict';
 
+    Kinetic.Util.addMethods(Kinetic.Transform, {
+
+        transformCoords: function(x, y) {
+            return {
+                x: this.m[0] * x + this.m[2] * y + this.m[4],
+                y: this.m[1] * x + this.m[3] * y + this.m[5]
+            };
+        },
+
+        transformPoint: function(p) {
+            return this.transformCoords(p.x, p.y);
+        },
+
+        dup: function() {
+            var t = new Kinetic.Transform();
+            t.m = this.m.slice(0);
+            return t;
+        }
+
+    });
+
     Kinetic.Util.addMethods(Kinetic.Node, {
 
         // Transforms
