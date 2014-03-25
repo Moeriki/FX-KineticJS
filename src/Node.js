@@ -1130,7 +1130,7 @@
         /**
          * Get closest node matching a @{link Kinetic.Kizzle} selector going up the hierarchy starting from the current node.
          * @method
-         * @memberf Kinetic.Node.prototype
+         * @memberof Kinetic.Node.prototype
          * @returns {?Kinetic.Node}
          */
         getClosest: function(selector) {
