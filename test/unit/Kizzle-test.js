@@ -208,8 +208,8 @@ suite('Kizzle', function() {
         var rect = new Kinetic.Rect();
         layer.add(rect);
 
-        assert.equal(circle.next(), rect);
-        assert.equal(rect.previous(), circle);
+        assert.equal(circle.getNext(), rect);
+        assert.equal(rect.getPrevious(), circle);
     });
 
     test('#siblings', function() {
@@ -221,7 +221,7 @@ suite('Kizzle', function() {
         var circle = new Kinetic.Circle();
         layer.add(circle);
 
-        assert.equal(circle.siblings().length, 11);
+        assert.equal(circle.getSiblings().length, 11);
     });
 
     test('#first');
