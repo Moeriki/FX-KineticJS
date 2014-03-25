@@ -1087,9 +1087,9 @@
         * @method
         * @memberof Kinetic.Node.prototype
         * @param {number|string} selector - pass a number to get the next n node, or a kizzle selector to find the next node matching a certain condition
-        * @returns {Kinetic.Node|undefined}
+        * @returns {?Kinetic.Node}
         */
-        next: function(selector) {
+        getNext: function(selector) {
             if(!selector) {
                 selector = 1;
             }
@@ -1105,9 +1105,9 @@
         * Get the previous node from its siblings. Returns undefined if this node is the first.
         * @method
         * @memberof Kinetic.Node.prototype
-        * @returns {Kinetic.Node|undefined}
+        * @returns {?Kinetic.Node}
         */
-        previous: function(selector) {
+        getPrevious: function(selector) {
             if(!selector) {
                 selector = 1;
             }
@@ -1120,16 +1120,18 @@
         },
         /**
         * Get all nodes that have the same parent as the current {@link Kinetic.Node}, (include the node itself.
-        * @returns {[Kinetic.Node]}
+        * @method
+        * @memberof Kinetic.Node.prototype
+        * @returns {Kinetic.Collection}
         */
-        siblings: function(selector) {
+        getSiblings: function(selector) {
             return selector ? this.parent.getChildren(selector) : this.parent.children;
         },
         /**
          * Get closest node matching a @{link Kinetic.Kizzle} selector going up the hierarchy starting from the current node.
          * @method
          * @memberf Kinetic.Node.prototype
-         * @returns {Kinetic.Node}
+         * @returns {?Kinetic.Node}
          */
         getClosest: function(selector) {
             var kizz, closest;
