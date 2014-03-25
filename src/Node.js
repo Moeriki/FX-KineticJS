@@ -1120,7 +1120,7 @@
         },
         /**
         * Get all nodes that have the same parent as the current {@link Kinetic.Node}, (include the node itself.
-        * @returns {[Kinetic.Node]}
+        * @returns {Kinetic.Collection}
         */
         siblings: function(selector) {
             return selector ? this.parent.getChildren(selector) : this.parent.children;

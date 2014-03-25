@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-03-05
+ * Date: 2014-03-25
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -3086,19 +3086,21 @@ var Kinetic = {};
          * check if the node is the first child of its parent
          * @method
          * @memberof Kinetic.Node.prototype
+         * @param {number} [head = 1] - specify if a node should be either of the first N nodes
          * @returns {boolean}
          */
-        isFirst: function() {
-            return this.index === 0;
+        isFirst: function(head) {
+            return this.index <= (head ? head - 1 : 0);
         },
         /**
          * check if the node is the last child of its parent
          * @method
          * @memberof Kinetic.Node.prototype
+         * @param {number} [tail = 1] - specify if a node should be either of the last N nodes
          * @returns {boolean}
          */
-        isLast: function() {
-            return this.index === this.parent.children.length - 1;
+        isLast: function(tail) {
+            return this.index === this.parent.children.length - (tail || 1);
         },
         /**
          * check if the node has a parent
@@ -3247,7 +3249,7 @@ var Kinetic = {};
         },
         /**
         * Get all nodes that have the same parent as the current {@link Kinetic.Node}, (include the node itself.
-        * @returns {[Kinetic.Node]}
+        * @returns {Kinetic.Collection}
         */
         siblings: function(selector) {
             return selector ? this.parent.getChildren(selector) : this.parent.children;
@@ -9062,388 +9064,6 @@ var Kinetic = {};
     Kinetic.Collection.mapMethods(Kinetic.Ellipse);
 
 })();;(function() {
-    /**
-     * Wedge constructor
-     * @constructor
-     * @augments Kinetic.Shape
-     * @param {Object} config
-     * @param {Number} config.angle in degrees
-     * @param {Number} config.radius
-     * @param {Boolean} [config.clockwise]
-     * @param {String} [config.fill] fill color
-     * @param {Integer} [config.fillRed] set fill red component
-     * @param {Integer} [config.fillGreen] set fill green component
-     * @param {Integer} [config.fillBlue] set fill blue component
-     * @param {Integer} [config.fillAlpha] set fill alpha component
-     * @param {Image} [config.fillPatternImage] fill pattern image
-     * @param {Number} [config.fillPatternX]
-     * @param {Number} [config.fillPatternY]
-     * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX] 
-     * @param {Number} [config.fillPatternOffsetY] 
-     * @param {Object} [config.fillPatternScale] object with x and y component
-     * @param {Number} [config.fillPatternScaleX]
-     * @param {Number} [config.fillPatternScaleY]
-     * @param {Number} [config.fillPatternRotation]
-     * @param {String} [config.fillPatternRepeat] can be "repeat", "repeat-x", "repeat-y", or "no-repeat".  The default is "no-repeat"
-     * @param {Object} [config.fillLinearGradientStartPoint] object with x and y component
-     * @param {Number} [config.fillLinearGradientStartPointX]
-     * @param {Number} [config.fillLinearGradientStartPointY]
-     * @param {Object} [config.fillLinearGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillLinearGradientEndPointX]
-     * @param {Number} [config.fillLinearGradientEndPointY]
-     * @param {Array} [config.fillLinearGradientColorStops] array of color stops
-     * @param {Object} [config.fillRadialGradientStartPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientStartPointX]
-     * @param {Number} [config.fillRadialGradientStartPointY]
-     * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX] 
-     * @param {Number} [config.fillRadialGradientEndPointY] 
-     * @param {Number} [config.fillRadialGradientStartRadius]
-     * @param {Number} [config.fillRadialGradientEndRadius]
-     * @param {Array} [config.fillRadialGradientColorStops] array of color stops
-     * @param {Boolean} [config.fillEnabled] flag which enables or disables the fill.  The default value is true
-     * @param {String} [config.fillPriority] can be color, linear-gradient, radial-graident, or pattern.  The default value is color.  The fillPriority property makes it really easy to toggle between different fill types.  For example, if you want to toggle between a fill color style and a fill pattern style, simply set the fill property and the fillPattern properties, and then use setFillPriority('color') to render the shape with a color fill, or use setFillPriority('pattern') to render the shape with the pattern fill configuration
-     * @param {String} [config.stroke] stroke color
-     * @param {Integer} [config.strokeRed] set stroke red component
-     * @param {Integer} [config.strokeGreen] set stroke green component
-     * @param {Integer} [config.strokeBlue] set stroke blue component
-     * @param {Integer} [config.strokeAlpha] set stroke alpha component
-     * @param {Number} [config.strokeWidth] stroke width
-     * @param {Boolean} [config.strokeScaleEnabled] flag which enables or disables stroke scale.  The default is true
-     * @param {Boolean} [config.strokeEnabled] flag which enables or disables the stroke.  The default value is true
-     * @param {String} [config.lineJoin] can be miter, round, or bevel.  The default
-     *  is miter
-     * @param {String} [config.lineCap] can be butt, round, or sqare.  The default
-     *  is butt
-     * @param {String} [config.shadowColor]
-     * @param {Integer} [config.shadowRed] set shadow color red component
-     * @param {Integer} [config.shadowGreen] set shadow color green component
-     * @param {Integer} [config.shadowBlue] set shadow color blue component
-     * @param {Integer} [config.shadowAlpha] set shadow color alpha component
-     * @param {Number} [config.shadowBlur]
-     * @param {Object} [config.shadowOffset] object with x and y component
-     * @param {Number} [config.shadowOffsetX]
-     * @param {Number} [config.shadowOffsetY]
-     * @param {Number} [config.shadowOpacity] shadow opacity.  Can be any real number
-     *  between 0 and 1
-     * @param {Boolean} [config.shadowEnabled] flag which enables or disables the shadow.  The default value is true
-     * @param {Array} [config.dash]
-     * @param {Boolean} [config.dashEnabled] flag which enables or disables the dashArray.  The default value is true
-     * @param {Number} [config.x]
-     * @param {Number} [config.y]
-     * @param {Number} [config.width]
-     * @param {Number} [config.height]
-     * @param {Boolean} [config.visible]
-     * @param {Boolean} [config.listening] whether or not the node is listening for events
-     * @param {String} [config.id] unique id
-     * @param {String} [config.name] non-unique name
-     * @param {Number} [config.opacity] determines node opacity.  Can be any number between 0 and 1
-     * @param {Object} [config.scale] set scale
-     * @param {Number} [config.scaleX] set scale x
-     * @param {Number} [config.scaleY] set scale y
-     * @param {Number} [config.rotation] rotation in degrees
-     * @param {Object} [config.offset] offset from center point and rotation point
-     * @param {Number} [config.offsetX] set offset x
-     * @param {Number} [config.offsetY] set offset y
-     * @param {Boolean} [config.draggable] makes the node draggable.  When stages are draggable, you can drag and drop
-     *  the entire stage by dragging any portion of the stage
-     * @param {Function} [config.dragBoundFunc]
-     * @example
-     * // draw a wedge that's pointing downwards<br>
-     * var wedge = new Kinetic.Wedge({<br>
-     *   radius: 40,<br>
-     *   fill: 'red',<br>
-     *   stroke: 'black'<br>
-     *   strokeWidth: 5,<br>
-     *   angleDeg: 60,<br>
-     *   rotationDeg: -120<br>
-     * });
-     */
-    Kinetic.Wedge = function(config) {
-        this.___init(config);
-    };
-
-    Kinetic.Wedge.prototype = {
-        ___init: function(config) {
-            // call super constructor
-            Kinetic.Shape.call(this, config);
-            this.className = 'Wedge';
-            this.sceneFunc(this._sceneFunc);
-        },
-        _sceneFunc: function(context) {
-            context.beginPath();
-            context.arc(0, 0, this.getRadius(), 0, this.getAngle() * Math.PI / 180, this.getClockwise());
-            context.lineTo(0, 0);
-            context.closePath();
-            context.fillStrokeShape(this);
-        }
-    };
-    Kinetic.Util.extend(Kinetic.Wedge, Kinetic.Shape);
-
-    // add getters setters
-    Kinetic.Factory.addGetterSetter(Kinetic.Wedge, 'radius', 0);
-
-    /**
-     * get/set radius
-     * @name radius
-     * @method
-     * @memberof Kinetic.Wedge.prototype
-     * @param {Number} radius
-     * @returns {Number}
-     * @example
-     * // get radius<br>
-     * var radius = wedge.radius();<br><br>
-     *
-     * // set radius<br>
-     * wedge.radius(10);<br>
-     */
-
-    Kinetic.Factory.addGetterSetter(Kinetic.Wedge, 'angle', 0);
-
-    /**
-     * get/set angle in degrees
-     * @name angle
-     * @method
-     * @memberof Kinetic.Wedge.prototype
-     * @param {Number} angle
-     * @returns {Number}
-     * @example
-     * // get angle<br>
-     * var angle = wedge.angle();<br><br>
-     *
-     * // set angle<br>
-     * wedge.angle(20);
-     */
-
-    Kinetic.Factory.addGetterSetter(Kinetic.Wedge, 'clockwise', false);
-
-    /**
-     * get/set clockwise flag
-     * @name clockwise
-     * @method
-     * @memberof Kinetic.Wedge.prototype
-     * @param {Number} clockwise
-     * @returns {Number}
-     * @example
-     * // get clockwise flag<br>
-     * var clockwise = wedge.clockwise();<br><br>
-     *
-     * // draw wedge counter-clockwise<br>
-     * wedge.clockwise(false);<br><br>
-     *
-     * // draw wedge clockwise<br>
-     * wedge.clockwise(true);
-     */
-
-    Kinetic.Factory.backCompat(Kinetic.Wedge, {
-        angleDeg: 'angle',
-        getAngleDeg: 'getAngle',
-        setAngleDeg: 'setAngle'
-    });
-
-    Kinetic.Collection.mapMethods(Kinetic.Wedge);
-})();
-;(function() {
-    /**
-     * Arc constructor
-     * @constructor
-     * @augments Kinetic.Shape
-     * @param {Object} config
-     * @param {Number} config.angle in degrees
-     * @param {Number} config.innerRadius
-     * @param {Number} config.outerRadius
-     * @param {Boolean} [config.clockwise]
-     * @param {String} [config.fill] fill color
-     * @param {Integer} [config.fillRed] set fill red component
-     * @param {Integer} [config.fillGreen] set fill green component
-     * @param {Integer} [config.fillBlue] set fill blue component
-     * @param {Integer} [config.fillAlpha] set fill alpha component
-     * @param {Image} [config.fillPatternImage] fill pattern image
-     * @param {Number} [config.fillPatternX]
-     * @param {Number} [config.fillPatternY]
-     * @param {Object} [config.fillPatternOffset] object with x and y component
-     * @param {Number} [config.fillPatternOffsetX] 
-     * @param {Number} [config.fillPatternOffsetY] 
-     * @param {Object} [config.fillPatternScale] object with x and y component
-     * @param {Number} [config.fillPatternScaleX]
-     * @param {Number} [config.fillPatternScaleY]
-     * @param {Number} [config.fillPatternRotation]
-     * @param {String} [config.fillPatternRepeat] can be "repeat", "repeat-x", "repeat-y", or "no-repeat".  The default is "no-repeat"
-     * @param {Object} [config.fillLinearGradientStartPoint] object with x and y component
-     * @param {Number} [config.fillLinearGradientStartPointX]
-     * @param {Number} [config.fillLinearGradientStartPointY]
-     * @param {Object} [config.fillLinearGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillLinearGradientEndPointX]
-     * @param {Number} [config.fillLinearGradientEndPointY]
-     * @param {Array} [config.fillLinearGradientColorStops] array of color stops
-     * @param {Object} [config.fillRadialGradientStartPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientStartPointX]
-     * @param {Number} [config.fillRadialGradientStartPointY]
-     * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
-     * @param {Number} [config.fillRadialGradientEndPointX] 
-     * @param {Number} [config.fillRadialGradientEndPointY] 
-     * @param {Number} [config.fillRadialGradientStartRadius]
-     * @param {Number} [config.fillRadialGradientEndRadius]
-     * @param {Array} [config.fillRadialGradientColorStops] array of color stops
-     * @param {Boolean} [config.fillEnabled] flag which enables or disables the fill.  The default value is true
-     * @param {String} [config.fillPriority] can be color, linear-gradient, radial-graident, or pattern.  The default value is color.  The fillPriority property makes it really easy to toggle between different fill types.  For example, if you want to toggle between a fill color style and a fill pattern style, simply set the fill property and the fillPattern properties, and then use setFillPriority('color') to render the shape with a color fill, or use setFillPriority('pattern') to render the shape with the pattern fill configuration
-     * @param {String} [config.stroke] stroke color
-     * @param {Integer} [config.strokeRed] set stroke red component
-     * @param {Integer} [config.strokeGreen] set stroke green component
-     * @param {Integer} [config.strokeBlue] set stroke blue component
-     * @param {Integer} [config.strokeAlpha] set stroke alpha component
-     * @param {Number} [config.strokeWidth] stroke width
-     * @param {Boolean} [config.strokeScaleEnabled] flag which enables or disables stroke scale.  The default is true
-     * @param {Boolean} [config.strokeEnabled] flag which enables or disables the stroke.  The default value is true
-     * @param {String} [config.lineJoin] can be miter, round, or bevel.  The default
-     *  is miter
-     * @param {String} [config.lineCap] can be butt, round, or sqare.  The default
-     *  is butt
-     * @param {String} [config.shadowColor]
-     * @param {Integer} [config.shadowRed] set shadow color red component
-     * @param {Integer} [config.shadowGreen] set shadow color green component
-     * @param {Integer} [config.shadowBlue] set shadow color blue component
-     * @param {Integer} [config.shadowAlpha] set shadow color alpha component
-     * @param {Number} [config.shadowBlur]
-     * @param {Object} [config.shadowOffset] object with x and y component
-     * @param {Number} [config.shadowOffsetX]
-     * @param {Number} [config.shadowOffsetY]
-     * @param {Number} [config.shadowOpacity] shadow opacity.  Can be any real number
-     *  between 0 and 1
-     * @param {Boolean} [config.shadowEnabled] flag which enables or disables the shadow.  The default value is true
-     * @param {Array} [config.dash]
-     * @param {Boolean} [config.dashEnabled] flag which enables or disables the dashArray.  The default value is true
-     * @param {Number} [config.x]
-     * @param {Number} [config.y]
-     * @param {Number} [config.width]
-     * @param {Number} [config.height]
-     * @param {Boolean} [config.visible]
-     * @param {Boolean} [config.listening] whether or not the node is listening for events
-     * @param {String} [config.id] unique id
-     * @param {String} [config.name] non-unique name
-     * @param {Number} [config.opacity] determines node opacity.  Can be any number between 0 and 1
-     * @param {Object} [config.scale] set scale
-     * @param {Number} [config.scaleX] set scale x
-     * @param {Number} [config.scaleY] set scale y
-     * @param {Number} [config.rotation] rotation in degrees
-     * @param {Object} [config.offset] offset from center point and rotation point
-     * @param {Number} [config.offsetX] set offset x
-     * @param {Number} [config.offsetY] set offset y
-     * @param {Boolean} [config.draggable] makes the node draggable.  When stages are draggable, you can drag and drop
-     *  the entire stage by dragging any portion of the stage
-     * @param {Function} [config.dragBoundFunc]
-     * @example
-     * // draw a Arc that's pointing downwards<br>
-     * var arc = new Kinetic.Arc({<br>
-     *   innerRadius: 40,<br>
-     *   outerRadius: 80,<br>
-     *   fill: 'red',<br>
-     *   stroke: 'black'<br>
-     *   strokeWidth: 5,<br>
-     *   angle: 60,<br>
-     *   rotationDeg: -120<br>
-     * });
-     */
-    Kinetic.Arc = function(config) {
-        this.___init(config);
-    };
-
-    Kinetic.Arc.prototype = {
-        ___init: function(config) {
-            // call super constructor
-            Kinetic.Shape.call(this, config);
-            this.className = 'Arc';
-            this.sceneFunc(this._sceneFunc);
-        },
-        _sceneFunc: function(context) {
-            var angle = this.angle() * Math.PI / 180,
-                clockwise = this.clockwise();
-
-            context.beginPath();
-            context.arc(0, 0, this.getOuterRadius(), 0, angle, clockwise);
-            context.arc(0, 0, this.getInnerRadius(), angle, 0, !clockwise);
-            context.closePath();
-            context.fillStrokeShape(this);
-        }
-    };
-    Kinetic.Util.extend(Kinetic.Arc, Kinetic.Shape);
-
-    // add getters setters
-    Kinetic.Factory.addGetterSetter(Kinetic.Arc, 'innerRadius', 0);
-
-    /**
-     * get/set innerRadius
-     * @name innerRadius
-     * @method
-     * @memberof Kinetic.Arc.prototype
-     * @param {Number} innerRadius
-     * @returns {Number}
-     * @example
-     * // get inner radius
-     * var innerRadius = arc.innerRadius();
-     *
-     * // set inner radius
-     * arc.innerRadius(20);
-     */
-     
-    Kinetic.Factory.addGetterSetter(Kinetic.Arc, 'outerRadius', 0);
-
-    /**
-     * get/set outerRadius
-     * @name outerRadius
-     * @method
-     * @memberof Kinetic.Arc.prototype
-     * @param {Number} outerRadius
-     * @returns {Number}
-     * @example
-     * // get outer radius<br>
-     * var outerRadius = arc.outerRadius();<br><br>
-     *
-     * // set outer radius<br>
-     * arc.outerRadius(20);
-     */
-
-    Kinetic.Factory.addGetterSetter(Kinetic.Arc, 'angle', 0);
-
-    /**
-     * get/set angle in degrees
-     * @name angle
-     * @method
-     * @memberof Kinetic.Arc.prototype
-     * @param {Number} angle
-     * @returns {Number}
-     * @example
-     * // get angle<br>
-     * var angle = arc.angle();<br><br>
-     *
-     * // set angle<br>
-     * arc.angle(20);
-     */
-
-    Kinetic.Factory.addGetterSetter(Kinetic.Arc, 'clockwise', false);
-
-    /**
-     * get/set clockwise flag
-     * @name clockwise
-     * @method
-     * @memberof Kinetic.Arc.prototype
-     * @param {Number} clockwise
-     * @returns {Number}
-     * @example
-     * // get clockwise flag<br>
-     * var clockwise = arc.clockwise();<br><br>
-     *
-     * // draw arc counter-clockwise<br>
-     * arc.clockwise(false);<br><br>
-     *
-     * // draw arc clockwise<br>
-     * arc.clockwise(true);
-     */
-
-    Kinetic.Collection.mapMethods(Kinetic.Arc);
-})();
-;(function() {
 
     // CONSTANTS
     var IMAGE = 'Image';
