@@ -297,10 +297,18 @@
          *   console.log('you clicked/touched me!');<br>
          * });
          */
-        on: function(evtStr, handler) {
+        on: function(evtStr, selector, handler) {
             var events = evtStr.split(SPACE),
                 len = events.length,
                 n, event, parts, baseEvent, name;
+
+            if(!handler) {
+                handler = selector;
+                selector = null;
+            }
+            if(selector && !this.find) {
+                throw 'Delegated event handler on non-container node.';
+            }
 
              /*
              * loop through types and attach event listeners to
@@ -320,7 +328,7 @@
 
                 this.eventListeners[baseEvent].push({
                     name: name,
-                    handler: handler
+                    handler: (!selector ? handler : this._wrapDelegatedHandler(selector, handler))
                 });
 
                 // NOTE: this flag is set to true when any event handler is added, even non
@@ -336,6 +344,24 @@
             }
 
             return this;
+        },
+        _wrapDelegatedHandler: function (selector, handler) {
+            return function (e) {
+                var matches = this.find(selector);
+                var breadcrumbs = [];
+                var crumb = e.targetNode;
+
+                while(crumb != this) {
+                    breadcrumbs.push(crumb);
+                    crumb = crumb.parent;
+                }
+
+                breadcrumbs.filter(function (crumb) {
+                    return matches.indexOf(crumb) != -1;
+                }).forEach(function (crumb) {
+                    handler.call(crumb, e);
+                });
+            }.bind(this);
         },
         /**
          * remove event bindings from the node. Pass in a string of

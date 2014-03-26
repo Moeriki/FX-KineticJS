@@ -1765,6 +1765,68 @@ suite('Node', function() {
     });
 
     // ======================================================
+    test('delegated event handlers', function() {
+        var stage = addStage();
+        var layer = new Kinetic.Layer();
+        var group = new Kinetic.Group();
+        var group1 = new Kinetic.Group();
+        var group2 = new Kinetic.Group();
+        var group3 = new Kinetic.Group();
+        var group4 = new Kinetic.Group();
+
+        var circle = new Kinetic.Circle();
+        var rect = new Kinetic.Rect();
+
+        stage.add(layer);
+        layer.add(group);
+        group.add(group1);
+        group1.add(group2);
+        group1.add(group3);
+        group3.add(group4);
+
+        group4.add(circle);
+        group2.add(rect);
+        layer.draw();
+
+        var clicks = [];
+
+        group.on('click', 'Group', function() {
+            clicks.push(this);
+        });
+        circle.fire('click',null,true);
+
+        assert.equal(clicks.length, 3);
+        assert.equal(clicks[0], group4);
+        assert.equal(clicks[1], group3);
+        assert.equal(clicks[2], group1);
+    });
+
+    // ======================================================
+    test('delegated event handlers should set this to the matched node', function() {
+        var stage = addStage();
+        var layer = new Kinetic.Layer();
+        var group = new Kinetic.Group();
+        var group1 = new Kinetic.Group();
+
+        var rect = new Kinetic.Rect();
+
+        stage.add(layer);
+        layer.add(group);
+        group.add(group1);
+
+        group1.add(rect);
+        layer.draw();
+
+        var fired = false;
+        group.on('click', 'Group', function() {
+            assert.equal(this, group1)
+            fired = true;
+        });
+        rect.fire('click',null,true);
+        assert.equal(fired, true);
+    });
+
+    // ======================================================
     test('move shape, group, and layer, and then get absolute position', function() {
         var stage = addStage();
         var layer = new Kinetic.Layer();
