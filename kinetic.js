@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-03-25
+ * Date: 2014-03-28
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -1093,6 +1093,20 @@ var Kinetic = {};
                 if(!( key in c1.prototype)) {
                     c1.prototype[key] = c2.prototype[key];
                 }
+            }
+            this._enableSubclassing(c1);
+            this._enableSubclassing(c2);
+            c2._subclasses.push(c1);
+        },
+        _enableSubclassing: function (c) {
+            if (!c._subclasses) {
+                c._subclasses = [];
+                c.eachSubclass = function (callback) {
+                    callback(this);
+                    for (var s = 0; s < c._subclasses.length; s++) {
+                        c._subclasses[s].eachSubclass(callback);
+                    }
+                };
             }
         },
         /**
@@ -2426,10 +2440,18 @@ var Kinetic = {};
          *   console.log('you clicked/touched me!');<br>
          * });
          */
-        on: function(evtStr, handler) {
+        on: function(evtStr, selector, handler) {
             var events = evtStr.split(SPACE),
                 len = events.length,
                 n, event, parts, baseEvent, name;
+
+            if(!handler) {
+                handler = selector;
+                selector = null;
+            }
+            if(selector && !this.find) {
+                throw 'Delegated event handler on non-container node.';
+            }
 
              /*
              * loop through types and attach event listeners to
@@ -2449,7 +2471,7 @@ var Kinetic = {};
 
                 this.eventListeners[baseEvent].push({
                     name: name,
-                    handler: handler
+                    handler: (!selector ? handler : this._wrapDelegatedHandler(selector, handler))
                 });
 
                 // NOTE: this flag is set to true when any event handler is added, even non
@@ -2465,6 +2487,24 @@ var Kinetic = {};
             }
 
             return this;
+        },
+        _wrapDelegatedHandler: function (selector, handler) {
+            return function (e) {
+                var matches = this.find(selector);
+                var breadcrumbs = [];
+                var crumb = e.targetNode;
+
+                while(crumb != this) {
+                    breadcrumbs.push(crumb);
+                    crumb = crumb.parent;
+                }
+
+                breadcrumbs.filter(function (crumb) {
+                    return matches.indexOf(crumb) != -1;
+                }).forEach(function (crumb) {
+                    handler.call(crumb, e);
+                });
+            }.bind(this);
         },
         /**
          * remove event bindings from the node. Pass in a string of
