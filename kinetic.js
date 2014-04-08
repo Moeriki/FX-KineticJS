@@ -5760,7 +5760,7 @@ var Kinetic = {};
 
             if(typeof selector === 'function') {
                 return this.children.filter(selector);
-            } else if(typeof select === 'string') {
+            } else if(typeof selector === 'string') {
                 selector = selector.split(',').map(Kinetic.Kizzle);
                 nodes = [];
 
