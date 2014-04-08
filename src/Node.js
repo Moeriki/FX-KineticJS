@@ -1725,6 +1725,65 @@
             this.drawScene();
             this.drawHit();
             return this;
+        },
+        /**
+         * Calculate the bounding box within the node's local space.
+         *
+         * A bare node's bounding box can be calculated by simply using the w/h
+         * This may be overridden for irregular shapes like circles.
+         */
+        calculateLocalBoundingBox: function () {
+            return {
+                left: 0,
+                top: 0,
+                right: this.getWidth(),
+                bottom: this.getHeight()
+            };
+        },
+
+        /*
+         * Calculates the bounding box in the node's parent space.
+         *
+         * This may be overridden for more complex shapes to add a more correct bounding box.
+         * For example, a rotated circle's bounding box should not rotate, since it
+         * always has the same radius.
+         */
+        calculateBoundingBox: function () {
+            var transform = this.getTransform();
+            var localBounds = this.calculateLocalBoundingBox();
+
+            // Original bounding box is a 0x0 rectangle centered on our position
+            var res = { left: this.getX(), top: this.getY(), right: this.getX(), bottom: this.getY() };
+
+            // Make corners from the local bounds
+            var localCorners = [{
+                x: localBounds.left,
+                y: localBounds.top
+            }, {
+                x: localBounds.right,
+                y: localBounds.top
+            }, {
+                x: localBounds.right,
+                y: localBounds.bottom
+            }, {
+                x: localBounds.left,
+                y: localBounds.bottom
+            }];
+
+            // Now transform those corners from our local space into our parent's space.
+            var cornersInParentSpace = localCorners.map(function (corner) {
+                return transform.transformPoint(corner);
+            });
+
+            // Push the bounds of the bounding-box-up-till-now
+            cornersInParentSpace.forEach(function (corner) {
+                res.left   = Math.min(res.left, corner.x);
+                res.top    = Math.min(res.top, corner.y);
+                res.right  = Math.max(res.right, corner.x);
+                res.bottom = Math.max(res.bottom, corner.y);
+            });
+
+            return res;
         }
     });
 
