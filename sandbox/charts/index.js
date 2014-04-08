@@ -54,6 +54,22 @@ define([
                 this.test.dataset.set('Mushimush', this.test.dataset.get('Mushimush') + 30);
             }.bind(this));
 
+            var circle = new Kinetic.Circle({
+                radius: 300,
+                fill: 'green'
+            });
+            this.node.add(circle);
+            var box = circle.calculateBoundingBox();
+            this.node.add(new Kinetic.Rect({
+                stroke: 'red',
+                strokeWidth: 3,
+                x: box.left,
+                y: box.top,
+                width: box.right - box.left,
+                height: box.bottom - box.top
+            }));
+            console.log(box);
+
             this.dancer = new Dancer();
             this.dancer.load({src: '/sandbox/morning.mp3'});
             this.dancer.play();

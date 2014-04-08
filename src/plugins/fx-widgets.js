@@ -72,7 +72,12 @@
             });
         },
 
-        // A bare node's bounding box can be calculated by simply using the w/h
+        /**
+         * Calculate the bounding box within the node's local space.
+         *
+         * A bare node's bounding box can be calculated by simply using the w/h
+         * This may be overridden for irregular shapes like circles.
+         */
         calculateLocalBoundingBox: function () {
             return {
                 left: 0,
@@ -82,8 +87,13 @@
             };
         },
 
-        // Calculates the bounding box in the node's parent space. 
-        // This may be overridden for more complex shapes to add a more correct bounding box.
+        /*
+         * Calculates the bounding box in the node's parent space.
+         *
+         * This may be overridden for more complex shapes to add a more correct bounding box.
+         * For example, a rotated circle's bounding box should not rotate, since it
+         * always has the same radius.
+         */
         calculateBoundingBox: function () {
             var transform = this.getTransform();
             var localBounds = this.calculateLocalBoundingBox();
@@ -124,6 +134,10 @@
     });
 
     Kinetic.Util.addMethods(Kinetic.Group, {
+        /**
+         * Overrides the default local bounding box calculation with
+         * one the incorporates all its children that are visible
+         */
         calculateLocalBoundingBox: function () {
             // Start with no bounds
             var res = { left: 0, top: 0, right: 0, bottom: 0 };
