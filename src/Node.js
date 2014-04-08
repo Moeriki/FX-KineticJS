@@ -1466,7 +1466,6 @@
         },
         setWidth: function(newWidth) {
             var anchorX = this.getAnchorX();
-
             if(anchorX) {
                 this._setAttr('offsetX',
                     this.getOffsetX() +
@@ -1474,12 +1473,10 @@
                         this.getScaleX() * anchorX
                 );
             }
-
             this._setAttr('width', newWidth);
         },
         setHeight: function(newHeight) {
             var anchorY = this.getAnchorX();
-
             if(anchorY) {
                 this._setAttr('offsetY',
                     this.getOffsetY() +
@@ -1487,25 +1484,20 @@
                         this.getScaleY() * anchorY
                 );
             }
-
             this._setAttr('height', newHeight);
         },
         setOffsetX: function(newOffsetX) {
             var anchorX = this.getAnchorX();
-
             if(anchorX) {
                 newOffsetX += anchorX * this.getWidth();
             }
-
             this._setAttr('offsetX', newOffsetX);
         },
         setOffsetY: function(newOffsetY) {
             var anchorY = this.getAnchorY();
-
             if(anchorY) {
                 newOffsetY += anchorY * this.getHeight();
             }
-
             this._setAttr('offsetY', newOffsetY);
         },
         /**
