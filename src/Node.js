@@ -1732,7 +1732,7 @@
          * A bare node's bounding box can be calculated by simply using the w/h
          * This may be overridden for irregular shapes like circles.
          */
-        calculateLocalBoundingBox: function () {
+        calculateLocalBoundingBox: function() {
             return {
                 left: 0,
                 top: 0,
@@ -1748,7 +1748,7 @@
          * For example, a rotated circle's bounding box should not rotate, since it
          * always has the same radius.
          */
-        calculateBoundingBox: function () {
+        calculateBoundingBox: function() {
             var transform = this.getTransform();
             var localBounds = this.calculateLocalBoundingBox();
 
