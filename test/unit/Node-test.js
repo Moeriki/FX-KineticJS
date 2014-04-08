@@ -416,7 +416,8 @@ suite('Node', function() {
             shadowOffsetX: 20,
             shadowOffsetY: 20,
             draggable: true,
-            name: 'myRect'
+            name: 'myRect',
+            id : 'myRect'
         });
 
         var clicks = [];
@@ -438,6 +439,8 @@ suite('Node', function() {
 
         assert.equal(rect.getShadowColor(), 'black');
         assert.equal(clone.getShadowColor(), 'black');
+
+        assert.equal(clone.id() == undefined, true, 'do not clone id');
 
         clone.setShadowColor('green');
 
@@ -1759,6 +1762,68 @@ suite('Node', function() {
 
         assert.equal(clicks[0], 'circle');
         assert.equal(clicks[1], 'layer');
+    });
+
+    // ======================================================
+    test('delegated event handlers', function() {
+        var stage = addStage();
+        var layer = new Kinetic.Layer();
+        var group = new Kinetic.Group();
+        var group1 = new Kinetic.Group();
+        var group2 = new Kinetic.Group();
+        var group3 = new Kinetic.Group();
+        var group4 = new Kinetic.Group();
+
+        var circle = new Kinetic.Circle();
+        var rect = new Kinetic.Rect();
+
+        stage.add(layer);
+        layer.add(group);
+        group.add(group1);
+        group1.add(group2);
+        group1.add(group3);
+        group3.add(group4);
+
+        group4.add(circle);
+        group2.add(rect);
+        layer.draw();
+
+        var clicks = [];
+
+        group.on('click', 'Group', function() {
+            clicks.push(this);
+        });
+        circle.fire('click',null,true);
+
+        assert.equal(clicks.length, 3);
+        assert.equal(clicks[0], group4);
+        assert.equal(clicks[1], group3);
+        assert.equal(clicks[2], group1);
+    });
+
+    // ======================================================
+    test('delegated event handlers should set this to the matched node', function() {
+        var stage = addStage();
+        var layer = new Kinetic.Layer();
+        var group = new Kinetic.Group();
+        var group1 = new Kinetic.Group();
+
+        var rect = new Kinetic.Rect();
+
+        stage.add(layer);
+        layer.add(group);
+        group.add(group1);
+
+        group1.add(rect);
+        layer.draw();
+
+        var fired = false;
+        group.on('click', 'Group', function() {
+            assert.equal(this, group1)
+            fired = true;
+        });
+        rect.fire('click',null,true);
+        assert.equal(fired, true);
     });
 
     // ======================================================
@@ -3316,8 +3381,6 @@ suite('Node', function() {
           anchor: 0.5
       });
       rect1.scale({x: 1.5, y: 1.5});
-      rect1.placeAnchor();
-      rect2.placeAnchor();
 
       rect0.on('click', function(){
         rect2.rotate(10);
@@ -3333,5 +3396,49 @@ suite('Node', function() {
 
       stage.add(layer);
   });
+
+    test('#isFirst / #isLast', function() {
+        var layer = new Kinetic.Layer();
+
+        var circle = new Kinetic.Circle();
+        layer.add(circle);
+
+        var rect = new Kinetic.Rect();
+        layer.insert(rect);
+
+        assert.equal(rect.isFirst(), true);
+        assert.equal(circle.isLast(), true);
+    });
+
+    test('#isOrphan', function() {
+        var layer = new Kinetic.Layer();
+
+        var circle = new Kinetic.Circle();
+        assert.equal(circle.isOrphan(), true);
+
+        layer.add(circle);
+        assert.equal(circle.isOrphan(), false);
+    });
+
+    test('#moveBefore / #moveAfter', function() {
+        var layer = new Kinetic.Layer();
+        for(var i = 0; i < 10; i++) {
+            layer.add(new Kinetic.Shape());
+        }
+
+        var circle = new Kinetic.Circle();
+        layer.insert(circle, 5);
+
+        var rect = new Kinetic.Rect();
+        rect.moveAfter(circle);
+
+        assert.equal(circle.index, 5);
+        assert.equal(rect.index, 6);
+
+        rect.moveBefore(circle);
+
+        assert.equal(circle.index, 6);
+        assert.equal(rect.index, 5);
+    });
 
 });

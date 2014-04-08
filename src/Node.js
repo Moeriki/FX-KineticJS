@@ -22,6 +22,7 @@
         TRANSFORM = 'transform',
         UPPER_STAGE = 'Stage',
         VISIBLE = 'visible',
+        CLONE_BLACK_LIST = ['id'],
 
         TRANSFORM_CHANGE_STR = [
             'xChange.kinetic',
@@ -35,6 +36,7 @@
             'offsetYChange.kinetic',
             'transformsEnabledChange.kinetic'
         ].join(SPACE);
+
 
     Kinetic.Util.addMethods(Kinetic.Node, {
         _init: function(config) {
@@ -115,7 +117,7 @@
         * @param {Number} [config.y]
         * @param {Number} [config.width]
         * @param {Number} [config.height]
-        * @param {Boolean} [config.showBorder] when set to true, a red border will be drawn around the cached
+        * @param {Boolean} [config.drawBorder] when set to true, a red border will be drawn around the cached
         *  region for debugging purposes
         * @returns {Kinetic.Node}
         * @example
@@ -295,10 +297,18 @@
          *   console.log('you clicked/touched me!');<br>
          * });
          */
-        on: function(evtStr, handler) {
+        on: function(evtStr, selector, handler) {
             var events = evtStr.split(SPACE),
                 len = events.length,
                 n, event, parts, baseEvent, name;
+
+            if(!handler) {
+                handler = selector;
+                selector = null;
+            }
+            if(selector && !this.find) {
+                throw 'Delegated event handler on non-container node.';
+            }
 
              /*
              * loop through types and attach event listeners to
@@ -318,7 +328,7 @@
 
                 this.eventListeners[baseEvent].push({
                     name: name,
-                    handler: handler
+                    handler: (!selector ? handler : this._wrapDelegatedHandler(selector, handler))
                 });
 
                 // NOTE: this flag is set to true when any event handler is added, even non
@@ -334,6 +344,24 @@
             }
 
             return this;
+        },
+        _wrapDelegatedHandler: function (selector, handler) {
+            return function (e) {
+                var matches = this.find(selector);
+                var breadcrumbs = [];
+                var crumb = e.targetNode;
+
+                while(crumb != this) {
+                    breadcrumbs.push(crumb);
+                    crumb = crumb.parent;
+                }
+
+                breadcrumbs.filter(function (crumb) {
+                    return matches.indexOf(crumb) != -1;
+                }).forEach(function (crumb) {
+                    handler.call(crumb, e);
+                });
+            }.bind(this);
         },
         /**
          * remove event bindings from the node. Pass in a string of
@@ -379,6 +407,14 @@
                 }
             }
             return this;
+        },
+        // some event aliases for third party integration like HammerJS
+        dispatchEvent: function(evt) {
+            evt.targetNode = this;
+            this.fire(evt.type, evt);
+        },
+        addEventListener: function() {
+            this.on.apply(this, arguments);
         },
         /**
          * remove self from parent, but don't destroy
@@ -852,6 +888,10 @@
          * @returns {Boolean}
          */
         moveToTop: function() {
+            if (!this.parent) {
+                Kinetic.Util.warn('Node has no parent. moveToTop function is ignored.');
+                return;
+            }
             var index = this.index;
             this.parent.children.splice(index, 1);
             this.parent.children.push(this);
@@ -865,6 +905,10 @@
          * @returns {Boolean}
          */
         moveUp: function() {
+            if (!this.parent) {
+                Kinetic.Util.warn('Node has no parent. moveUp function is ignored.');
+                return;
+            }
             var index = this.index,
                 len = this.parent.getChildren().length;
             if(index < len - 1) {
@@ -882,6 +926,10 @@
          * @returns {Boolean}
          */
         moveDown: function() {
+            if (!this.parent) {
+                Kinetic.Util.warn('Node has no parent. moveDown function is ignored.');
+                return;
+            }
             var index = this.index;
             if(index > 0) {
                 this.parent.children.splice(index, 1);
@@ -898,6 +946,10 @@
          * @returns {Boolean}
          */
         moveToBottom: function() {
+            if (!this.parent) {
+                Kinetic.Util.warn('Node has no parent. moveToBottom function is ignored.');
+                return;
+            }
             var index = this.index;
             if(index > 0) {
                 this.parent.children.splice(index, 1);
@@ -908,6 +960,55 @@
             return false;
         },
         /**
+         * move node before another node
+         * @method
+         * @memberof Kinetic.Node.prototype
+         * @param {Node} node
+         */
+        moveBefore: function(node) {
+            this.moveTo(node.parent);
+            this.setZIndex(node.index);
+        },
+        /**
+         * move node after another node
+         * @method
+         * @memberof Kinetic.Node.prototype
+         * @param {Node} node
+         */
+        moveAfter: function(node) {
+            this.moveTo(node.parent);
+            this.setZIndex(node.index + 1);
+        },
+        /**
+         * check if the node is the first child of its parent
+         * @method
+         * @memberof Kinetic.Node.prototype
+         * @param {number} [head = 1] - specify if a node should be either of the first N nodes
+         * @returns {boolean}
+         */
+        isFirst: function(head) {
+            return this.index <= (head ? head - 1 : 0);
+        },
+        /**
+         * check if the node is the last child of its parent
+         * @method
+         * @memberof Kinetic.Node.prototype
+         * @param {number} [tail = 1] - specify if a node should be either of the last N nodes
+         * @returns {boolean}
+         */
+        isLast: function(tail) {
+            return this.index === this.parent.children.length - (tail || 1);
+        },
+        /**
+         * check if the node has a parent
+         * @method
+         * @memberof Kinetic.Node.prototype
+         * @returns {boolean}
+         */
+        isOrphan: function() {
+            return !this.parent;
+        },
+        /**
          * set zIndex relative to siblings
          * @method
          * @memberof Kinetic.Node.prototype
@@ -915,6 +1016,10 @@
          * @returns {Kinetic.Node}
          */
         setZIndex: function(zIndex) {
+            if (!this.parent) {
+                Kinetic.Util.warn('Node has no parent. zIndex parameter is ignored.');
+                return;
+            }
             var index = this.index;
             this.parent.children.splice(index, 1);
             this.parent.children.splice(zIndex, 0, this);
@@ -1002,6 +1107,72 @@
          */
         getParent: function() {
             return this.parent;
+        },
+        /**
+        * Get the next node from its siblings. Returns undefined if this node is the last.
+        * @method
+        * @memberof Kinetic.Node.prototype
+        * @param {number|string} selector - pass a number to get the next n node, or a kizzle selector to find the next node matching a certain condition
+        * @returns {?Kinetic.Node}
+        */
+        getNext: function(selector) {
+            if(!selector) {
+                selector = 1;
+            }
+
+            if(typeof selector === 'number') {
+                return this.parent.children[this.index + selector];
+            } else {
+                return this.parent.first(selector, this.index + 1);
+            }
+        },
+
+        /**
+        * Get the previous node from its siblings. Returns undefined if this node is the first.
+        * @method
+        * @memberof Kinetic.Node.prototype
+        * @returns {?Kinetic.Node}
+        */
+        getPrevious: function(selector) {
+            if(!selector) {
+                selector = 1;
+            }
+
+            if(typeof selector === 'number') {
+                return this.parent.children[this.index - selector];
+            } else {
+                return this.parent.last(selector, this.index - 1);
+            }
+        },
+        /**
+        * Get all nodes that have the same parent as the current {@link Kinetic.Node}, (include the node itself.
+        * @method
+        * @memberof Kinetic.Node.prototype
+        * @returns {Kinetic.Collection}
+        */
+        getSiblings: function(selector) {
+            return selector ? this.parent.getChildren(selector) : this.parent.children;
+        },
+        /**
+         * Get closest node matching a @{link Kinetic.Kizzle} selector going up the hierarchy starting from the current node.
+         * @method
+         * @memberof Kinetic.Node.prototype
+         * @returns {?Kinetic.Node}
+         */
+        getClosest: function(selector) {
+            var kizz, closest;
+
+            kizz = Kinetic.Kizzle(selector);
+            closest = this;
+
+            while(closest) {
+                if(kizz.matchAll(closest)) {
+                    break;
+                }
+                closest = closest.parent;
+            }
+
+            return closest;
         },
         /**
          * get layer ancestor
@@ -1153,9 +1324,14 @@
         clone: function(obj) {
             // instantiate new node
             var className = this.getClassName(),
-                node = new Kinetic[className](this.attrs),
+                attrs = this.attrs,
                 key, allListeners, len, n, listener;
-
+            // filter black attrs
+            for (var i in CLONE_BLACK_LIST) {
+                var blockAttr = CLONE_BLACK_LIST[i];
+                delete attrs[blockAttr];
+            }
+            var node = new Kinetic[className](attrs);
             // copy over listeners
             for(key in this.eventListeners) {
                 allListeners = this.eventListeners[key];
@@ -1258,8 +1434,8 @@
          * @method
          * @memberof Kinetic.Node.prototype
          * @param {Object} size
-         * @param {Number} width
-         * @param {Number} height
+         * @param {Number} size.width
+         * @param {Number} size.height
          * @returns {Kinetic.Node}
          */
         setSize: function(size) {
@@ -1280,24 +1456,6 @@
             };
         },
         /**
-         * get width
-         * @method
-         * @memberof Kinetic.Node.prototype
-         * @returns {Integer}
-         */
-        getWidth: function() {
-            return this.attrs.width || 0;
-        },
-        /**
-         * get height
-         * @method
-         * @memberof Kinetic.Node.prototype
-         * @returns {Integer}
-         */
-        getHeight: function() {
-            return this.attrs.height || 0;
-        },
-        /**
          * get class name, which may return Stage, Layer, Group, or shape class names like Rect, Circle, Text, etc.
          * @method
          * @memberof Kinetic.Node.prototype
@@ -1306,24 +1464,92 @@
         getClassName: function() {
             return this.className || this.nodeType;
         },
+        setWidth: function(newWidth) {
+            var anchorX = this.getAnchorX();
+
+            if(anchorX) {
+                this._setAttr('offsetX',
+                    this.getOffsetX() +
+                        (-this.getWidth() +newWidth) *
+                        this.getScaleX() * anchorX
+                );
+            }
+
+            this._setAttr('width', newWidth);
+        },
+        setHeight: function(newHeight) {
+            var anchorY = this.getAnchorX();
+
+            if(anchorY) {
+                this._setAttr('offsetY',
+                    this.getOffsetY() +
+                        (-this.getHeight() +newHeight) *
+                        this.getScaleY() * anchorY
+                );
+            }
+
+            this._setAttr('height', newHeight);
+        },
+        setOffsetX: function(newOffsetX) {
+            var anchorX = this.getAnchorX();
+
+            if(anchorX) {
+                newOffsetX += anchorX * this.getWidth();
+            }
+
+            this._setAttr('offsetX', newOffsetX);
+        },
+        setOffsetY: function(newOffsetY) {
+            var anchorY = this.getAnchorY();
+
+            if(anchorY) {
+                newOffsetY += anchorY * this.getHeight();
+            }
+
+            this._setAttr('offsetY', newOffsetY);
+        },
         /**
-         * place anchor for rotation
+         * Setting anchorX will update your X and offsetX without visually moving your node.
          * @method
          * @memberof Kinetic.Node.prototype
          * @returns {Node}
          */
-        placeAnchor: function(){
-            var x = this.x(),
-                y = this.y(),
-                sx = this.scaleX(),
-                sy = this.scaleY(),
-                w = this.width(),
-                h = this.height(),
-                a = this.anchor();
-            this._setAttr('x', x + w * sx * a);
-            this._setAttr('y', y + h * sy * a);
-            this._setAttr('offsetX', w * a);
-            this._setAttr('offsetY', h * a);
+        setAnchorX: function(newAnchorX) {
+            var scaleX, width, offsetDiff;
+
+            scaleX = this.getScaleX();
+            width = this.getWidth();
+
+            if(width) {
+                offsetDiff = (-this.getAnchorX() +newAnchorX) * width * scaleX;
+                this._setAttr('x', this.getX() + offsetDiff * scaleX);
+                this._setAttr('offsetX', this.getOffsetX() + offsetDiff);
+            }
+
+            this._setAttr('anchorX', newAnchorX);
+
+            return this;
+        },
+        /**
+         * Setting anchorY will update your Y and offsetY without visually moving your node.
+         * @method
+         * @memberof Kinetic.Node.prototype
+         * @returns {Node}
+         */
+        setAnchorY: function(newAnchorY) {
+            var scaleY, height, offsetDiff;
+
+            scaleY = this.getScaleX();
+            height = this.getHeight();
+
+            if(height) {
+                offsetDiff = (-this.getAnchorY() +newAnchorY) * height * scaleY;
+                this._setAttr('y', this.getY() + offsetDiff * scaleY);
+                this._setAttr('offsetY', this.getOffsetY() + offsetDiff);
+            }
+
+            this._setAttr('anchorY', newAnchorY);
+
             return this;
         },
         /**
@@ -1336,7 +1562,13 @@
             return this.nodeType;
         },
         _get: function(selector) {
-            return this.nodeType === selector ? [this] : [];
+            var nodes = [];
+
+            if((!selector.nodeType || selector.nodeType === this.nodeType) && selector.matchAttrs(this)) {
+                nodes.push(this);
+            }
+
+            return nodes;
         },
         _off: function(type, name) {
             var evtListeners = this.eventListeners[type],
@@ -1829,7 +2061,7 @@
      * node.offsetY(3);
      */
 
-    Kinetic.Factory.addSetter(Kinetic.Node, 'width', 0);
+    Kinetic.Factory.addGetter(Kinetic.Node, 'width', 0);
     Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node, 'width');
     /**
      * get/set width
@@ -1846,7 +2078,7 @@
      * node.width(100);
      */
 
-    Kinetic.Factory.addSetter(Kinetic.Node, 'height', 0);
+    Kinetic.Factory.addGetter(Kinetic.Node, 'height', 0);
     Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node, 'height');
     /**
      * get/set height
@@ -1970,7 +2202,41 @@
      * node.locked(true);
      */
 
-    Kinetic.Factory.addGetterSetter(Kinetic.Node, 'anchor', 0);//, undefined, function(){this.placeAnchor();});
+    Kinetic.Factory.addComponentsGetterSetter(Kinetic.Node, 'anchor', ['x', 'y']);
+    Kinetic.Factory.addGetter(Kinetic.Node, 'anchorX', 0);
+    Kinetic.Factory.addGetter(Kinetic.Node, 'anchorY', 0);
+
+    Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node, 'anchorX');
+    /**
+     * get/set anchor x
+     * @name anchorX
+     * @param {Number} x
+     * @method
+     * @memberof Kinetic.Node.prototype
+     * @returns {Number}
+     * @example
+     * // get anchor x<br>
+     * var anchorX = node.anchorX();<br><br>
+     *
+     * // set anchor x<br>
+     * node.anchorX(0.5);
+     */
+
+    Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node, 'anchorY');
+    /**
+     * get/set anchor y
+     * @name anchorX
+     * @param {Number} y
+     * @method
+     * @memberof Kinetic.Node.prototype
+     * @returns {Number}
+     * @example
+     * // get anchor x<br>
+     * var anchorX = node.anchorX();<br><br>
+     *
+     * // set anchor x<br>
+     * node.anchorX(0.5);
+     */
 
     /**
      * get/set anchor

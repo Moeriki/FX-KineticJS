@@ -8,9 +8,34 @@
          * returns a {@link Kinetic.Collection} of direct descendant nodes
          * @method
          * @memberof Kinetic.Container.prototype
+         * @param {Function} [filterFunc] filter function
+         * @returns {Kinetic.Collection}
+         * @example
+         * // get all children<br>
+         * var children = layer.getChildren();<br><br>
+         *
+         * // get only circles<br>
+         * var circles = layer.getChildren(function(node){<br>
+         *    return node.getClassName() === 'Circle';<br>
+         * });
          */
-        getChildren: function() {
-            return this.children;
+        getChildren: function(selector) {
+            var nodes, s;
+
+            if(typeof selector === 'function') {
+                return this.children.filter(selector);
+            } else if(typeof select === 'string') {
+                selector = selector.split(',').map(Kinetic.Kizzle);
+                nodes = [];
+
+                for(s = 0; s < selector.length; s++) {
+                    Array.prototype.push.apply(nodes, (Kinetic.Kizzle(selector[s]).filter(this.children)));
+                }
+
+                return nodes;
+            } else {
+                return this.children;
+            }
         },
         /**
          * determine if node has children
@@ -27,18 +52,20 @@
          * @memberof Kinetic.Container.prototype
          */
         removeChildren: function() {
-            var children = this.children,
-                child, nrChildren;
-
-            nrChildren = children.length;
-            while(nrChildren > 0) {
-                child = children[--nrChildren];
+            var children = Kinetic.Collection.toCollection(this.children);
+            var child;
+            for (var i = 0; i < children.length; i++) {
+                child = children[i];
+                // reset parent to prevent many _setChildrenIndices calls
+                delete child.parent;
+                child.index = 0;
                 if (child.hasChildren()) {
                     child.removeChildren();
                 }
                 child.remove();
             }
-
+            children = null;
+            this.children = new Kinetic.Collection();
             return this;
         },
         /**
@@ -47,11 +74,17 @@
          * @memberof Kinetic.Container.prototype
          */
         destroyChildren: function() {
-            var children = this.getChildren(),
-                i = children.length - 1;
-            while(i >= 0) {
-                children[i--].destroy();
+           var children = Kinetic.Collection.toCollection(this.children);
+            var child;
+            for (var i = 0; i < children.length; i++) {
+                child = children[i];
+                // reset parent to prevent many _setChildrenIndices calls
+                delete child.parent;
+                child.index = 0;
+                child.destroy();
             }
+            children = null;
+            this.children = new Kinetic.Collection();
             return this;
         },
         /**
@@ -62,8 +95,11 @@
          * @returns {Container}
          */
         add: function(child) {
+            if (child.getParent()) {
+                child.moveTo(this);
+                return;
+            }
             var children = this.children;
-
             this._validateAdd(child);
             child.index = children.length;
             child.parent = this;
@@ -74,6 +110,17 @@
 
             // chainable
             return this;
+        },
+        /**
+         * insert a node at a specific position
+         * @method
+         * @memberof Kinetic.Container.prototype
+         * @param {Node} node
+         * @param {number} zIndex
+         */
+        insert: function(node, zIndex) {
+            node.moveTo(this);
+            node.setZIndex(zIndex || 0);
         },
         destroy: function() {
             // destroy children
@@ -108,37 +155,30 @@
          * var nodes = layer.find('#foo, .bar');
          */
         find: function(selector) {
-            var retArr = [],
-                selectorArr = selector.replace(/ /g, '').split(','),
-                len = selectorArr.length,
-                n, i, sel, arr, node, children, clen;
+            var s, nodes, kizz, node, clen, c;
 
-            for (n = 0; n < len; n++) {
-                sel = selectorArr[n];
+            selector = selector.split(',').map(Kinetic.Kizzle);
+            nodes = [];
 
-                // id selector
-                if(sel.charAt(0) === '#') {
-                    node = this._getNodeById(sel.slice(1));
+            for(s = 0; s < selector.length; s++) {
+                kizz = selector[s];
+
+                if(kizz.id) {
+                    node = this._getNodeById(kizz.id);
                     if(node) {
-                        retArr.push(node);
+                        Array.prototype.push.apply(nodes, node._get(kizz));
                     }
-                }
-                // name selector
-                else if(sel.charAt(0) === '.') {
-                    arr = this._getNodesByName(sel.slice(1));
-                    retArr = retArr.concat(arr);
-                }
-                // unrecognized selector, pass to children
-                else {
-                    children = this.getChildren();
-                    clen = children.length;
-                    for(i = 0; i < clen; i++) {
-                        retArr = retArr.concat(children[i]._get(sel));
+                } else if(kizz.name) {
+                    Array.prototype.push.apply(nodes, this._getNodesByName(kizz.name).filter(kizz.matchAttrs.bind(kizz)));
+                } else {
+                    clen = this.children.length;
+                    for(c = 0; c < clen; c++) {
+                        Array.prototype.push.apply(nodes, this.children[c]._get(kizz));
                     }
                 }
             }
 
-            return Kinetic.Collection.toCollection(retArr);
+            return Kinetic.Collection.toCollection(nodes);
         },
         _getNodeById: function(key) {
             var node = Kinetic.ids[key];
@@ -153,13 +193,20 @@
             return this._getDescendants(arr);
         },
         _get: function(selector) {
-            var retArr = Kinetic.Node.prototype._get.call(this, selector);
-            var children = this.getChildren();
-            var len = children.length;
-            for(var n = 0; n < len; n++) {
-                retArr = retArr.concat(children[n]._get(selector));
+            var nodes, clen, c;
+
+            nodes = [];
+
+            if(selector.match(this, {nodeType: true})) {
+                nodes.push(this);
             }
-            return retArr;
+
+            clen = this.children.length;
+            for(c = 0; c < clen; c++) {
+                Array.prototype.push.apply(nodes, this.children[c]._get(selector));
+            }
+
+            return nodes;
         },
         // extenders
         toObject: function() {
@@ -238,11 +285,10 @@
 
             return arr;
         },
-        _setChildrenIndices: function(fromIndex) {
-            var i, len = this.children.length;
-            for(i = fromIndex || 0; i < len; i++) {
-                this.children[i].index = i;
-            }
+        _setChildrenIndices: function() {
+            this.children.each(function(child, n) {
+                child.index = n;
+            });
         },
         drawScene: function(can) {
             var layer = this.getLayer(),
@@ -294,7 +340,7 @@
                 context.beginPath();
                 context.rect(clipX, clipY, clipWidth, clipHeight);
                 context.clip();
-                context.reset();   
+                context.reset();
             }
 
             this.children.each(function(child) {
@@ -401,5 +447,5 @@
      * container.clipHeight(100);
      */
 
-     Kinetic.Collection.mapMethods(Kinetic.Container);
+    Kinetic.Collection.mapMethods(Kinetic.Container);
 })();

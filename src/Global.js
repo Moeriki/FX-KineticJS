@@ -1,3 +1,4 @@
+
 /*
  * KineticJS JavaScript Framework v@@version
  * http://www.kineticjs.com/
@@ -28,8 +29,9 @@
 /**
  * @namespace Kinetic
  */
+/*jshint -W079, -W020*/
 var Kinetic = {};
-(function() {
+(function(root) {
     Kinetic = {
         // public
         version: '@@version',
@@ -48,21 +50,29 @@ var Kinetic = {};
         traceArrMax: 100,
         dblClickWindow: 400,
         pixelRatio: undefined,
+        enableThrottling: true,
 
         // user agent  
         UA: (function() {
-            var ua = navigator.userAgent.toLowerCase(),
+            var userAgent = (root.navigator && root.navigator.userAgent) || '';
+            var ua = userAgent.toLowerCase(),
                 // jQuery UA regex
                 match = /(chrome)[ \/]([\w.]+)/.exec( ua ) ||
                 /(webkit)[ \/]([\w.]+)/.exec( ua ) ||
                 /(opera)(?:.*version|)[ \/]([\w.]+)/.exec( ua ) ||
                 /(msie) ([\w.]+)/.exec( ua ) ||
-                ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec( ua ) ||
-                [];
+                ua.indexOf('compatible') < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec( ua ) ||
+                [],
+
+                // adding mobile flag as well
+                mobile = !!(userAgent.match(/Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile/i));
 
             return {
                 browser: match[ 1 ] || '',
-                version: match[ 2 ] || '0'
+                version: match[ 2 ] || '0',
+
+                // adding mobile flab
+                mobile: mobile
             };
         })(),
 
@@ -253,7 +263,7 @@ var Kinetic = {};
             }
         }
     };
-})();
+})(this);
 
 // Uses Node, AMD or browser globals to create a module.
 
@@ -277,17 +287,29 @@ var Kinetic = {};
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like enviroments that support module.exports,
         // like Node.
-        module.exports = factory();
+        var Canvas = require('canvas');
+        var jsdom = require('jsdom').jsdom;
+        var doc = jsdom('<!DOCTYPE html><html><head></head><body></body></html>');
+
+        var KineticJS = factory();
+
+        Kinetic.document = doc;
+        Kinetic.window = Kinetic.document.createWindow();
+        Kinetic.window.Image = Canvas.Image;
+        Kinetic.root = root;
+        Kinetic._nodeCanvas = Canvas;
+        module.exports = KineticJS;
+        return;
     }
     else if( typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define(factory);
     }
-    else {
-        // Browser globals (root is window)
-        root.returnExports = factory();
-    }
-}(this, function() {
+    Kinetic.document = document;
+    Kinetic.window = window;
+    Kinetic.root = root;
+
+}((1, eval)('this'), function() {
 
     // Just return a value to define the module export.
     // This example returns an object, but the module
