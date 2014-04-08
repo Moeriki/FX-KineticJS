@@ -621,6 +621,20 @@
                     c1.prototype[key] = c2.prototype[key];
                 }
             }
+            this._enableSubclassing(c1);
+            this._enableSubclassing(c2);
+            c2._subclasses.push(c1);
+        },
+        _enableSubclassing: function (c) {
+            if (!c._subclasses) {
+                c._subclasses = [];
+                c.eachSubclass = function (callback) {
+                    callback(this);
+                    for (var s = 0; s < c._subclasses.length; s++) {
+                        c._subclasses[s].eachSubclass(callback);
+                    }
+                };
+            }
         },
         /**
          * adds methods to a constructor prototype
