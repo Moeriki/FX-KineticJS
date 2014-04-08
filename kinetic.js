@@ -3891,7 +3891,7 @@ var Kinetic = {};
          * A bare node's bounding box can be calculated by simply using the w/h
          * This may be overridden for irregular shapes like circles.
          */
-        calculateLocalBoundingBox: function () {
+        calculateLocalBoundingBox: function() {
             return {
                 left: 0,
                 top: 0,
@@ -3907,7 +3907,7 @@ var Kinetic = {};
          * For example, a rotated circle's bounding box should not rotate, since it
          * always has the same radius.
          */
-        calculateBoundingBox: function () {
+        calculateBoundingBox: function() {
             var transform = this.getTransform();
             var localBounds = this.calculateLocalBoundingBox();
 
@@ -9050,7 +9050,21 @@ var Kinetic = {};
         setHeight: function(height) {
             Kinetic.Node.prototype.setHeight.call(this, height);
             this.setRadius(height / 2);
-        }
+        },
+        // implements Node.prototype.calculateBoundingBox()
+        calculateBoundingBox: function() {
+            var res, radius;
+
+            res = Kinetic.Node.prototype.calculateBoundingBox.call(this);
+            radius = this.getRadius();
+
+            res.left -= radius;
+            res.right -= radius;
+            res.top -= radius;
+            res.bottom -= radius;
+
+            return res;
+        },
     };
     Kinetic.Util.extend(Kinetic.Circle, Kinetic.Shape);
 
@@ -9143,7 +9157,22 @@ var Kinetic = {};
             this.setRadius({
                 y: height / 2
             });
-        }
+        },
+        // implements Node.prototype.calculateBoundingBox()
+        calculateBoundingBox: function() {
+            var res, radiusX, radiusY;
+
+            res = Kinetic.Node.prototype.calculateBoundingBox.call(this);
+            radiusX = this.getRadiusX();
+            radiusY = this.getRadiusY();
+
+            res.left -= radiusX;
+            res.right -= radiusX;
+            res.top -= radiusY;
+            res.bottom -= radiusY;
+
+            return res;
+        },
     };
     Kinetic.Util.extend(Kinetic.Ellipse, Kinetic.Shape);
 
@@ -9162,7 +9191,7 @@ var Kinetic = {};
      * @example
      * // get radius<br>
      * var radius = ellipse.radius();<br><br>
-     * 
+     *
      * // set radius<br>
      * ellipse.radius({<br>
      *   x: 200,<br>
@@ -9181,7 +9210,7 @@ var Kinetic = {};
      * @example
      * // get radius x<br>
      * var radiusX = ellipse.radiusX();<br><br>
-     * 
+     *
      * // set radius x<br>
      * ellipse.radiusX(200);
      */
@@ -9197,7 +9226,7 @@ var Kinetic = {};
      * @example
      * // get radius y<br>
      * var radiusY = ellipse.radiusY();<br><br>
-     * 
+     *
      * // set radius y<br>
      * ellipse.radiusY(200);
      */
