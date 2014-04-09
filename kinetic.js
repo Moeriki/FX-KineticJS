@@ -3623,20 +3623,6 @@ var Kinetic = {};
         getClassName: function() {
             return this.className || this.nodeType;
         },
-        // setX: function(newX) {
-        //     var anchorX = this.getAnchorX();
-        //     if(anchorX) {
-        //         newX -= anchorX * this.getWidth();
-        //     }
-        //     return newX;
-        // },
-        // setY: function(newY) {
-        //     var anchorY = this.getAnchorY();
-        //     if(anchorY) {
-        //         newY -= anchorY * this.getHeight();
-        //     }
-        //     return newY;
-        // },
         setWidth: function(newWidth) {
             var anchorX = this.getAnchorX();
             if(anchorX) {
