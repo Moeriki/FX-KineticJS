@@ -84,25 +84,6 @@ module.exports = function(grunt) {
     'src/Node.js',
     'src/Kizzle.js',
 
-    // filters
-    // 'src/filters/Grayscale.js',
-    // 'src/filters/Brighten.js',
-    // 'src/filters/Invert.js',
-    // 'src/filters/Blur.js',
-    // 'src/filters/Mask.js',
-    // 'src/filters/RGB.js',
-    // 'src/filters/HSV.js',
-    // 'src/filters/HSL.js',
-    // 'src/filters/Emboss.js',
-    // 'src/filters/Enhance.js',
-    // 'src/filters/Posterize.js',
-    // 'src/filters/Noise.js',
-    // 'src/filters/Pixelate.js',
-    // 'src/filters/Threshold.js',
-    // 'src/filters/Sepia.js',
-    // 'src/filters/Solarize.js',
-    // 'src/filters/Kaleidoscope.js',
-
     // core
     'src/Animation.js',
     'src/Tween.js',
@@ -110,27 +91,22 @@ module.exports = function(grunt) {
     'src/Container.js',
     'src/Shape.js',
     'src/Stage.js',
+    'src/BaseLayer.js',
     'src/Layer.js',
+    'src/FastLayer.js',
     'src/Group.js',
 
     // shapes
     'src/shapes/Rect.js',
     'src/shapes/Circle.js',
     'src/shapes/Ellipse.js',
-    // 'src/shapes/Ring.js',
-    // 'src/shapes/Wedge.js',
-    // 'src/shapes/Arc.js',
     'src/shapes/Image.js',
     'src/shapes/Text.js',
     'src/shapes/Line.js',
-    // 'src/shapes/Sprite.js',
 
     // plugins
-    // 'src/plugins/Path.js',
-    // 'src/plugins/TextPath.js',
     'src/plugins/RegularPolygon.js',
     'src/plugins/Star.js',
-    // 'src/plugins/Label.js',
   ];
 
   // Project configuration.
