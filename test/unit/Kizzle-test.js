@@ -196,7 +196,7 @@ suite('Kizzle', function() {
         layer.add(group2);
         stage.add(layer);
 
-        assert.equal(layer.getChildren('#group1, group2').length, 2);
+        assert.equal(layer.getChildren('#group1, #group2').length, 2);
     });
 
     test('#next / #previous', function() {
