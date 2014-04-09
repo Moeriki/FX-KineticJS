@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-04-08
+ * Date: 2014-04-09
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -9051,20 +9051,29 @@ var Kinetic = {};
             Kinetic.Node.prototype.setHeight.call(this, height);
             this.setRadius(height / 2);
         },
-        // implements Node.prototype.calculateBoundingBox()
-        calculateBoundingBox: function() {
-            var res, radius;
-
-            res = Kinetic.Node.prototype.calculateBoundingBox.call(this);
-            radius = this.getRadius();
-
-            res.left -= radius;
-            res.right -= radius;
-            res.top -= radius;
-            res.bottom -= radius;
-
-            return res;
+        calculateLocalBoundingBox: function() {
+            var radius = this.getRadius();
+            return {
+                left: -radius,
+                right: radius,
+                top: -radius,
+                bottom: radius,
+            };
         },
+        // implements Node.prototype.calculateBoundingBox()
+        // calculateBoundingBox: function() {
+        //     var res, radius;
+
+        //     res = Kinetic.Node.prototype.calculateBoundingBox.call(this);
+        //     radius = this.getRadius();
+
+        //     res.left -= radius;
+        //     res.right -= radius;
+        //     res.top -= radius;
+        //     res.bottom -= radius;
+
+        //     return res;
+        // },
     };
     Kinetic.Util.extend(Kinetic.Circle, Kinetic.Shape);
 
@@ -9158,21 +9167,32 @@ var Kinetic = {};
                 y: height / 2
             });
         },
-        // implements Node.prototype.calculateBoundingBox()
-        calculateBoundingBox: function() {
-            var res, radiusX, radiusY;
-
-            res = Kinetic.Node.prototype.calculateBoundingBox.call(this);
+        calculateLocalBoundingBox: function() {
+            var radiusX, radiusY;
             radiusX = this.getRadiusX();
             radiusY = this.getRadiusY();
-
-            res.left -= radiusX;
-            res.right -= radiusX;
-            res.top -= radiusY;
-            res.bottom -= radiusY;
-
-            return res;
+            return {
+                left: -radiusX,
+                right: radiusX,
+                top: -radiusY,
+                bottom: radiusY,
+            };
         },
+        // implements Node.prototype.calculateBoundingBox()
+        // calculateBoundingBox: function() {
+        //     var res, radiusX, radiusY;
+
+        //     res = Kinetic.Node.prototype.calculateBoundingBox.call(this);
+        //     radiusX = this.getRadiusX();
+        //     radiusY = this.getRadiusY();
+
+        //     res.left -= radiusX;
+        //     res.right -= radiusX;
+        //     res.top -= radiusY;
+        //     res.bottom -= radiusY;
+
+        //     return res;
+        // },
     };
     Kinetic.Util.extend(Kinetic.Ellipse, Kinetic.Shape);
 

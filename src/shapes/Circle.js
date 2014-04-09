@@ -56,20 +56,29 @@
             Kinetic.Node.prototype.setHeight.call(this, height);
             this.setRadius(height / 2);
         },
-        // implements Node.prototype.calculateBoundingBox()
-        calculateBoundingBox: function() {
-            var res, radius;
-
-            res = Kinetic.Node.prototype.calculateBoundingBox.call(this);
-            radius = this.getRadius();
-
-            res.left -= radius;
-            res.right -= radius;
-            res.top -= radius;
-            res.bottom -= radius;
-
-            return res;
+        calculateLocalBoundingBox: function() {
+            var radius = this.getRadius();
+            return {
+                left: -radius,
+                right: radius,
+                top: -radius,
+                bottom: radius,
+            };
         },
+        // implements Node.prototype.calculateBoundingBox()
+        // calculateBoundingBox: function() {
+        //     var res, radius;
+
+        //     res = Kinetic.Node.prototype.calculateBoundingBox.call(this);
+        //     radius = this.getRadius();
+
+        //     res.left -= radius;
+        //     res.right -= radius;
+        //     res.top -= radius;
+        //     res.bottom -= radius;
+
+        //     return res;
+        // },
     };
     Kinetic.Util.extend(Kinetic.Circle, Kinetic.Shape);
 
