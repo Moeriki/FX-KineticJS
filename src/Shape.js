@@ -175,13 +175,8 @@
                         bufferContext.save();
                         bufferContext._applyLineJoin(this);
 
-// <<<<<<< HEAD
-//                         bufferContext._applyTransform(this);
-
-// =======
                         layer._applyTransform(this, bufferContext, top);
 
-// >>>>>>> master
                         drawFunc.call(this, bufferContext);
                         bufferContext.restore();
 
@@ -198,13 +193,8 @@
                     // if buffer canvas is not needed
                     else {
                         context._applyLineJoin(this);
-// <<<<<<< HEAD
-//                         context._applyTransform(this);
-
-// =======
                         layer._applyTransform(this, context, top);
 
-// >>>>>>> master
                         if (hasShadow) {
                             context.save();
                             context._applyShadow(this);
@@ -237,13 +227,9 @@
                 else if (drawFunc) {
                     context.save();
                     context._applyLineJoin(this);
-// <<<<<<< HEAD
-//                     context._applyTransform(this);
 
-// =======
                     layer._applyTransform(this, context, top);
 
-// >>>>>>> master
                     drawFunc.call(this, context);
                     context.restore();
                 }

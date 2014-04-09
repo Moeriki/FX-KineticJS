@@ -1708,12 +1708,7 @@
                     // set value to default value using getAttr
                     this.attrs[key] = this.getAttr(key);
                 }
-// <<<<<<< HEAD
 
-                //this._fireBeforeChangeEvent(key, oldVal, val);
-// =======
-
-// >>>>>>> master
                 this.attrs[key][component] = val;
                 this._fireChangeEvent(key, oldVal, val);
             }
