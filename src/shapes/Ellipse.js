@@ -67,7 +67,33 @@
             this.setRadius({
                 y: height / 2
             });
-        }
+        },
+        calculateLocalBoundingBox: function() {
+            var radiusX, radiusY;
+            radiusX = this.getRadiusX();
+            radiusY = this.getRadiusY();
+            return {
+                left: -radiusX,
+                right: radiusX,
+                top: -radiusY,
+                bottom: radiusY,
+            };
+        },
+        // implements Node.prototype.calculateBoundingBox()
+        // calculateBoundingBox: function() {
+        //     var res, radiusX, radiusY;
+
+        //     res = Kinetic.Node.prototype.calculateBoundingBox.call(this);
+        //     radiusX = this.getRadiusX();
+        //     radiusY = this.getRadiusY();
+
+        //     res.left -= radiusX;
+        //     res.right -= radiusX;
+        //     res.top -= radiusY;
+        //     res.bottom -= radiusY;
+
+        //     return res;
+        // },
     };
     Kinetic.Util.extend(Kinetic.Ellipse, Kinetic.Shape);
 
@@ -86,7 +112,7 @@
      * @example
      * // get radius<br>
      * var radius = ellipse.radius();<br><br>
-     * 
+     *
      * // set radius<br>
      * ellipse.radius({<br>
      *   x: 200,<br>
@@ -105,7 +131,7 @@
      * @example
      * // get radius x<br>
      * var radiusX = ellipse.radiusX();<br><br>
-     * 
+     *
      * // set radius x<br>
      * ellipse.radiusX(200);
      */
@@ -121,7 +147,7 @@
      * @example
      * // get radius y<br>
      * var radiusY = ellipse.radiusY();<br><br>
-     * 
+     *
      * // set radius y<br>
      * ellipse.radiusY(200);
      */

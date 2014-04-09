@@ -3448,4 +3448,35 @@ suite('Node', function() {
         assert.equal(rect.index, 5);
     });
 
+    test('#calculateBoundingBox', function () {
+        var rect = new Kinetic.Rect({
+            width: 50,
+            height: 50,
+            offset: {
+                x: 25,
+                y: 25
+            },
+            x: -30
+        });
+        var rect2 = new Kinetic.Rect({
+            width: 20,
+            height: 80,
+            y: 70,
+            scale: {
+                x: 0.5,
+                y: 0.5
+            }
+        });
+
+        var group = new Kinetic.Group();
+        group.add(rect);
+        group.add(rect2);
+
+        var bounds = group.calculateBoundingBox();
+        assert.equal(bounds.left,  -55);
+        assert.equal(bounds.top, -25);
+        assert.equal(bounds.right, 10);
+        assert.equal(bounds.bottom, 110);
+    });
+
 });

@@ -1499,7 +1499,6 @@
         },
         setWidth: function(newWidth) {
             var anchorX = this.getAnchorX();
-
             if(anchorX) {
                 this._setAttr('offsetX',
                     this.getOffsetX() +
@@ -1507,12 +1506,10 @@
                         this.getScaleX() * anchorX
                 );
             }
-
             this._setAttr('width', newWidth);
         },
         setHeight: function(newHeight) {
             var anchorY = this.getAnchorX();
-
             if(anchorY) {
                 this._setAttr('offsetY',
                     this.getOffsetY() +
@@ -1520,25 +1517,20 @@
                         this.getScaleY() * anchorY
                 );
             }
-
             this._setAttr('height', newHeight);
         },
         setOffsetX: function(newOffsetX) {
             var anchorX = this.getAnchorX();
-
             if(anchorX) {
                 newOffsetX += anchorX * this.getWidth();
             }
-
             this._setAttr('offsetX', newOffsetX);
         },
         setOffsetY: function(newOffsetY) {
             var anchorY = this.getAnchorY();
-
             if(anchorY) {
                 newOffsetY += anchorY * this.getHeight();
             }
-
             this._setAttr('offsetY', newOffsetY);
         },
         /**
@@ -1770,7 +1762,7 @@
          * A bare node's bounding box can be calculated by simply using the w/h
          * This may be overridden for irregular shapes like circles.
          */
-        calculateLocalBoundingBox: function () {
+        calculateLocalBoundingBox: function() {
             return {
                 left: 0,
                 top: 0,
@@ -1786,7 +1778,7 @@
          * For example, a rotated circle's bounding box should not rotate, since it
          * always has the same radius.
          */
-        calculateBoundingBox: function () {
+        calculateBoundingBox: function() {
             var transform = this.getTransform();
             var localBounds = this.calculateLocalBoundingBox();
 
