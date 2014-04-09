@@ -68,21 +68,32 @@
                 y: height / 2
             });
         },
-        // implements Node.prototype.calculateBoundingBox()
-        calculateBoundingBox: function() {
-            var res, radiusX, radiusY;
-
-            res = Kinetic.Node.prototype.calculateBoundingBox.call(this);
+        calculateLocalBoundingBox: function() {
+            var radiusX, radiusY;
             radiusX = this.getRadiusX();
             radiusY = this.getRadiusY();
-
-            res.left -= radiusX;
-            res.right -= radiusX;
-            res.top -= radiusY;
-            res.bottom -= radiusY;
-
-            return res;
+            return {
+                left: -radiusX,
+                right: radiusX,
+                top: -radiusY,
+                bottom: radiusY,
+            };
         },
+        // implements Node.prototype.calculateBoundingBox()
+        // calculateBoundingBox: function() {
+        //     var res, radiusX, radiusY;
+
+        //     res = Kinetic.Node.prototype.calculateBoundingBox.call(this);
+        //     radiusX = this.getRadiusX();
+        //     radiusY = this.getRadiusY();
+
+        //     res.left -= radiusX;
+        //     res.right -= radiusX;
+        //     res.top -= radiusY;
+        //     res.bottom -= radiusY;
+
+        //     return res;
+        // },
     };
     Kinetic.Util.extend(Kinetic.Ellipse, Kinetic.Shape);
 
