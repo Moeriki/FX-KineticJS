@@ -1,6 +1,6 @@
 /**
-    @author Dieter Luypaert <dieterluypaert@gmail.com>
-*/
+ * @author Dieter Luypaert <dieterluypaert@gmail.com>
+ */
 
 (function() {
     'use strict';
