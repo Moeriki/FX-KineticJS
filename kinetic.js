@@ -591,7 +591,7 @@ var Kinetic = {};
     Kinetic.Collection.filter = function(filterOrSelector) {
         var len, n, nodes;
 
-        if(typeof filter !== 'function') {
+        if(typeof filterOrSelector !== 'function') {
             return Kinetic.Kizzle(filterOrSelector).filter(this);
         }
 
@@ -4644,8 +4644,8 @@ var Kinetic = {};
     Kinetic.Collection.mapMethods(Kinetic.Node);
 })();
 ;/**
-    @author Dieter Luypaert <dieterluypaert@gmail.com>
-*/
+ * @author Dieter Luypaert <dieterluypaert@gmail.com>
+ */
 
 (function() {
     'use strict';
@@ -6024,7 +6024,7 @@ var Kinetic = {};
                 return this.children.filter(selector);
             } else if(typeof selector === 'string') {
                 selector = selector.split(',').map(Kinetic.Kizzle);
-                nodes = [];
+                nodes = new Kinetic.Collection();
 
                 for(s = 0; s < selector.length; s++) {
                     Array.prototype.push.apply(nodes, (Kinetic.Kizzle(selector[s]).filter(this.children)));
