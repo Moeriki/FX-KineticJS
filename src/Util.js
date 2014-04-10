@@ -37,7 +37,7 @@
     Kinetic.Collection.filter = function(filterOrSelector) {
         var len, n, nodes;
 
-        if(typeof filter !== 'function') {
+        if(typeof filterOrSelector !== 'function') {
             return Kinetic.Kizzle(filterOrSelector).filter(this);
         }
 
