@@ -3472,4 +3472,11 @@ suite('Node', function() {
         assert.equal(bounds.bottom, 110);
     });
 
+    test('#calculateBoundingBox on empty group', function () {
+        var group = new Kinetic.Group();
+
+        var bounds = group.calculateBoundingBox();
+        assert.equal(bounds, null);
+    });
+
 });

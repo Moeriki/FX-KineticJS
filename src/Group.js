@@ -17,14 +17,18 @@
          */
         calculateLocalBoundingBox: function () {
             // Start with no bounds
-            var res = { left: 0, top: 0, right: 0, bottom: 0 };
+            var res = { left: +Infinity, top: +Infinity, right: -Infinity, bottom: -Infinity };
 
             // Iterate over all children
-            this.children.filter(function (child) {
+            var visibleChildren = this.children.filter(function (child) {
                 return child.getVisible();
-            }).forEach(function (child) {
+            });
+            visibleChildren.forEach(function (child) {
                 // Get the child's bounding box (may recurse back into this function if the child is a group)
                 var childBounds = child.calculateBoundingBox();
+                if(childBounds == null) {
+                    return;
+                }
 
                 // Push the bounds of the bounding-box-up-till-now
                 res.left   = Math.min(res.left, childBounds.left);
@@ -33,7 +37,7 @@
                 res.bottom = Math.max(res.bottom, childBounds.bottom);
             });
 
-            return res;
+            return visibleChildren.length > 0 ? res : null;
         }
     });
     Kinetic.Util.extend(Kinetic.Group, Kinetic.Container);

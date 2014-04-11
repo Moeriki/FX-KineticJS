@@ -1751,9 +1751,12 @@
         calculateBoundingBox: function() {
             var transform = this.getTransform();
             var localBounds = this.calculateLocalBoundingBox();
+            if(localBounds == null) {
+                return null;
+            }
 
-            // Original bounding box is a 0x0 rectangle centered on our position
-            var res = { left: this.getX(), top: this.getY(), right: this.getX(), bottom: this.getY() };
+            // Original bounding box is an impossible inverted infinite box.
+            var res = { left: +Infinity, top: +Infinity, right: -Infinity, bottom: -Infinity };
 
             // Make corners from the local bounds
             var localCorners = [{
