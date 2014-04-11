@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-04-10
+ * Date: 2014-04-11
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -4032,9 +4032,12 @@ var Kinetic = {};
         calculateBoundingBox: function() {
             var transform = this.getTransform();
             var localBounds = this.calculateLocalBoundingBox();
+            if(localBounds == null) {
+                return null;
+            }
 
-            // Original bounding box is a 0x0 rectangle centered on our position
-            var res = { left: this.getX(), top: this.getY(), right: this.getX(), bottom: this.getY() };
+            // Original bounding box is an impossible inverted infinite box.
+            var res = { left: +Infinity, top: +Infinity, right: -Infinity, bottom: -Infinity };
 
             // Make corners from the local bounds
             var localCorners = [{
@@ -9082,14 +9085,18 @@ var Kinetic = {};
          */
         calculateLocalBoundingBox: function () {
             // Start with no bounds
-            var res = { left: 0, top: 0, right: 0, bottom: 0 };
+            var res = { left: +Infinity, top: +Infinity, right: -Infinity, bottom: -Infinity };
 
             // Iterate over all children
-            this.children.filter(function (child) {
+            var visibleChildren = this.children.filter(function (child) {
                 return child.getVisible();
-            }).forEach(function (child) {
+            });
+            visibleChildren.forEach(function (child) {
                 // Get the child's bounding box (may recurse back into this function if the child is a group)
                 var childBounds = child.calculateBoundingBox();
+                if(childBounds == null) {
+                    return;
+                }
 
                 // Push the bounds of the bounding-box-up-till-now
                 res.left   = Math.min(res.left, childBounds.left);
@@ -9098,7 +9105,7 @@ var Kinetic = {};
                 res.bottom = Math.max(res.bottom, childBounds.bottom);
             });
 
-            return res;
+            return visibleChildren.length > 0 ? res : null;
         }
     });
     Kinetic.Util.extend(Kinetic.Group, Kinetic.Container);
