@@ -11,7 +11,6 @@
         ID = 'id',
         KINETIC = 'kinetic',
         LISTENING = 'listening',
-        //LISTENING_ENABLED = 'listeningEnabled',
         MOUSEENTER = 'mouseenter',
         MOUSELEAVE = 'mouseleave',
         NAME = 'name',
@@ -151,7 +150,12 @@
                 width = conf.width || this.width(),
                 height = conf.height || this.height(),
                 drawBorder = conf.drawBorder || false,
-                cachedSceneCanvas = new Kinetic.SceneCanvas({
+                layer = this.getLayer();
+            if (width === 0 || height === 0) {
+                Kinetic.Util.warn('Width or height of caching configuration equals 0. Cache is ignored.');
+                return;
+            }
+            var cachedSceneCanvas = new Kinetic.SceneCanvas({
                     pixelRatio: 1,
                     width: width,
                     height: height
@@ -168,21 +172,17 @@
                 origTransEnabled = this.transformsEnabled(),
                 origX = this.x(),
                 origY = this.y(),
-                sceneContext;
+                sceneContext = cachedSceneCanvas.getContext(),
+                hitContext = cachedHitCanvas.getContext();
 
             this.clearCache();
 
-            this.transformsEnabled('position');
-            this.x(x * -1);
-            this.y(y * -1);
-
-            this.drawScene(cachedSceneCanvas);
-            this.drawHit(cachedHitCanvas);
+            sceneContext.save();
+            hitContext.save();
 
             // this will draw a red border around the cached box for
             // debugging purposes
             if (drawBorder) {
-                sceneContext = cachedSceneCanvas.getContext();
                 sceneContext.save();
                 sceneContext.beginPath();
                 sceneContext.rect(0, 0, width, height);
@@ -193,9 +193,19 @@
                 sceneContext.restore();
             }
 
-            this.x(origX);
-            this.y(origY);
-            this.transformsEnabled(origTransEnabled);
+            sceneContext.translate(x * -1, y * -1);
+            hitContext.translate(x * -1, y * -1);
+
+            if (this.nodeType === 'Shape') {
+                sceneContext.translate(this.x() * -1, this.y() * -1);
+                hitContext.translate(this.x() * -1, this.y() * -1);
+            }
+
+            this.drawScene(cachedSceneCanvas, this);
+            this.drawHit(cachedHitCanvas, this);
+
+            sceneContext.restore();
+            hitContext.restore();
 
             this._cache.canvas = {
                 scene: cachedSceneCanvas,
@@ -207,7 +217,7 @@
         },
         _drawCachedSceneCanvas: function(context) {
             context.save();
-            context._applyTransform(this);
+            this.getLayer()._applyTransform(this, context);
             context.drawImage(this._getCachedSceneCanvas()._canvas, 0, 0);
             context.restore();
         },
@@ -253,7 +263,7 @@
                 hitCanvas = cachedCanvas.hit;
 
             context.save();
-            context._applyTransform(this);
+            this.getLayer()._applyTransform(this, context);
             context.drawImage(hitCanvas._canvas, 0, 0);
             context.restore();
         },
@@ -279,7 +289,7 @@
          *
          * // get the target node<br>
          * node.on('click', function(evt) {<br>
-         *   console.log(evt.targetNode);<br>
+         *   console.log(evt.target);<br>
          * });<br><br>
          *
          * // stop event propagation<br>
@@ -295,6 +305,22 @@
          * // namespace listener<br>
          * node.on('click.foo', function() {<br>
          *   console.log('you clicked/touched me!');<br>
+         * });<br><br>
+         *
+         * // get the event type<br>
+         * node.on('click tap', function(evt) {<br>
+         *   var eventType = evt.type;<br>
+         * });<br><br>
+         *
+         * // get native event object<br>
+         * node.on('click tap', function(evt) {<br>
+         *   var nativeEvent = evt.evt;<br>
+         * });<br><br>
+         *
+         * // for change events, get the old and new val<br>
+         * node.on('xChange', function(evt) {<br>
+         *   var oldVal = evt.oldVal;<br>
+         *   var newVal = evt.newVal;<br>
          * });
          */
         on: function(evtStr, selector, handler) {
@@ -349,7 +375,7 @@
             return function (e) {
                 var matches = this.find(selector);
                 var breadcrumbs = [];
-                var crumb = e.targetNode;
+                var crumb = e.target;
 
                 while(crumb != this) {
                     breadcrumbs.push(crumb);
@@ -410,11 +436,18 @@
         },
         // some event aliases for third party integration like HammerJS
         dispatchEvent: function(evt) {
-            evt.targetNode = this;
-            this.fire(evt.type, evt);
+            var e = {
+              target: this,
+              type: evt.type,
+              evt: evt
+            };
+            this.fire(evt.type, e);
         },
-        addEventListener: function() {
-            this.on.apply(this, arguments);
+        addEventListener: function(type, handler) {
+            // we to pass native event to handler
+            this.on(type, function(evt){
+                handler.call(this, evt.evt);
+            });
         },
         /**
          * remove self from parent, but don't destroy
@@ -851,16 +884,22 @@
             this.setPosition({x:x, y:y});
             return this;
         },
-        _eachAncestorReverse: function(func, includeSelf) {
+        _eachAncestorReverse: function(func, top) {
             var family = [],
                 parent = this.getParent(),
                 len, n;
 
-            // build family by traversing ancestors
-            if(includeSelf) {
-                family.unshift(this);
+            // if top node is defined, and this node is top node,
+            // there's no need to build a family tree.  just execute
+            // func with this because it will be the only node
+            if (top && top._id === this._id) {
+                func(this);
+                return true;
             }
-            while(parent) {
+
+            family.unshift(this);
+
+            while(parent && (!top || parent._id !== top._id)) {
                 family.unshift(parent);
                 parent = parent.parent;
             }
@@ -1244,10 +1283,17 @@
          * @memberof Kinetic.Node.prototype
          * @returns {Kinetic.Transform}
          */
-        getAbsoluteTransform: function() {
-            return this._getCache(ABSOLUTE_TRANSFORM, this._getAbsoluteTransform);
+        getAbsoluteTransform: function(top) {
+            // if using an argument, we can't cache the result.
+            if (top) {
+                return this._getAbsoluteTransform(top);
+            }
+            // if no argument, we can cache the result
+            else {
+                return this._getCache(ABSOLUTE_TRANSFORM, this._getAbsoluteTransform);
+            }
         },
-        _getAbsoluteTransform: function() {
+        _getAbsoluteTransform: function(top) {
             var at = new Kinetic.Transform(),
                 transformsEnabled, trans;
 
@@ -1262,7 +1308,7 @@
                 else if (transformsEnabled === 'position') {
                     at.translate(node.x(), node.y());
                 }
-            }, true);
+            }, top);
             return at;
         },
         /**
@@ -1278,7 +1324,7 @@
             var m = new Kinetic.Transform(),
                 x = this.getX(),
                 y = this.getY(),
-                rotation = this.getRotation() * Math.PI / 180,
+                rotation = Kinetic.getAngle(this.getRotation()),
                 scaleX = this.getScaleX(),
                 scaleY = this.getScaleY(),
                 skewX = this.getSkewX(),
@@ -1324,13 +1370,18 @@
         clone: function(obj) {
             // instantiate new node
             var className = this.getClassName(),
-                attrs = this.attrs,
+                attrs = Kinetic.Util.cloneObject(this.attrs),
                 key, allListeners, len, n, listener;
             // filter black attrs
             for (var i in CLONE_BLACK_LIST) {
                 var blockAttr = CLONE_BLACK_LIST[i];
                 delete attrs[blockAttr];
             }
+            // apply attr overrides
+            for (key in obj) {
+                attrs[key] = obj[key];
+            }
+
             var node = new Kinetic[className](attrs);
             // copy over listeners
             for(key in this.eventListeners) {
@@ -1351,9 +1402,6 @@
                     }
                 }
             }
-
-            // apply attr overrides
-            node.setAttrs(obj);
             return node;
         },
         /**
@@ -1429,26 +1477,11 @@
                 config.callback(img);
             });
         },
-        /**
-         * set size
-         * @method
-         * @memberof Kinetic.Node.prototype
-         * @param {Object} size
-         * @param {Number} size.width
-         * @param {Number} size.height
-         * @returns {Kinetic.Node}
-         */
         setSize: function(size) {
             this.setWidth(size.width);
             this.setHeight(size.height);
             return this;
         },
-        /**
-         * get size
-         * @method
-         * @memberof Kinetic.Node.prototype
-         * @returns {Object}
-         */
         getSize: function() {
             return {
                 width: this.getWidth(),
@@ -1466,7 +1499,6 @@
         },
         setWidth: function(newWidth) {
             var anchorX = this.getAnchorX();
-
             if(anchorX) {
                 this._setAttr('offsetX',
                     this.getOffsetX() +
@@ -1474,12 +1506,10 @@
                         this.getScaleX() * anchorX
                 );
             }
-
             this._setAttr('width', newWidth);
         },
         setHeight: function(newHeight) {
             var anchorY = this.getAnchorX();
-
             if(anchorY) {
                 this._setAttr('offsetY',
                     this.getOffsetY() +
@@ -1487,25 +1517,20 @@
                         this.getScaleY() * anchorY
                 );
             }
-
             this._setAttr('height', newHeight);
         },
         setOffsetX: function(newOffsetX) {
             var anchorX = this.getAnchorX();
-
             if(anchorX) {
                 newOffsetX += anchorX * this.getWidth();
             }
-
             this._setAttr('offsetX', newOffsetX);
         },
         setOffsetY: function(newOffsetY) {
             var anchorY = this.getAnchorY();
-
             if(anchorY) {
                 newOffsetY += anchorY * this.getHeight();
             }
-
             this._setAttr('offsetY', newOffsetY);
         },
         /**
@@ -1561,6 +1586,16 @@
         getType: function() {
             return this.nodeType;
         },
+        getDragDistance: function() {
+            // compare with undefined because we need to track 0 value
+            if (this.attrs.dragDistance !== undefined) {
+                return this.attrs.dragDistance;
+            } else if (this.parent) {
+                return this.parent.getDragDistance();
+            } else {
+                return Kinetic.dragDistance;
+            }
+        },
         _get: function(selector) {
             var nodes = [];
 
@@ -1589,12 +1624,6 @@
                     i--;
                 }
             }
-        },
-        _fireBeforeChangeEvent: function(attr, oldVal, newVal) {
-            this._fire([BEFORE, Kinetic.Util._capitalize(attr), CHANGE].join(EMPTY_STRING), {
-                oldVal: oldVal,
-                newVal: newVal
-            });
         },
         _fireChangeEvent: function(attr, oldVal, newVal) {
             this._fire(attr + CHANGE, {
@@ -1672,7 +1701,6 @@
                     this.attrs[key] = this.getAttr(key);
                 }
 
-                //this._fireBeforeChangeEvent(key, oldVal, val);
                 this.attrs[key][component] = val;
                 this._fireChangeEvent(key, oldVal, val);
             }
@@ -1681,7 +1709,7 @@
             var okayToRun = true;
 
             if(evt && this.nodeType === SHAPE) {
-                evt.targetNode = this;
+                evt.target = this;
             }
 
             if(eventType === MOUSEENTER && compareShape && this._id === compareShape._id) {
@@ -1708,6 +1736,8 @@
         _fire: function(eventType, evt) {
             var events = this.eventListeners[eventType],
                 i;
+
+            evt.type = eventType;
 
             if (events) {
                 for(i = 0; i < events.length; i++) {
@@ -2109,6 +2139,26 @@
     Kinetic.Factory.addGetterSetter(Kinetic.Node, 'offsetY', 0);
 
     /**
+     * get/set drag distance
+     * @name dragDistance
+     * @memberof Kinetic.Node.prototype
+     * @param {Number} distance
+     * @returns {Number}
+     * @example
+     * // get drag distance<br>
+     * var dragDistance = node.dragDistance();<br><br>
+     *
+     * // set distance<br>
+     * // node starts dragging only if pointer moved more then 3 pixels<br>
+     * node.dragDistance(3);<br>
+     * // or set globally<br>
+     * Kinetic.dragDistance = 3;
+     */
+
+    Kinetic.Factory.addSetter(Kinetic.Node, 'dragDistance');
+    Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node, 'dragDistance');
+
+    /**
      * get/set offset y
      * @name offsetY
      * @method
@@ -2313,6 +2363,29 @@
      * // set anchor <br>
      * node.anchor(0.5);
      */
+
+    /**
+     * get/set node size
+     * @name size
+     * @method
+     * @memberof Kinetic.Node.prototype
+     * @param {Object} size
+     * @param {Number} size.width
+     * @param {Number} size.height
+     * @returns {Object}
+     * @example
+     * // get node size<br>
+     * var size = node.size();<br>
+     * var x = size.x;<br>
+     * var y = size.y;<br><br>
+     *
+     * // set size<br>
+     * node.size({<br>
+     *   width: 100,<br>
+     *   height: 200<br>
+     * });
+     */
+    Kinetic.Factory.addOverloadedGetterSetter(Kinetic.Node, 'size');
 
     Kinetic.Factory.backCompat(Kinetic.Node, {
         rotateDeg: 'rotate',

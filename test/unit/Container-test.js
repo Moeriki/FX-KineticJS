@@ -1425,11 +1425,7 @@ suite('Container', function() {
 
         assert.equal(testName.length, 1, 'group has one children with test name');
 
-
         layer.add(group);
-
-
-
 
         layer.draw();
     });
@@ -1448,6 +1444,32 @@ suite('Container', function() {
         var rect = new Kinetic.Rect();
         layer.insert(rect);
         assert.equal(rect.index, 0);
+    });
+
+    test('add multiple nodes to container', function() {
+        var stage = addStage();
+        var layer = new Kinetic.Layer();
+        var circle1 = new Kinetic.Circle({
+            x: 0,
+            y: 0,
+            radius: 10,
+            fill: 'red'
+        });
+        var circle2 = new Kinetic.Circle({
+            x: 0,
+            y: 0,
+            radius: 10,
+            fill: 'white'
+        });
+        var circle3 = new Kinetic.Circle({
+            x: 0,
+            y: 0,
+            radius: 10,
+            fill: 'blue'
+        });
+        layer.add(circle1, circle2, circle3);
+        assert.equal(layer.getChildren().length, 3, 'layer has exactly three children');
+
     });
 
 });

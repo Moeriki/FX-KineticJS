@@ -131,6 +131,10 @@ suite('Shape', function() {
         shape.setShadowOpacity(0.5);
 
         assert.equal(shape.hasShadow(), true, 'shape should have a shadow because opacity is nonzero');
+
+        shape.setShadowEnabled(false);
+
+        assert.equal(shape.hasShadow(), false, 'shape should not have a shadow because it is not enabled');
     });
 
     // ======================================================
@@ -340,7 +344,7 @@ suite('Shape', function() {
         layer.draw();
         var trace = layer.getContext().getTrace();
         //console.log(trace);
-        assert.equal(trace, 'clearRect(0,0,578,200);save();save();shadowColor=black;shadowBlur=10;shadowOffsetX=10;shadowOffsetY=10;drawImage([object HTMLCanvasElement],0,0);restore();drawImage([object HTMLCanvasElement],0,0);restore();clearRect(0,0,578,200);save();save();shadowColor=black;shadowBlur=10;shadowOffsetX=10;shadowOffsetY=10;drawImage([object HTMLCanvasElement],0,0);restore();drawImage([object HTMLCanvasElement],0,0);restore();');
+        assert.equal(trace, 'clearRect(0,0,578,200);save();save();globalAlpha=1;shadowColor=black;shadowBlur=10;shadowOffsetX=10;shadowOffsetY=10;drawImage([object HTMLCanvasElement],0,0);restore();drawImage([object HTMLCanvasElement],0,0);restore();clearRect(0,0,578,200);save();save();globalAlpha=1;shadowColor=black;shadowBlur=10;shadowOffsetX=10;shadowOffsetY=10;drawImage([object HTMLCanvasElement],0,0);restore();drawImage([object HTMLCanvasElement],0,0);restore();');
 
         circle.fillEnabled(false);
         assert.equal(circle.getFillEnabled(), false, 'fillEnabled should be false');
@@ -517,7 +521,7 @@ suite('Shape', function() {
     rect.dash([1]);
     assert.equal(rect.dash()[0], 1);
 
-    // NOTE: skipping the rest because it would take hours to test all possible methods.  
+    // NOTE: skipping the rest because it would take hours to test all possible methods.
     // This should hopefully be enough to test Factor overloaded methods
 
 
@@ -621,63 +625,105 @@ suite('Shape', function() {
     assert.equal(shape.fillPatternRotation(), 0);
   });
 
-  // ======================================================
-  test('adaptive dash', function() {
-    var dashArray = [0.001, 3];
-    var stage = addStage();
-    var layer = new Kinetic.Layer();
+    // ======================================================
+    test.skip('hit graph when shape cached before adding to Layer', function() {
+        var stage = addStage();
+        var layer = new Kinetic.Layer();
+        var rect = new Kinetic.Rect({
+            x: 290,
+            y: 111,
+            width : 50,
+            height : 50,
+            fill : 'black'
+        });
+        rect.cache();
 
-    var circle = new Kinetic.Circle({
-        x: 75,
-        y: 75,
-        fill: 'yellow',
-        radius: 50,
-        stroke: 'red',
-        strokeWidth: 22,
-        lineCap: 'round',
-        dash: dashArray,
-        adaptiveDash: true
+        var click = false;
+
+        rect.on('click', function() {
+            click = true;
+        });
+
+        layer.add(rect);
+        stage.add(layer);
+
+        var top = stage.content.getBoundingClientRect().top;
+
+        showHit(layer);
+
+        stage._mousedown({
+            clientX: 300,
+            clientY: 120 + top
+        });
+
+        Kinetic.DD._endDragBefore();
+        stage._mouseup({
+            clientX: 300,
+            clientY: 120 + top
+        });
+        Kinetic.DD._endDragAfter({dragEndNode:rect});
+
+        //TODO: can't get this to pass
+        assert.equal(click, true, 'click event should have been fired when mousing down and then up on rect');
     });
 
-    var circle2 = new Kinetic.Circle({
-        x: 225,
-        y: 75,
-        fill: 'yellow',
-        radius: 50,
-        stroke: 'red',
-        lineCap: 'round',
-        adaptiveDash: true
+    // ======================================================
+    test('adaptive dash', function() {
+        var dashArray = [0.001, 3];
+        var stage = addStage();
+        var layer = new Kinetic.Layer();
+
+        var circle = new Kinetic.Circle({
+            x: 75,
+            y: 75,
+            fill: 'yellow',
+            radius: 50,
+            stroke: 'red',
+            strokeWidth: 22,
+            lineCap: 'round',
+            dash: dashArray,
+            adaptiveDash: true
+        });
+
+        var circle2 = new Kinetic.Circle({
+            x: 225,
+            y: 75,
+            fill: 'yellow',
+            radius: 50,
+            stroke: 'red',
+            lineCap: 'round',
+            adaptiveDash: true
+        });
+
+        circle2.dash(dashArray);
+        circle2.strokeWidth(7.5);
+
+        var circle3 = new Kinetic.Circle({
+            x: 375,
+            y: 75,
+            fill: 'yellow',
+            radius: 50,
+            stroke: 'red',
+            lineCap: 'round',
+            strokeWidth: 2.5,
+            dash: dashArray
+        });
+
+        circle3.adaptiveDash(true);
+
+        layer.add(circle);
+        layer.add(circle2);
+        layer.add(circle3);
+        stage.add(layer);
+
+        assert.equal(circle.dash()[0] * circle.strokeWidth(), circle.adaptiveDash()[0]);
+        assert.equal(circle.dash()[1] * circle.strokeWidth(), circle.adaptiveDash()[1]);
+
+        assert.equal(circle2.dash()[0] * circle2.strokeWidth(), circle2.adaptiveDash()[0]);
+        assert.equal(circle2.dash()[1] * circle2.strokeWidth(), circle2.adaptiveDash()[1]);
+
+        assert.equal(circle3.dash()[0] * circle3.strokeWidth(), circle3.adaptiveDash()[0]);
+        assert.equal(circle3.dash()[1] * circle3.strokeWidth(), circle3.adaptiveDash()[1]);
     });
-
-    circle2.dash(dashArray);
-    circle2.strokeWidth(7.5);
-
-    var circle3 = new Kinetic.Circle({
-        x: 375,
-        y: 75,
-        fill: 'yellow',
-        radius: 50,
-        stroke: 'red',
-        lineCap: 'round',
-        strokeWidth: 2.5,
-        dash: dashArray
-    });
-
-    circle3.adaptiveDash(true);
-
-    layer.add(circle);
-    layer.add(circle2);
-    layer.add(circle3);
-    stage.add(layer);
-
-    assert.equal(circle.dash()[0] * circle.strokeWidth(), circle.adaptiveDash()[0]);
-    assert.equal(circle.dash()[1] * circle.strokeWidth(), circle.adaptiveDash()[1]);
-
-    assert.equal(circle2.dash()[0] * circle2.strokeWidth(), circle2.adaptiveDash()[0]);
-    assert.equal(circle2.dash()[1] * circle2.strokeWidth(), circle2.adaptiveDash()[1]);
-
-    assert.equal(circle3.dash()[0] * circle3.strokeWidth(), circle3.adaptiveDash()[0]);
-    assert.equal(circle3.dash()[1] * circle3.strokeWidth(), circle3.adaptiveDash()[1]);
-  });
 
 });

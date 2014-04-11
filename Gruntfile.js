@@ -35,7 +35,9 @@ module.exports = function(grunt) {
     'src/Container.js',
     'src/Shape.js',
     'src/Stage.js',
+    'src/BaseLayer.js',
     'src/Layer.js',
+    'src/FastLayer.js',
     'src/Group.js',
 
     // shapes
@@ -82,25 +84,6 @@ module.exports = function(grunt) {
     'src/Node.js',
     'src/Kizzle.js',
 
-    // filters
-    // 'src/filters/Grayscale.js',
-    // 'src/filters/Brighten.js',
-    // 'src/filters/Invert.js',
-    // 'src/filters/Blur.js',
-    // 'src/filters/Mask.js',
-    // 'src/filters/RGB.js',
-    // 'src/filters/HSV.js',
-    // 'src/filters/HSL.js',
-    // 'src/filters/Emboss.js',
-    // 'src/filters/Enhance.js',
-    // 'src/filters/Posterize.js',
-    // 'src/filters/Noise.js',
-    // 'src/filters/Pixelate.js',
-    // 'src/filters/Threshold.js',
-    // 'src/filters/Sepia.js',
-    // 'src/filters/Solarize.js',
-    // 'src/filters/Kaleidoscope.js',
-
     // core
     'src/Animation.js',
     'src/Tween.js',
@@ -108,27 +91,22 @@ module.exports = function(grunt) {
     'src/Container.js',
     'src/Shape.js',
     'src/Stage.js',
+    'src/BaseLayer.js',
     'src/Layer.js',
+    'src/FastLayer.js',
     'src/Group.js',
 
     // shapes
     'src/shapes/Rect.js',
     'src/shapes/Circle.js',
     'src/shapes/Ellipse.js',
-    // 'src/shapes/Ring.js',
-    // 'src/shapes/Wedge.js',
-    // 'src/shapes/Arc.js',
     'src/shapes/Image.js',
     'src/shapes/Text.js',
     'src/shapes/Line.js',
-    // 'src/shapes/Sprite.js',
 
     // plugins
-    // 'src/plugins/Path.js',
-    // 'src/plugins/TextPath.js',
     'src/plugins/RegularPolygon.js',
     'src/plugins/Star.js',
-    // 'src/plugins/Label.js',
   ];
 
   // Project configuration.
@@ -277,7 +255,7 @@ module.exports = function(grunt) {
                 stderr : true,
                 failOnError : true
             },
-            command: './node_modules/.bin/jsdoc ./dist/kinetic-v<%= pkg.version %>.js -d ./documentation'
+            command: './node_modules/.bin/jsdoc ./dist/kinetic-v<%= pkg.version %>.js -d ./docs'
         }
     },
     mocha_phantomjs: {
@@ -321,7 +299,7 @@ module.exports = function(grunt) {
     'copy:prod2'
   ]);
 
-  grunt.registerTask('docs', 'Generate documentation to documentation folder', [
+  grunt.registerTask('docs', 'Generate docs', [
     'full',
     'shell:jsdoc',
   ]);
@@ -329,15 +307,25 @@ module.exports = function(grunt) {
   grunt.registerTask('hint', 'Check hint errors', ['jshint']);
   grunt.registerTask('test', 'Run tests', ['dev', 'mocha_phantomjs']);
 
-  grunt.registerTask('server', 'run local server and create dev version', function() {
-
+  grunt.registerTask('node-test', 'Run tests in pure NodeJS environment', function(){
     grunt.task.run('dev');
-    grunt.log.writeln('Tests server starts on http://localhost:8080/test/runner.html');
+    grunt.task.run('_run-node-test');
+  });
+
+
+  grunt.registerTask('server', 'run local server and create dev version', function() {
+    grunt.task.run('dev');
     var connect = require('connect');
     connect.createServer(
         connect.static(__dirname)
     ).listen(8080);
     grunt.task.run('watch:dev');
+    grunt.log.writeln('Tests server starts on http://localhost:8080/test/runner.html');
+  });
+
+  // run pure node tests
+  grunt.registerTask('_run-node-test', function(){
+    require('./test/node-runner');
   });
 
   grunt.loadNpmTasks('grunt-contrib-concat');
