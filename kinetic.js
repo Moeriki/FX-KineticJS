@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-04-11
+ * Date: 2014-04-14
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -4737,7 +4737,7 @@ var Kinetic = {};
     Kinetic.Kizzle.prototype = {
 
         matchAttrs: function(node) {
-            var len, i, name, val, reverse;
+            var len, i, name, val, attrVal, reverse;
 
             if(!node) {
                 return false;
@@ -4748,18 +4748,25 @@ var Kinetic = {};
             }
 
             len = this.attrs.length;
-
             for(i = 0; i < len; i++) {
                 name = this.attrs[i][0];
                 val = this.attrs[i][1];
 
-                if(typeof val !== 'undefined') {
-                    if(val !== node.attrs[name]) {
+                if (name === 'visible') {
+                    attrVal = node.isVisible();
+                } else if (name === 'listening') {
+                    attrVal = node.isListening();
+                } else {
+                    attrVal = node.getAttr(name);
+                }
+
+                if (typeof val !== 'undefined') {
+                    if(val !== attrVal) {
                         return false;
                     }
                 } else {
                     reverse = !!this.attrs[i][2];
-                    if(Boolean(node.attrs[name]) === reverse) {
+                    if(Boolean(attrVal) === reverse) {
                         return false;
                     }
                 }
