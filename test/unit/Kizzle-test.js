@@ -145,6 +145,23 @@ suite('Kizzle', function() {
         assert.equal(k.match(node), false);
     });
 
+    test('match attrs inherited values', function() {
+        var group, node, k;
+
+        group = new Kinetic.Group({
+            listening: true,
+            visible: true,
+        });
+        node = new Kinetic.Rect();
+        group.add(node);
+
+        k = kizz('[visible]');
+        assert.equal(k.match(node), true);
+
+        k = kizz('[listening]');
+        assert.equal(k.match(node), true);
+    });
+
     test('match attrs val', function() {
         var node, k;
 

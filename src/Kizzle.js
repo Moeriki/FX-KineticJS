@@ -89,7 +89,7 @@
     Kinetic.Kizzle.prototype = {
 
         matchAttrs: function(node) {
-            var len, i, name, val, reverse;
+            var len, i, name, val, attrVal, reverse;
 
             if(!node) {
                 return false;
@@ -100,18 +100,25 @@
             }
 
             len = this.attrs.length;
-
             for(i = 0; i < len; i++) {
                 name = this.attrs[i][0];
                 val = this.attrs[i][1];
 
-                if(typeof val !== 'undefined') {
-                    if(val !== node.attrs[name]) {
+                if (name === 'visible') {
+                    attrVal = node.isVisible();
+                } else if (name === 'listening') {
+                    attrVal = node.isListening();
+                } else {
+                    attrVal = node.getAttr(name);
+                }
+
+                if (typeof val !== 'undefined') {
+                    if(val !== attrVal) {
                         return false;
                     }
                 } else {
                     reverse = !!this.attrs[i][2];
-                    if(Boolean(node.attrs[name]) === reverse) {
+                    if(Boolean(attrVal) === reverse) {
                         return false;
                     }
                 }
