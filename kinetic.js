@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-04-14
+ * Date: 2014-04-15
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -4864,6 +4864,9 @@ var Kinetic = {};
      *  to the last animation frame.  The time property is the time in milliseconds that ellapsed from the moment the animation started
      *  to the current animation frame.  The frameRate property is the current frame rate in frames / second
      * @param {Kinetic.Layer|Array} [layers] layer(s) to be redrawn on each animation frame. Can be a layer, an array of layers, or null.
+     * @param {boolean} [isPartial] Indicates that the the animation wants to perform a partial update. func is passed an extra boolean
+     *  indicates that the specified layers will be updated, and if true func can choose not to do the partial update because it will have
+     *  been done by drawing the layers.
      *  Not specifying a node will result in no redraw.
      * @example
      * // move a node to the right at 50 pixels / second<br>
@@ -4876,10 +4879,11 @@ var Kinetic = {};
      *
      * anim.start();
      */
-    Kinetic.Animation = function(func, layers) {
+    Kinetic.Animation = function(func, layers, isPartial) {
         var Anim = Kinetic.Animation;
         this.func = func;
         this.setLayers(layers);
+        this.isPartial = isPartial;
         this.id = Anim.animIdCounter++;
         this.frame = {
             time: 0,
@@ -4979,6 +4983,7 @@ var Kinetic = {};
             this.stop();
             this.frame.timeDiff = 0;
             this.frame.lastTime = now();
+            this.enable();
             Anim._addAnimation(this);
         },
         /**
@@ -4988,6 +4993,25 @@ var Kinetic = {};
          */
         stop: function() {
             Kinetic.Animation._removeAnimation(this);
+        },
+        /**
+         * Temporarily disables animation. disable() incurs less overhead than stop(),
+         * but a disabled animation still uses some CPU time when the animation is
+         * rendered. Good alternative for when start and stop are called frequently
+         * for a few animations.
+         * @method
+         * @memberof Kinetic.Animation.prototype
+         */
+        disable: function () {
+            this._disabled = true;
+        },
+        /**
+         * Reenables animation.
+         * @method
+         * @memberof Kinetic.Animation.prototype
+         */
+        enable: function () {
+            this._disabled = false;
         },
         _updateFrameObject: function(time) {
             this.frame.timeDiff = time - this.frame.lastTime;
@@ -5021,7 +5045,22 @@ var Kinetic = {};
     Kinetic.Animation._runFrames = function() {
         var layerHash = {},
             animations = this.animations,
-            anim, layers, func, n, i, layersLen, layer, key;
+            anim, animLen, layers, func, n, i, layersLen, layer, key, allLayersDrawn;
+
+        for(n = 0, animLen = animations.length; n < animLen; n++) {
+            anim = animations[n];
+            if (!anim._disabled && !anim.isPartial) {
+                layers = anim.layers;
+                layersLen = layers.length;
+
+                for (i=0; i<layersLen; i++) {
+                    layer = layers[i];
+                    if(layer._id !== undefined) {
+                        layerHash[layer._id] = layer;
+                    }
+                }
+            }
+        }
         /*
          * loop through all animations and execute animation
          *  function.  if the animation object has specified node,
@@ -5035,22 +5074,28 @@ var Kinetic = {};
          */
         for(n = 0; n < animations.length; n++) {
             anim = animations[n];
-            layers = anim.layers;
-            func = anim.func;
+            if (!anim._disabled) {
+                layers = anim.layers;
+                func = anim.func;
 
-            anim._updateFrameObject(now());
-            layersLen = layers.length;
+                anim._updateFrameObject(now());
+                layersLen = layers.length;
 
-            for (i=0; i<layersLen; i++) {
-                layer = layers[i];
-                if(layer._id !== undefined) {
-                    layerHash[layer._id] = layer;
+                if (anim.isPartial) {
+                    allLayersDrawn = true;
+                    for (i=0; i<layersLen; i++) {
+                        layer = layers[i];
+                        if(layer._id !== undefined && !layerHash[layer._id]) {
+                            allLayersDrawn = false;
+                            break;
+                        }
+                    }
                 }
-            }
 
-            // if animation object has a function, execute it
-            if(func) {
-                func.call(anim, anim.frame);
+                // if animation object has a function, execute it
+                if(func) {
+                    func.call(anim, anim.frame, allLayersDrawn);
+                }
             }
         }
 
@@ -5087,23 +5132,47 @@ var Kinetic = {};
      * @method
      * @memberof Kinetic.Layer.prototype
      */
-    Kinetic.Layer.prototype.batchDraw = function() {
+    Kinetic.Layer.prototype.batchDraw = function(shape) {
         var that = this,
             Anim = Kinetic.Animation;
 
+        this.batchShapes = [];
+        this.batchAll = false;
+        if (shape) {
+            this.batchShapes.push(shape);
+        } else {
+            this.batchAll = true;
+        }
         if (!this.batchAnim) {
-            this.batchAnim = new Anim(function() {
+            this.batchAnim = new Anim(function(_, layerDrawn) {
                 if (that.lastBatchDrawTime && now() - that.lastBatchDrawTime > BATCH_DRAW_STOP_TIME_DIFF) {
                     that.batchAnim.stop();
+                } else {
+                    that.batchAnim.disable();
                 }
-            }, this);
+                if (!layerDrawn) {
+                    if (that.batchAll) {
+                        that.draw();
+                    } else if (that.batchShapes.length > 0) {
+                        for (var bs = 0, bsLen = that.batchShapes.length; bs < bsLen; bs++) {
+                            that.batchShapes[bs].draw();
+                        }
+                    }
+                }
+                this.batchShapes = [];
+                this.batchAll = false;
+            }, this, true);
         }
 
         this.lastBatchDrawTime = now();
 
         if (!this.batchAnim.isRunning()) {
+            // NOTE: This draw serves no purpose in my opinion. Let's say batchDraw is called twice in a row,
+            //       the second time after some updates. These updates won't be drawn right away. ~Peter
             this.draw();
             this.batchAnim.start();
+        } else {
+            that.batchAnim.enable();
         }
     };
 
@@ -5112,11 +5181,12 @@ var Kinetic = {};
      * @method
      * @memberof Kinetic.Stage.prototype
      */
-    Kinetic.Stage.prototype.batchDraw = function() {
+    Kinetic.Stage.prototype.batchDraw = function(shape) {
         this.getChildren().each(function(layer) {
-            layer.batchDraw();
+            layer.batchDraw(shape);
         });
     };
+
 })((1,eval)('this'));
 ;(function() {
     var blacklist = {
