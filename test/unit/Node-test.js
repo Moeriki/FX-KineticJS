@@ -3486,4 +3486,124 @@ suite('Node', function() {
         assert.equal(bounds, null);
     });
 
+    test('#getInverseAbsoluteTransform', function () {
+        var stage = addStage();
+        stage.setX(500);
+        var layer = new Kinetic.Layer({
+            y: 200
+        });
+        var group = new Kinetic.Group({
+            x: -50
+        });
+        stage.add(layer);
+        layer.add(group);
+
+        var tf = group.getAbsoluteTransform();
+        var rtf = group.getInverseAbsoluteTransform();
+        var pos = rtf.transformPoint(tf.transformCoords(5,3));
+        assert.equal(pos.x, 5);
+        assert.equal(pos.y, 3);
+    });
+
+    test('#getAbsoluteToLocalSpaceTransform', function () {
+        var stage = addStage();
+        stage.setX(500);
+        var layer = new Kinetic.Layer({
+            y: 200
+        });
+        var group = new Kinetic.Group({
+            x: -50
+        });
+        stage.add(layer);
+        layer.add(group);
+
+        var pos = group.getAbsoluteToLocalSpaceTransform().transformCoords(0, 0);
+        assert.equal(pos.x, -450);
+        assert.equal(pos.y, -200);
+    });
+
+    test('#getLocalToAbsoluteSpaceTransform', function () {
+        var stage = addStage();
+        stage.setX(500);
+        var layer = new Kinetic.Layer({
+            y: 200
+        });
+        var group = new Kinetic.Group({
+            x: -50
+        });
+        stage.add(layer);
+        layer.add(group);
+
+        var pos = group.getLocalToAbsoluteSpaceTransform().transformCoords(0, 0);
+        assert.equal(pos.x, 450);
+        assert.equal(pos.y, 200);
+    });
+
+    test('#getStageToLocalSpaceTransform', function () {
+        var stage = addStage();
+        stage.setX(500);
+        var layer = new Kinetic.Layer({
+            y: 200
+        });
+        var group = new Kinetic.Group({
+            x: -50
+        });
+        stage.add(layer);
+        layer.add(group);
+
+        var pos = group.getStageToLocalSpaceTransform().transformCoords(0, 0);
+        assert.equal(pos.x, 50);
+        assert.equal(pos.y, -200);
+    });
+
+    test('#getLocalToStageSpaceTransform', function () {
+        var stage = addStage();
+        stage.setX(500);
+        var layer = new Kinetic.Layer({
+            y: 200
+        });
+        var group = new Kinetic.Group({
+            x: -50
+        });
+        stage.add(layer);
+        layer.add(group);
+
+        var pos = group.getLocalToStageSpaceTransform().transformCoords(0, 0);
+        assert.equal(pos.x, -50);
+        assert.equal(pos.y, 200);
+    });
+
+    test('#getLayerToLocalSpaceTransform', function () {
+        var stage = addStage();
+        stage.setX(500);
+        var layer = new Kinetic.Layer({
+            y: 200
+        });
+        var group = new Kinetic.Group({
+            x: -50
+        });
+        stage.add(layer);
+        layer.add(group);
+
+        var pos = group.getLayerToLocalSpaceTransform().transformCoords(0, 0);
+        assert.equal(pos.x, 50);
+        assert.equal(pos.y, 0);
+    });
+
+    test('#getLocalToLayerSpaceTransform', function () {
+        var stage = addStage();
+        stage.setX(500);
+        var layer = new Kinetic.Layer({
+            y: 200
+        });
+        var group = new Kinetic.Group({
+            x: -50
+        });
+        stage.add(layer);
+        layer.add(group);
+
+        var pos = group.getLocalToLayerSpaceTransform().transformCoords(0, 0);
+        assert.equal(pos.x, -50);
+        assert.equal(pos.y, 0);
+    });
 });

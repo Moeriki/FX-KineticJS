@@ -1817,6 +1817,46 @@
             });
 
             return res;
+        },
+
+        getInverseAbsoluteTransform: function (top) {
+            var tf = this.getAbsoluteTransform(top).dup();
+            tf.invert();
+            return tf;
+        },
+
+        // Transforms
+        getAbsoluteToLocalSpaceTransform: function () {
+            return this.getInverseAbsoluteTransform();
+        },
+
+        getLocalToAbsoluteSpaceTransform: function () {
+            return this.getAbsoluteTransform().dup();
+        },
+
+        getStageToLocalSpaceTransform: function () {
+            return this.getInverseAbsoluteTransform(this.getStage());
+        },
+
+        getLocalToStageSpaceTransform: function () {
+            return this.getAbsoluteTransform(this.getStage()).dup();
+        },
+
+        getLayerToLocalSpaceTransform: function () {
+            return this.getInverseAbsoluteTransform(this.getLayer());
+        },
+
+        getLocalToLayerSpaceTransform: function () {
+            return this.getAbsoluteTransform(this.getLayer()).dup();
+        },
+
+        // Simplified tween.
+        tweenTo: function (attrs) {
+            if(this.tween)
+                this.tween.destroy();
+            attrs.node = this;
+            this.tween = new Kinetic.Tween(attrs);
+            this.tween.play();
         }
     });
 
