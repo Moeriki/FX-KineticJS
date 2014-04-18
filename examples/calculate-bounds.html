@@ -1,0 +1,54 @@
+<html>
+<head>
+<script src="../dist/kinetic-dev.js" ></script>
+</head>
+
+<body>
+    <!-- used for KineticJS container -->
+    <div id="container"></div>
+<script>
+
+var stage = new Kinetic.Stage({
+    container: 'container',
+    width: window.innerWidth,
+    height: window.innerHeight
+});
+
+var layer = new Kinetic.Layer({
+    width: stage.getWidth(),
+    height: stage.getHeight(),
+});
+
+stage.add(layer);
+
+var circle = new Kinetic.Circle({
+	x: 500,
+	y: 500,
+	scale: 0.6,
+	rotation: 0,
+	fill: 'green',
+	radius: 200
+});
+layer.add(circle);
+
+var bounds = new Kinetic.Rect({
+	stroke: 'red',
+	strokeWidth: 3
+});
+layer.add(bounds);
+
+var anim = new Kinetic.Animation(function (frame) {
+	circle.setScaleX(Math.sin(frame.time / 1000));
+	circle.setScaleY(Math.sin(frame.time / 1000));
+	circle.setRotation(Math.sin(frame.time / 1000) * 180);
+
+	var b = circle.calculateBoundingBox();
+	bounds.setPosition({x: b.left, y: b.top});
+	bounds.setSize({width: b.right - b.left, height: b.bottom - b.top});
+}, layer);
+anim.start();
+
+</script>
+</body>
+
+<html>

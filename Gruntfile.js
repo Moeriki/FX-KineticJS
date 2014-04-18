@@ -8,6 +8,7 @@ module.exports = function(grunt) {
     'src/Factory.js',
     'src/Node.js',
     'src/Kizzle.js',
+    'src/MultiSelector.js',
 
     // filters
     'src/filters/Grayscale.js',
@@ -230,7 +231,7 @@ module.exports = function(grunt) {
       }
     },
     clean: {
-      build: ['dist/*']
+      build: ['dist/*','src/MultiSelector.js']
     },
     jshint: {
       options: hintConf,
@@ -256,6 +257,9 @@ module.exports = function(grunt) {
                 failOnError : true
             },
             command: './node_modules/.bin/jsdoc ./dist/kinetic-v<%= pkg.version %>.js -d ./docs'
+        },
+        pegjs: {
+            command: './node_modules/.bin/pegjs -e Kinetic.MultiSelector ./src/MultiSelector.pegjs ./src/MultiSelector.js'
         }
     },
     mocha_phantomjs: {
@@ -263,7 +267,7 @@ module.exports = function(grunt) {
     },
     watch: {
       dev: {
-        files: ['src/**/*.js'],
+        files: ['src/**/*.js','src/**/*.pegjs'],
         tasks: ['dev'],
         options: {
           spawn: false,
@@ -285,10 +289,11 @@ module.exports = function(grunt) {
 
 
   // Tasks
-  grunt.registerTask('dev', 'Create dev version', ['clean', 'concat:dev', 'replace:dev']);
-  grunt.registerTask('beta', 'Create beta version', ['clean', 'concat:beta', 'replace:beta']);
+  grunt.registerTask('dev', 'Create dev version', ['clean', 'shell:pegjs', 'concat:dev', 'replace:dev']);
+  grunt.registerTask('beta', 'Create beta version', ['clean', 'shell:pegjs', 'concat:beta', 'replace:beta']);
   grunt.registerTask('full', 'Build full version and create min files', [
     'clean',
+    'shell:pegjs',
     'concat:prod',
     'uglify',
     'replace:prod1',

@@ -19,7 +19,8 @@
     "jsdoc": "~3.3.0-alpha4",
     "grunt-mocha-phantomjs": "~0.4.2",
     "grunt-contrib-watch": "~0.5.3",
-    "grunt-shell": "~0.6.4"
+    "grunt-shell": "~0.6.4",
+    "pegjs": "~0.8.0"
   },
   "readmeFilename": "README.md",
   "main": "kinetic.js",
