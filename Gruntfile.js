@@ -102,6 +102,8 @@ module.exports = function(grunt) {
     'src/shapes/Rect.js',
     'src/shapes/Circle.js',
     'src/shapes/Ellipse.js',
+    'src/shapes/Wedge.js',
+    'src/shapes/Arc.js',
     'src/shapes/Image.js',
     'src/shapes/Text.js',
     'src/shapes/Line.js',
