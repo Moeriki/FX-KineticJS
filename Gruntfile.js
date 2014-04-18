@@ -84,6 +84,7 @@ module.exports = function(grunt) {
     'src/Factory.js',
     'src/Node.js',
     'src/Kizzle.js',
+    'src/MultiSelector.js',
 
     // core
     'src/Animation.js',
