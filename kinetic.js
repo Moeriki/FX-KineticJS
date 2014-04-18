@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-04-15
+ * Date: 2014-04-18
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -6241,30 +6241,8 @@ var Kinetic = {};
          * var nodes = layer.find('#foo, .bar');
          */
         find: function(selector) {
-            var s, nodes, kizz, node, clen, c;
-
-            selector = selector.split(',').map(Kinetic.Kizzle);
-            nodes = [];
-
-            for(s = 0; s < selector.length; s++) {
-                kizz = selector[s];
-
-                if(kizz.id) {
-                    node = this._getNodeById(kizz.id);
-                    if(node) {
-                        Array.prototype.push.apply(nodes, node._get(kizz));
-                    }
-                } else if(kizz.name) {
-                    Array.prototype.push.apply(nodes, this._getNodesByName(kizz.name).filter(kizz.matchAttrs.bind(kizz)));
-                } else {
-                    clen = this.children.length;
-                    for(c = 0; c < clen; c++) {
-                        Array.prototype.push.apply(nodes, this.children[c]._get(kizz));
-                    }
-                }
-            }
-
-            return Kinetic.Collection.toCollection(nodes);
+            selector = Kinetic.MultiSelector.parse(selector, { baseNode: this });
+            return Kinetic.Collection.toCollection(selector.find());
         },
         _getNodeById: function(key) {
             var node = Kinetic.ids[key];
