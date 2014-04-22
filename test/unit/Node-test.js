@@ -3500,7 +3500,10 @@ suite('Node', function() {
 
         var tf = group.getAbsoluteTransform();
         var rtf = group.getInverseAbsoluteTransform();
-        var pos = rtf.transformPoint(tf.transformCoords(5,3));
+        var pos = rtf.point(tf.point({
+            x: 5,
+            y: 3
+        }));
         assert.equal(pos.x, 5);
         assert.equal(pos.y, 3);
     });
@@ -3517,7 +3520,10 @@ suite('Node', function() {
         stage.add(layer);
         layer.add(group);
 
-        var pos = group.getAbsoluteToLocalSpaceTransform().transformCoords(0, 0);
+        var pos = group.getAbsoluteToLocalSpaceTransform().point({
+            x: 0,
+            y: 0
+        });
         assert.equal(pos.x, -450);
         assert.equal(pos.y, -200);
     });
@@ -3534,7 +3540,10 @@ suite('Node', function() {
         stage.add(layer);
         layer.add(group);
 
-        var pos = group.getLocalToAbsoluteSpaceTransform().transformCoords(0, 0);
+        var pos = group.getLocalToAbsoluteSpaceTransform().point({
+            x: 0,
+            y: 0
+        });
         assert.equal(pos.x, 450);
         assert.equal(pos.y, 200);
     });
@@ -3551,7 +3560,10 @@ suite('Node', function() {
         stage.add(layer);
         layer.add(group);
 
-        var pos = group.getStageToLocalSpaceTransform().transformCoords(0, 0);
+        var pos = group.getStageToLocalSpaceTransform().point({
+            x: 0,
+            y: 0
+        });
         assert.equal(pos.x, 50);
         assert.equal(pos.y, -200);
     });
@@ -3568,7 +3580,10 @@ suite('Node', function() {
         stage.add(layer);
         layer.add(group);
 
-        var pos = group.getLocalToStageSpaceTransform().transformCoords(0, 0);
+        var pos = group.getLocalToStageSpaceTransform().point({
+            x: 0,
+            y: 0
+        });
         assert.equal(pos.x, -50);
         assert.equal(pos.y, 200);
     });
@@ -3585,7 +3600,10 @@ suite('Node', function() {
         stage.add(layer);
         layer.add(group);
 
-        var pos = group.getLayerToLocalSpaceTransform().transformCoords(0, 0);
+        var pos = group.getLayerToLocalSpaceTransform().point({
+            x: 0,
+            y: 0
+        });
         assert.equal(pos.x, 50);
         assert.equal(pos.y, 0);
     });
@@ -3602,7 +3620,10 @@ suite('Node', function() {
         stage.add(layer);
         layer.add(group);
 
-        var pos = group.getLocalToLayerSpaceTransform().transformCoords(0, 0);
+        var pos = group.getLocalToLayerSpaceTransform().point({
+            x: 0,
+            y: 0
+        });
         assert.equal(pos.x, -50);
         assert.equal(pos.y, 0);
     });

@@ -299,18 +299,13 @@
 
             return this.translate(xt, yt);
         },
-        /** TODO-RT */
-        transformCoords: function(x, y) {
-            return {
-                x: this.m[0] * x + this.m[2] * y + this.m[4],
-                y: this.m[1] * x + this.m[3] * y + this.m[5]
-            };
-        },
-        /** TODO-RT */
-        transformPoint: function(p) {
-            return this.transformCoords(p.x, p.y);
-        },
-        /** TODO-RT */
+        /**
+         * copies this transform
+         * @method
+         * @memberOf  Kinetic.Transform.prototype
+         * @returns {Kinetic.Transform}
+         * @author rtytgat
+         */
         dup: function() {
             var t = new Kinetic.Transform();
             t.m = this.m.slice(0);

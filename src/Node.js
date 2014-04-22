@@ -1805,7 +1805,7 @@
 
             // Now transform those corners from our local space into our parent's space.
             var cornersInParentSpace = localCorners.map(function (corner) {
-                return transform.transformPoint(corner);
+                return transform.point(corner);
             });
 
             // Push the bounds of the bounding-box-up-till-now
