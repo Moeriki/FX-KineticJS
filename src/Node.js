@@ -2377,7 +2377,7 @@
      * node.locked(true);
      */
 
-    Kinetic.Factory.addGetterSetter(Kinetic.BaseLayer, 'clearBeforeDraw', true);
+    Kinetic.Factory.addGetterSetter(Kinetic.Node, 'clearBeforeDraw', true);
     /**
      * get/set clearBeforeDraw flag which determines if the layer is cleared or not
      *  before drawing. This has an effect on the redraw function. This also has an
