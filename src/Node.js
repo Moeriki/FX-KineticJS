@@ -1875,7 +1875,7 @@
          * setting clearBeforeDraw to false if they know that this won't give artifacts.
          */
         redraw: function () {
-            if(this.attrs.clearBeforeDraw) {
+            if(this.getClearBeforeDraw()) {
                 this.parent.redraw();
             } else {
                 this.batchDraw();
