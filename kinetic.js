@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-04-18
+ * Date: 2014-04-23
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -853,18 +853,13 @@ var Kinetic = {};
 
             return this.translate(xt, yt);
         },
-        /** TODO-RT */
-        transformCoords: function(x, y) {
-            return {
-                x: this.m[0] * x + this.m[2] * y + this.m[4],
-                y: this.m[1] * x + this.m[3] * y + this.m[5]
-            };
-        },
-        /** TODO-RT */
-        transformPoint: function(p) {
-            return this.transformCoords(p.x, p.y);
-        },
-        /** TODO-RT */
+        /**
+         * copies this transform
+         * @method
+         * @memberOf  Kinetic.Transform.prototype
+         * @returns {Kinetic.Transform}
+         * @author rtytgat
+         */
         dup: function() {
             var t = new Kinetic.Transform();
             t.m = this.m.slice(0);
@@ -4056,7 +4051,7 @@ var Kinetic = {};
 
             // Now transform those corners from our local space into our parent's space.
             var cornersInParentSpace = localCorners.map(function (corner) {
-                return transform.transformPoint(corner);
+                return transform.point(corner);
             });
 
             // Push the bounds of the bounding-box-up-till-now
@@ -4108,6 +4103,29 @@ var Kinetic = {};
             attrs.node = this;
             this.tween = new Kinetic.Tween(attrs);
             this.tween.play();
+        },
+
+        /**
+         * Notifies the system that this node wants to be redrawn in the next frame.
+         * Delegates the drawing of this node to a parent node that knows how to
+         * redraw it reliably.
+         *
+         * This function basically signals
+         * that the node wants to be redrawn in the next frame. Every Node has a
+         * clearBeforeDraw boolean property that decides if the draw should trigger a clear.
+         * Setting this property to true causes the redraw call to chain upwards in the node
+         * tree, with its final destination being the layer. If clearBeforeDraw is false,
+         * the node queues a batchdraw of itself (and all its children) without clearing.
+         *
+         * This way intermediary nodes can decide to improve drawing performance by
+         * setting clearBeforeDraw to false if they know that this won't give artifacts.
+         */
+        redraw: function () {
+            if(this.attrs.clearBeforeDraw) {
+                this.parent.redraw();
+            } else {
+                this.batchDraw();
+            }
         }
     });
 
@@ -4603,6 +4621,27 @@ var Kinetic = {};
      *
      * // set locked<br>
      * node.locked(true);
+     */
+
+    Kinetic.Factory.addGetterSetter(Kinetic.BaseLayer, 'clearBeforeDraw', true);
+    /**
+     * get/set clearBeforeDraw flag which determines if the layer is cleared or not
+     *  before drawing. This has an effect on the redraw function. This also has an
+     *  effect on layer drawing behaviour.
+     * @name clearBeforeDraw
+     * @method
+     * @memberof Kinetic.Node.prototype
+     * @param {Boolean} clearBeforeDraw
+     * @returns {Boolean}
+     * @example
+     * // get clearBeforeDraw flag<br>
+     * var clearBeforeDraw = node.clearBeforeDraw();<br><br>
+     *
+     * // disable clear before draw<br>
+     * node.clearBeforeDraw(false);<br><br>
+     *
+     * // enable clear before draw<br>
+     * node.clearBeforeDraw(true);
      */
 
     Kinetic.Factory.addComponentsGetterSetter(Kinetic.Node, 'anchor', ['x', 'y']);
@@ -5468,8 +5507,6 @@ var Kinetic = {};
   };
 })();
 ;(function() {
-    var BATCH_DRAW_STOP_TIME_DIFF = 500;
-
     var now =(function() {
         if (Kinetic.root.performance && Kinetic.root.performance.now) {
             return function() {
@@ -5773,67 +5810,81 @@ var Kinetic = {};
         moveTo.call(this, container);
     };
 
-    /**
-     * batch draw
-     * @method
-     * @memberof Kinetic.Layer.prototype
-     */
-    Kinetic.Layer.prototype.batchDraw = function(shape) {
-        var that = this,
-            Anim = Kinetic.Animation;
+})((1,eval)('this'));
+;(function() {
+    var BATCH_DRAW_STOP_TIME_DIFF = 500;
 
-        this.batchShapes = [];
-        this.batchAll = false;
-        if (shape) {
-            this.batchShapes.push(shape);
+    var workQueue = [],
+        anim;
+
+    function drawWorkNodes() {
+         // Process our work queue.
+        workQueue.forEach(function (node) {
+            node.draw();
+        });
+    }
+
+    function workLoop(frame) {
+        if (frame.timeDiff > BATCH_DRAW_STOP_TIME_DIFF) {
+            anim.stop();
         } else {
-            this.batchAll = true;
-        }
-        if (!this.batchAnim) {
-            this.batchAnim = new Anim(function(_, layerDrawn) {
-                if (that.lastBatchDrawTime && now() - that.lastBatchDrawTime > BATCH_DRAW_STOP_TIME_DIFF) {
-                    that.batchAnim.stop();
-                } else {
-                    that.batchAnim.disable();
-                }
-                if (!layerDrawn) {
-                    if (that.batchAll) {
-                        that.draw();
-                    } else if (that.batchShapes.length > 0) {
-                        for (var bs = 0, bsLen = that.batchShapes.length; bs < bsLen; bs++) {
-                            that.batchShapes[bs].draw();
-                        }
-                    }
-                }
-                this.batchShapes = [];
-                this.batchAll = false;
-            }, this, true);
+            anim.disable();
         }
 
-        this.lastBatchDrawTime = now();
+        drawWorkNodes();
+        workQueue = [];
+    }
+    anim = new Kinetic.Animation(workLoop);
 
-        if (!this.batchAnim.isRunning()) {
-            // NOTE: This draw serves no purpose in my opinion. Let's say batchDraw is called twice in a row,
-            //       the second time after some updates. These updates won't be drawn right away. ~Peter
-            this.draw();
-            this.batchAnim.start();
+    function isWorkAlreadyQueued(node) {
+        // Check all items in the work queue
+        return workQueue.some(function (queuedNode) {
+                // Check if the node is already in the work queue.
+            return node === queuedNode
+                // Otherwise, check the groups in the work queue to see if one of the node's
+                // ancestors isn't already being drawn, as this would also automatically
+                // draw this node.
+                || queuedNode.isAncestorOf && queuedNode.isAncestorOf(node);
+        });
+    }
+
+    function maybePushWorkToQueue(node) {
+        // First check if the node will already be redrawn
+        if(isWorkAlreadyQueued(node)) {
+            return;
+        }
+
+        // If we are adding a container, we want to drop work that's handled by
+        // this node.
+        if(node.isAncestorOf) {
+            workQueue = workQueue.filter(function (queuedNode) {
+                return !node.isAncestorOf(queuedNode);
+            });
+        }
+
+        // Now push the new node
+        workQueue.push(node);
+    }
+
+    function addWork(node) {
+        maybePushWorkToQueue(node);
+        if(!anim.isRunning()) {
+            anim.start();
         } else {
-            that.batchAnim.enable();
+            anim.enable();
         }
-    };
+    }
 
-    /**
-     * batch draw
-     * @method
-     * @memberof Kinetic.Stage.prototype
-     */
-    Kinetic.Stage.prototype.batchDraw = function(shape) {
+    Kinetic.Stage.prototype.batchDraw = function() {
         this.getChildren().each(function(layer) {
-            layer.batchDraw(shape);
+            layer.batchDraw();
         });
     };
 
-})((1,eval)('this'));
+    Kinetic.Node.prototype.batchDraw = function() {
+        addWork(this);
+    };
+})();
 ;(function() {
     var blacklist = {
         node: 1,
@@ -9434,30 +9485,23 @@ var Kinetic = {};
         },
         getStage: function() {
             return this.parent;
+        },
+        /**
+         * This function basically signals
+         * that the node wants to be redrawn in the next frame. Every Node has a
+         * clearBeforeDraw boolean property that decides if the draw should trigger a clear.
+         * Setting this property to true causes the redraw call to chain upwards in the node
+         * tree, with its final destination being the layer. If clearBeforeDraw is false,
+         * the node queues a batchdraw of itself (and all its children) without clearing.
+         *
+         * This way intermediary nodes can decide to improve drawing performance by
+         * setting clearBeforeDraw to false if they know that this won't give artifacts.
+         */
+        redraw: function() {
+            this.batchDraw();
         }
     });
     Kinetic.Util.extend(Kinetic.BaseLayer, Kinetic.Container);
-
-    // add getters and setters
-    Kinetic.Factory.addGetterSetter(Kinetic.BaseLayer, 'clearBeforeDraw', true);
-    /**
-     * get/set clearBeforeDraw flag which determines if the layer is cleared or not
-     *  before drawing
-     * @name clearBeforeDraw
-     * @method
-     * @memberof Kinetic.BaseLayer.prototype
-     * @param {Boolean} clearBeforeDraw
-     * @returns {Boolean}
-     * @example
-     * // get clearBeforeDraw flag<br>
-     * var clearBeforeDraw = layer.clearBeforeDraw();<br><br>
-     *
-     * // disable clear before draw<br>
-     * layer.clearBeforeDraw(false);<br><br>
-     *
-     * // enable clear before draw<br>
-     * layer.clearBeforeDraw(true);
-     */
 
     Kinetic.Collection.mapMethods(Kinetic.BaseLayer);
 })();
