@@ -127,30 +127,23 @@
         },
         getStage: function() {
             return this.parent;
+        },
+        /**
+         * This function basically signals
+         * that the node wants to be redrawn in the next frame. Every Node has a
+         * clearBeforeDraw boolean property that decides if the draw should trigger a clear.
+         * Setting this property to true causes the redraw call to chain upwards in the node
+         * tree, with its final destination being the layer. If clearBeforeDraw is false,
+         * the node queues a batchdraw of itself (and all its children) without clearing.
+         *
+         * This way intermediary nodes can decide to improve drawing performance by
+         * setting clearBeforeDraw to false if they know that this won't give artifacts.
+         */
+        redraw: function() {
+            this.batchDraw();
         }
     });
     Kinetic.Util.extend(Kinetic.BaseLayer, Kinetic.Container);
-
-    // add getters and setters
-    Kinetic.Factory.addGetterSetter(Kinetic.BaseLayer, 'clearBeforeDraw', true);
-    /**
-     * get/set clearBeforeDraw flag which determines if the layer is cleared or not
-     *  before drawing
-     * @name clearBeforeDraw
-     * @method
-     * @memberof Kinetic.BaseLayer.prototype
-     * @param {Boolean} clearBeforeDraw
-     * @returns {Boolean}
-     * @example
-     * // get clearBeforeDraw flag<br>
-     * var clearBeforeDraw = layer.clearBeforeDraw();<br><br>
-     *
-     * // disable clear before draw<br>
-     * layer.clearBeforeDraw(false);<br><br>
-     *
-     * // enable clear before draw<br>
-     * layer.clearBeforeDraw(true);
-     */
 
     Kinetic.Collection.mapMethods(Kinetic.BaseLayer);
 })();

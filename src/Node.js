@@ -1857,6 +1857,29 @@
             attrs.node = this;
             this.tween = new Kinetic.Tween(attrs);
             this.tween.play();
+        },
+
+        /**
+         * Notifies the system that this node wants to be redrawn in the next frame.
+         * Delegates the drawing of this node to a parent node that knows how to
+         * redraw it reliably.
+         *
+         * This function basically signals
+         * that the node wants to be redrawn in the next frame. Every Node has a
+         * clearBeforeDraw boolean property that decides if the draw should trigger a clear.
+         * Setting this property to true causes the redraw call to chain upwards in the node
+         * tree, with its final destination being the layer. If clearBeforeDraw is false,
+         * the node queues a batchdraw of itself (and all its children) without clearing.
+         *
+         * This way intermediary nodes can decide to improve drawing performance by
+         * setting clearBeforeDraw to false if they know that this won't give artifacts.
+         */
+        redraw: function () {
+            if(this.attrs.clearBeforeDraw) {
+                this.parent.redraw();
+            } else {
+                this.batchDraw();
+            }
         }
     });
 
@@ -2352,6 +2375,27 @@
      *
      * // set locked<br>
      * node.locked(true);
+     */
+
+    Kinetic.Factory.addGetterSetter(Kinetic.BaseLayer, 'clearBeforeDraw', true);
+    /**
+     * get/set clearBeforeDraw flag which determines if the layer is cleared or not
+     *  before drawing. This has an effect on the redraw function. This also has an
+     *  effect on layer drawing behaviour.
+     * @name clearBeforeDraw
+     * @method
+     * @memberof Kinetic.Node.prototype
+     * @param {Boolean} clearBeforeDraw
+     * @returns {Boolean}
+     * @example
+     * // get clearBeforeDraw flag<br>
+     * var clearBeforeDraw = node.clearBeforeDraw();<br><br>
+     *
+     * // disable clear before draw<br>
+     * node.clearBeforeDraw(false);<br><br>
+     *
+     * // enable clear before draw<br>
+     * node.clearBeforeDraw(true);
      */
 
     Kinetic.Factory.addComponentsGetterSetter(Kinetic.Node, 'anchor', ['x', 'y']);

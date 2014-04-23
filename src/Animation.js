@@ -1,6 +1,4 @@
 (function() {
-    var BATCH_DRAW_STOP_TIME_DIFF = 500;
-
     var now =(function() {
         if (Kinetic.root.performance && Kinetic.root.performance.now) {
             return function() {
@@ -302,66 +300,6 @@
     var moveTo = Kinetic.Node.prototype.moveTo;
     Kinetic.Node.prototype.moveTo = function(container) {
         moveTo.call(this, container);
-    };
-
-    /**
-     * batch draw
-     * @method
-     * @memberof Kinetic.Layer.prototype
-     */
-    Kinetic.Layer.prototype.batchDraw = function(shape) {
-        var that = this,
-            Anim = Kinetic.Animation;
-
-        this.batchShapes = [];
-        this.batchAll = false;
-        if (shape) {
-            this.batchShapes.push(shape);
-        } else {
-            this.batchAll = true;
-        }
-        if (!this.batchAnim) {
-            this.batchAnim = new Anim(function(_, layerDrawn) {
-                if (that.lastBatchDrawTime && now() - that.lastBatchDrawTime > BATCH_DRAW_STOP_TIME_DIFF) {
-                    that.batchAnim.stop();
-                } else {
-                    that.batchAnim.disable();
-                }
-                if (!layerDrawn) {
-                    if (that.batchAll) {
-                        that.draw();
-                    } else if (that.batchShapes.length > 0) {
-                        for (var bs = 0, bsLen = that.batchShapes.length; bs < bsLen; bs++) {
-                            that.batchShapes[bs].draw();
-                        }
-                    }
-                }
-                this.batchShapes = [];
-                this.batchAll = false;
-            }, this, true);
-        }
-
-        this.lastBatchDrawTime = now();
-
-        if (!this.batchAnim.isRunning()) {
-            // NOTE: This draw serves no purpose in my opinion. Let's say batchDraw is called twice in a row,
-            //       the second time after some updates. These updates won't be drawn right away. ~Peter
-            this.draw();
-            this.batchAnim.start();
-        } else {
-            that.batchAnim.enable();
-        }
-    };
-
-    /**
-     * batch draw
-     * @method
-     * @memberof Kinetic.Stage.prototype
-     */
-    Kinetic.Stage.prototype.batchDraw = function(shape) {
-        this.getChildren().each(function(layer) {
-            layer.batchDraw(shape);
-        });
     };
 
 })((1,eval)('this'));

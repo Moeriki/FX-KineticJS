@@ -31,6 +31,7 @@ module.exports = function(grunt) {
 
     // core
     'src/Animation.js',
+    'src/Batcher.js',
     'src/Tween.js',
     'src/DragAndDrop.js',
     'src/Container.js',
@@ -88,6 +89,7 @@ module.exports = function(grunt) {
 
     // core
     'src/Animation.js',
+    'src/Batcher.js',
     'src/Tween.js',
     'src/DragAndDrop.js',
     'src/Container.js',
