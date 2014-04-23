@@ -4106,6 +4106,17 @@ var Kinetic = {};
         },
 
         /**
+         * Same as batchRedraw but draws immediately
+         */
+        redraw: function () {
+            if(this.getClearBeforeDraw()) {
+                this.parent.redraw();
+            } else {
+                this.draw();
+            }
+        },
+
+        /**
          * Notifies the system that this node wants to be redrawn in the next frame.
          * Delegates the drawing of this node to a parent node that knows how to
          * redraw it reliably.
@@ -4120,9 +4131,9 @@ var Kinetic = {};
          * This way intermediary nodes can decide to improve drawing performance by
          * setting clearBeforeDraw to false if they know that this won't give artifacts.
          */
-        redraw: function () {
+        batchRedraw: function () {
             if(this.getClearBeforeDraw()) {
-                this.parent.redraw();
+                this.parent.batchRedraw();
             } else {
                 this.batchDraw();
             }
@@ -9487,6 +9498,12 @@ var Kinetic = {};
             return this.parent;
         },
         /**
+         * Same as batchRedraw but draws immediately.
+         */
+        redraw: function() {
+            this.draw();
+        },
+        /**
          * This function basically signals
          * that the node wants to be redrawn in the next frame. Every Node has a
          * clearBeforeDraw boolean property that decides if the draw should trigger a clear.
@@ -9497,7 +9514,7 @@ var Kinetic = {};
          * This way intermediary nodes can decide to improve drawing performance by
          * setting clearBeforeDraw to false if they know that this won't give artifacts.
          */
-        redraw: function() {
+        batchRedraw: function() {
             this.batchDraw();
         }
     });

@@ -129,6 +129,12 @@
             return this.parent;
         },
         /**
+         * Same as batchRedraw but draws immediately.
+         */
+        redraw: function() {
+            this.draw();
+        },
+        /**
          * This function basically signals
          * that the node wants to be redrawn in the next frame. Every Node has a
          * clearBeforeDraw boolean property that decides if the draw should trigger a clear.
@@ -139,7 +145,7 @@
          * This way intermediary nodes can decide to improve drawing performance by
          * setting clearBeforeDraw to false if they know that this won't give artifacts.
          */
-        redraw: function() {
+        batchRedraw: function() {
             this.batchDraw();
         }
     });

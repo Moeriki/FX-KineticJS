@@ -1860,6 +1860,17 @@
         },
 
         /**
+         * Same as batchRedraw but draws immediately
+         */
+        redraw: function () {
+            if(this.getClearBeforeDraw()) {
+                this.parent.redraw();
+            } else {
+                this.draw();
+            }
+        },
+
+        /**
          * Notifies the system that this node wants to be redrawn in the next frame.
          * Delegates the drawing of this node to a parent node that knows how to
          * redraw it reliably.
@@ -1874,9 +1885,9 @@
          * This way intermediary nodes can decide to improve drawing performance by
          * setting clearBeforeDraw to false if they know that this won't give artifacts.
          */
-        redraw: function () {
+        batchRedraw: function () {
             if(this.getClearBeforeDraw()) {
-                this.parent.redraw();
+                this.parent.batchRedraw();
             } else {
                 this.batchDraw();
             }
