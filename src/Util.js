@@ -298,18 +298,6 @@
                 xt = (x - m4 - (m2 * yt)) / m0;
 
             return this.translate(xt, yt);
-        },
-        /**
-         * copies this transform
-         * @method
-         * @memberOf  Kinetic.Transform.prototype
-         * @returns {Kinetic.Transform}
-         * @author rtytgat
-         */
-        dup: function() {
-            var t = new Kinetic.Transform();
-            t.m = this.m.slice(0);
-            return t;
         }
     };
 

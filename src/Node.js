@@ -1820,7 +1820,7 @@
         },
 
         getInverseAbsoluteTransform: function (top) {
-            var tf = this.getAbsoluteTransform(top).dup();
+            var tf = this.getAbsoluteTransform(top).copy();
             tf.invert();
             return tf;
         },
@@ -1831,7 +1831,7 @@
         },
 
         getLocalToAbsoluteSpaceTransform: function () {
-            return this.getAbsoluteTransform().dup();
+            return this.getAbsoluteTransform().copy();
         },
 
         getStageToLocalSpaceTransform: function () {
@@ -1839,7 +1839,7 @@
         },
 
         getLocalToStageSpaceTransform: function () {
-            return this.getAbsoluteTransform(this.getStage()).dup();
+            return this.getAbsoluteTransform(this.getStage()).copy();
         },
 
         getLayerToLocalSpaceTransform: function () {
@@ -1847,7 +1847,7 @@
         },
 
         getLocalToLayerSpaceTransform: function () {
-            return this.getAbsoluteTransform(this.getLayer()).dup();
+            return this.getAbsoluteTransform(this.getLayer()).copy();
         },
 
         // Simplified tween.

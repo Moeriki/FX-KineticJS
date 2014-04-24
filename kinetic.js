@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-04-23
+ * Date: 2014-04-24
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -852,18 +852,6 @@ var Kinetic = {};
                 xt = (x - m4 - (m2 * yt)) / m0;
 
             return this.translate(xt, yt);
-        },
-        /**
-         * copies this transform
-         * @method
-         * @memberOf  Kinetic.Transform.prototype
-         * @returns {Kinetic.Transform}
-         * @author rtytgat
-         */
-        dup: function() {
-            var t = new Kinetic.Transform();
-            t.m = this.m.slice(0);
-            return t;
         }
     };
 
@@ -4066,7 +4054,7 @@ var Kinetic = {};
         },
 
         getInverseAbsoluteTransform: function (top) {
-            var tf = this.getAbsoluteTransform(top).dup();
+            var tf = this.getAbsoluteTransform(top).copy();
             tf.invert();
             return tf;
         },
@@ -4077,7 +4065,7 @@ var Kinetic = {};
         },
 
         getLocalToAbsoluteSpaceTransform: function () {
-            return this.getAbsoluteTransform().dup();
+            return this.getAbsoluteTransform().copy();
         },
 
         getStageToLocalSpaceTransform: function () {
@@ -4085,7 +4073,7 @@ var Kinetic = {};
         },
 
         getLocalToStageSpaceTransform: function () {
-            return this.getAbsoluteTransform(this.getStage()).dup();
+            return this.getAbsoluteTransform(this.getStage()).copy();
         },
 
         getLayerToLocalSpaceTransform: function () {
@@ -4093,7 +4081,7 @@ var Kinetic = {};
         },
 
         getLocalToLayerSpaceTransform: function () {
-            return this.getAbsoluteTransform(this.getLayer()).dup();
+            return this.getAbsoluteTransform(this.getLayer()).copy();
         },
 
         // Simplified tween.
