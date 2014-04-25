@@ -298,6 +298,42 @@
                 xt = (x - m4 - (m2 * yt)) / m0;
 
             return this.translate(xt, yt);
+        },
+        /**
+         * This function takes a bounds object, transforms the cornerpoints
+         * of the bounding box and returns an array of the cornerpoints.
+         *
+         * Is now used in calculateBoundingBox. Can also be used to quickly draw a
+         * polygon that transforms along with the transformation of a node,
+         * instead of only drawing a straight rectangle.
+         *
+         * @param  {Bounds} bounds A bounding box
+         * @return {Array of Points}        An array with the transformed cornerpoints of the bounding box
+         * @example
+         * var box = new Polygon({<br>
+         *     points: node.getTransform().boundsToPoints(node.calculateLocalBoundingBox()).flattenPoints(),<br>
+         *     stroke: 'black'<br>
+         * });
+         */
+        boundsToPoints: function(bounds) {
+            // Make corners from the bounds
+            var corners = [{
+                x: bounds.left,
+                y: bounds.top
+            }, {
+                x: bounds.right,
+                y: bounds.top
+            }, {
+                x: bounds.right,
+                y: bounds.bottom
+            }, {
+                x: bounds.left,
+                y: bounds.bottom
+            }];
+
+            return corners.map(function (corner) {
+                return this.point(corner);
+            }, this);
         }
     };
 

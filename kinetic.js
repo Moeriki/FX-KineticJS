@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-04-24
+ * Date: 2014-04-25
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -852,6 +852,26 @@ var Kinetic = {};
                 xt = (x - m4 - (m2 * yt)) / m0;
 
             return this.translate(xt, yt);
+        },
+        boundsToPoints: function(bounds) {
+            // Make corners from the bounds
+            var corners = [{
+                x: bounds.left,
+                y: bounds.top
+            }, {
+                x: bounds.right,
+                y: bounds.top
+            }, {
+                x: bounds.right,
+                y: bounds.bottom
+            }, {
+                x: bounds.left,
+                y: bounds.bottom
+            }];
+
+            return corners.map(function (corner) {
+                return this.point(corner);
+            }, this);
         }
     };
 
@@ -4022,25 +4042,8 @@ var Kinetic = {};
             // Original bounding box is an impossible inverted infinite box.
             var res = { left: +Infinity, top: +Infinity, right: -Infinity, bottom: -Infinity };
 
-            // Make corners from the local bounds
-            var localCorners = [{
-                x: localBounds.left,
-                y: localBounds.top
-            }, {
-                x: localBounds.right,
-                y: localBounds.top
-            }, {
-                x: localBounds.right,
-                y: localBounds.bottom
-            }, {
-                x: localBounds.left,
-                y: localBounds.bottom
-            }];
-
-            // Now transform those corners from our local space into our parent's space.
-            var cornersInParentSpace = localCorners.map(function (corner) {
-                return transform.point(corner);
-            });
+            // Transform from our local space into our parent's space.
+            var cornersInParentSpace = transform.boundsToPoints(localBounds);
 
             // Push the bounds of the bounding-box-up-till-now
             cornersInParentSpace.forEach(function (corner) {

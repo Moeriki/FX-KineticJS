@@ -1788,25 +1788,8 @@
             // Original bounding box is an impossible inverted infinite box.
             var res = { left: +Infinity, top: +Infinity, right: -Infinity, bottom: -Infinity };
 
-            // Make corners from the local bounds
-            var localCorners = [{
-                x: localBounds.left,
-                y: localBounds.top
-            }, {
-                x: localBounds.right,
-                y: localBounds.top
-            }, {
-                x: localBounds.right,
-                y: localBounds.bottom
-            }, {
-                x: localBounds.left,
-                y: localBounds.bottom
-            }];
-
-            // Now transform those corners from our local space into our parent's space.
-            var cornersInParentSpace = localCorners.map(function (corner) {
-                return transform.point(corner);
-            });
+            // Transform from our local space into our parent's space.
+            var cornersInParentSpace = transform.boundsToPoints(localBounds);
 
             // Push the bounds of the bounding-box-up-till-now
             cornersInParentSpace.forEach(function (corner) {
