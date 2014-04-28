@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-04-25
+ * Date: 2014-04-28
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -853,6 +853,22 @@ var Kinetic = {};
 
             return this.translate(xt, yt);
         },
+        /**
+         * This function takes a bounds object, transforms the cornerpoints
+         * of the bounding box and returns an array of the cornerpoints.
+         *
+         * Is now used in calculateBoundingBox. Can also be used to quickly draw a
+         * polygon that transforms along with the transformation of a node,
+         * instead of only drawing a straight rectangle.
+         *
+         * @param  {Bounds} bounds A bounding box
+         * @return {Array of Points}        An array with the transformed cornerpoints of the bounding box
+         * @example
+         * var box = new Polygon({<br>
+         *     points: node.getTransform().boundsToPoints(node.calculateLocalBoundingBox()).flattenPoints(),<br>
+         *     stroke: 'black'<br>
+         * });
+         */
         boundsToPoints: function(bounds) {
             // Make corners from the bounds
             var corners = [{
@@ -5850,7 +5866,15 @@ var Kinetic = {};
         });
     }
 
-    function maybePushWorkToQueue(node) {
+    function maybePushWorkToQueue(node, onlySection) {
+        var layer = node.getLayer();
+        if (layer) {
+            if (onlySection) {
+                layer.addBatchDrawSection(onlySection);
+            } else {
+                layer.disableBatchDrawSections();
+            }
+        }
         // First check if the node will already be redrawn
         if(isWorkAlreadyQueued(node)) {
             return;
@@ -5868,8 +5892,8 @@ var Kinetic = {};
         workQueue.push(node);
     }
 
-    function addWork(node) {
-        maybePushWorkToQueue(node);
+    function addWork(node, onlySection) {
+        maybePushWorkToQueue(node, onlySection);
         if(!anim.isRunning()) {
             anim.start();
         } else {
@@ -5885,6 +5909,62 @@ var Kinetic = {};
 
     Kinetic.Node.prototype.batchDraw = function() {
         addWork(this);
+    };
+
+    Kinetic.Layer.prototype.batchDraw = function(onlySection) {
+        addWork(this, onlySection);
+    };
+})();
+;(function() {
+    Kinetic.Layer.prototype.addBatchDrawSection = function(section) {
+        if (this.attrs.batchDrawSectionsDisabled) {
+            return;
+        }
+        var sections = this.attrs.batchDrawSections;
+        if (!sections) {
+            sections = this.attrs.batchDrawSections = [];
+        }
+        sections.push(section);
+    };
+    Kinetic.Layer.prototype.disableBatchDrawSections = function () {
+        this.attrs.batchDrawSectionsDisabled = true;
+        delete this.attrs.batchDrawSections;
+    };
+    Kinetic.Layer.prototype.clearBatchDrawSections = function () {
+        delete this.attrs.batchDrawSectionsDisabled;
+        delete this.attrs.batchDrawSections;
+    };
+    Kinetic.Layer.prototype.withBatchDrawSections = function (can, top, callback) {
+        try {
+            var batchDrawSections = this.attrs.batchDrawSections;
+            if (batchDrawSections) {
+                var length = batchDrawSections.length;
+                var context = can.getContext();
+                for (var s = 0; s < length; s++) {
+                    var section  = batchDrawSections[s];
+                    var x = section.x,
+                        y = section.y,
+                        w = section.width,
+                        h = section.height;
+                    var tempCanvas = new Kinetic.SceneCanvas({
+                            width: w + 2,
+                            height: h + 2,
+                            pixelRatio: can.getPixelRatio()
+                        }),
+                        tempContext = tempCanvas.getContext();
+                    tempContext.save();
+                    tempContext.translate(-(x - 1), -(y - 1));
+                    callback.call(this, tempCanvas, top);
+                    tempContext.restore();
+                    context.clear({ x: x - 1, y: y - 1, width: w + 2, height: h + 2 });
+                    context.drawImage(tempCanvas._canvas, x - 1, y - 1);
+                }
+            } else {
+                callback.call(this, can, top);
+            }
+        } finally {
+            this.clearBatchDrawSections();
+        }
     };
 })();
 ;(function() {
@@ -9620,21 +9700,23 @@ var Kinetic = {};
             var layer = this.getLayer(),
                 canvas = can || (layer && layer.getCanvas());
 
-            this._fire(BEFORE_DRAW, {
-                node: this
+            this.withBatchDrawSections(canvas, top, function (canvas, top) {
+                this._fire(BEFORE_DRAW, {
+                    node: this
+                });
+
+                if(this.getClearBeforeDraw()) {
+                    canvas.getContext().clear();
+                }
+
+                Kinetic.Container.prototype.drawScene.call(this, canvas, top);
+
+                this._fire(DRAW, {
+                    node: this
+                });
+
+                return this;
             });
-
-            if(this.getClearBeforeDraw()) {
-                canvas.getContext().clear();
-            }
-
-            Kinetic.Container.prototype.drawScene.call(this, canvas, top);
-
-            this._fire(DRAW, {
-                node: this
-            });
-
-            return this;
         },
         // the apply transform method is handled by the Layer and FastLayer class
         // because it is up to the layer to decide if an absolute or relative transform
@@ -9647,12 +9729,14 @@ var Kinetic = {};
             var layer = this.getLayer(),
                 canvas = can || (layer && layer.hitCanvas);
 
-            if(layer && layer.getClearBeforeDraw()) {
-                layer.getHitCanvas().getContext().clear();
-            }
+            this.withBatchDrawSections(canvas, top, function (canvas, top) {
+                if(layer && layer.getClearBeforeDraw()) {
+                    layer.getHitCanvas().getContext().clear();
+                }
 
-            Kinetic.Container.prototype.drawHit.call(this, canvas, top);
-            return this;
+                Kinetic.Container.prototype.drawHit.call(this, canvas, top);
+                return this;
+            });
         },
         /**
          * clear scene and hit canvas contexts tied to the layer

@@ -105,21 +105,23 @@
             var layer = this.getLayer(),
                 canvas = can || (layer && layer.getCanvas());
 
-            this._fire(BEFORE_DRAW, {
-                node: this
+            this.withBatchDrawSections(canvas, top, function (canvas, top) {
+                this._fire(BEFORE_DRAW, {
+                    node: this
+                });
+
+                if(this.getClearBeforeDraw()) {
+                    canvas.getContext().clear();
+                }
+
+                Kinetic.Container.prototype.drawScene.call(this, canvas, top);
+
+                this._fire(DRAW, {
+                    node: this
+                });
+
+                return this;
             });
-
-            if(this.getClearBeforeDraw()) {
-                canvas.getContext().clear();
-            }
-
-            Kinetic.Container.prototype.drawScene.call(this, canvas, top);
-
-            this._fire(DRAW, {
-                node: this
-            });
-
-            return this;
         },
         // the apply transform method is handled by the Layer and FastLayer class
         // because it is up to the layer to decide if an absolute or relative transform
@@ -132,12 +134,14 @@
             var layer = this.getLayer(),
                 canvas = can || (layer && layer.hitCanvas);
 
-            if(layer && layer.getClearBeforeDraw()) {
-                layer.getHitCanvas().getContext().clear();
-            }
+            this.withBatchDrawSections(canvas, top, function (canvas, top) {
+                if(layer && layer.getClearBeforeDraw()) {
+                    layer.getHitCanvas().getContext().clear();
+                }
 
-            Kinetic.Container.prototype.drawHit.call(this, canvas, top);
-            return this;
+                Kinetic.Container.prototype.drawHit.call(this, canvas, top);
+                return this;
+            });
         },
         /**
          * clear scene and hit canvas contexts tied to the layer

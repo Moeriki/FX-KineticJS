@@ -35,7 +35,15 @@
         });
     }
 
-    function maybePushWorkToQueue(node) {
+    function maybePushWorkToQueue(node, onlySection) {
+        var layer = node.getLayer();
+        if (layer) {
+            if (onlySection) {
+                layer.addBatchDrawSection(onlySection);
+            } else {
+                layer.disableBatchDrawSections();
+            }
+        }
         // First check if the node will already be redrawn
         if(isWorkAlreadyQueued(node)) {
             return;
@@ -53,8 +61,8 @@
         workQueue.push(node);
     }
 
-    function addWork(node) {
-        maybePushWorkToQueue(node);
+    function addWork(node, onlySection) {
+        maybePushWorkToQueue(node, onlySection);
         if(!anim.isRunning()) {
             anim.start();
         } else {
@@ -70,5 +78,9 @@
 
     Kinetic.Node.prototype.batchDraw = function() {
         addWork(this);
+    };
+
+    Kinetic.Layer.prototype.batchDraw = function(onlySection) {
+        addWork(this, onlySection);
     };
 })();
