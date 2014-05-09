@@ -46,7 +46,22 @@
             }
             context.closePath();
             context.fillStrokeShape(this);
-        }
+        },
+        getWidth: function() {
+            return this.attrs.radius * 2;
+        },
+        getHeight: function() {
+            return this.attrs.radius * 2;
+        },
+        calculateLocalBoundingBox: function() {
+            var radius = this.attrs.radius;
+            return {
+                left: -radius,
+                right: radius,
+                top: -radius,
+                bottom: radius,
+            };
+        },
     };
     Kinetic.Util.extend(Kinetic.RegularPolygon, Kinetic.Shape);
 
