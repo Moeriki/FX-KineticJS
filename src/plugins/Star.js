@@ -50,7 +50,22 @@
             context.closePath();
 
             context.fillStrokeShape(this);
-        }
+        },
+        getWidth: function() {
+            return this.attrs.outerRadius * 2;
+        },
+        getHeight: function() {
+            return this.attrs.outerRadius * 2;
+        },
+        calculateLocalBoundingBox: function() {
+            var radius = this.attrs.outerRadius;
+            return {
+                left: -radius,
+                right: radius,
+                top: -radius,
+                bottom: radius,
+            };
+        },
     };
     Kinetic.Util.extend(Kinetic.Star, Kinetic.Shape);
 
