@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-05-09
+ * Date: 2014-05-14
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -9925,16 +9925,17 @@ var Kinetic = {};
             var res = { left: +Infinity, top: +Infinity, right: -Infinity, bottom: -Infinity };
 
             // Iterate over all children
-            var visibleChildren = this.children.filter(function (child) {
+            var validChildBounds = this.children.filter(function (child) {
+                // Drop invisible children
                 return child.getVisible();
-            });
-            visibleChildren.forEach(function (child) {
+            }).map(function (child) {
                 // Get the child's bounding box (may recurse back into this function if the child is a group)
-                var childBounds = child.calculateBoundingBox();
-                if(childBounds == null) {
-                    return;
-                }
-
+                return child.calculateBoundingBox();
+            }).filter(function (childBounds) {
+                // Drop children that have no bounds
+                return childBounds != null;
+            });
+            validChildBounds.forEach(function (childBounds) {
                 // Push the bounds of the bounding-box-up-till-now
                 res.left   = Math.min(res.left, childBounds.left);
                 res.top    = Math.min(res.top, childBounds.top);
@@ -9942,7 +9943,7 @@ var Kinetic = {};
                 res.bottom = Math.max(res.bottom, childBounds.bottom);
             });
 
-            return visibleChildren.length > 0 ? res : null;
+            return validChildBounds.length > 0 ? res : null;
         }
     });
     Kinetic.Util.extend(Kinetic.Group, Kinetic.Container);
