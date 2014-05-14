@@ -3486,6 +3486,15 @@ suite('Node', function() {
         assert.equal(bounds, null);
     });
 
+    test('#calculateBoundingBox on nested empty groups', function () {
+        var group = new Kinetic.Group();
+        var group2 = new Kinetic.Group();
+        group.add(group2);
+
+        var bounds = group.calculateBoundingBox();
+        assert.equal(bounds, null);
+    });
+
     test('#getInverseAbsoluteTransform', function () {
         var stage = addStage();
         stage.setX(500);
