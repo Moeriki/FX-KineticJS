@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-05-14
+ * Date: 2014-05-15
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -615,6 +615,18 @@ var Kinetic = {};
         var arr = [];
         Array.prototype.push.apply(arr, this);
         return arr;
+    };
+    /**
+     * Get the first node in the collection.
+     */
+    Kinetic.Collection.prototype.getFirst = function() {
+        return this[0];
+    };
+    /**
+     * Get the first node in the collection.
+     */
+    Kinetic.Collection.prototype.getLast = function() {
+        return this[this.length - 1];
     };
     /**
      * convert array into a collection

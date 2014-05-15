@@ -63,6 +63,18 @@
         return arr;
     };
     /**
+     * Get the first node in the collection.
+     */
+    Kinetic.Collection.prototype.getFirst = function() {
+        return this[0];
+    };
+    /**
+     * Get the first node in the collection.
+     */
+    Kinetic.Collection.prototype.getLast = function() {
+        return this[this.length - 1];
+    };
+    /**
      * convert array into a collection
      * @method
      * @memberof Kinetic.Collection
