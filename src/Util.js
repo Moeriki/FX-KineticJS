@@ -34,7 +34,7 @@
     };
     /**
      */
-    Kinetic.Collection.filter = function(filterOrSelector) {
+    Kinetic.Collection.prototype.filter = function(filterOrSelector) {
         var len, n, nodes;
 
         if(typeof filterOrSelector !== 'function') {
@@ -50,7 +50,7 @@
             }
         }
 
-        return nodes;
+        return Kinetic.Collection.toCollection(nodes);
     };
     /**
      * convert collection into an array
