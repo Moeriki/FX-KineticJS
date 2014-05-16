@@ -4,11 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
-<<<<<<< HEAD
- * Date: 2014-05-15
-=======
  * Date: 2014-05-16
->>>>>>> b41695bb4610e20f262d32b733cbe02116970e37
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -592,7 +588,7 @@ var Kinetic = {};
     };
     /**
      */
-    Kinetic.Collection.filter = function(filterOrSelector) {
+    Kinetic.Collection.prototype.filter = function(filterOrSelector) {
         var len, n, nodes;
 
         if(typeof filterOrSelector !== 'function') {
@@ -608,7 +604,7 @@ var Kinetic = {};
             }
         }
 
-        return nodes;
+        return Kinetic.Collection.toCollection(nodes);
     };
     /**
      * convert collection into an array
