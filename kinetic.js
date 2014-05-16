@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-05-14
+ * Date: 2014-05-16
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -9935,6 +9935,12 @@ var Kinetic = {};
                 // Drop children that have no bounds
                 return childBounds != null;
             });
+
+            // No elements, no bounds.
+            if (validChildBounds.length === 0) {
+                return null;
+            }
+
             validChildBounds.forEach(function (childBounds) {
                 // Push the bounds of the bounding-box-up-till-now
                 res.left   = Math.min(res.left, childBounds.left);
@@ -9943,7 +9949,24 @@ var Kinetic = {};
                 res.bottom = Math.max(res.bottom, childBounds.bottom);
             });
 
-            return validChildBounds.length > 0 ? res : null;
+            var clip = this.clip();
+            if(clip.width && clip.height) {
+                // If the clip and bounds boxes miss each other completely, no bounds.
+                if(     res.left >= clip.x + clip.width
+                    ||  res.top >= clip.y + clip.height
+                    ||  res.right <= clip.x
+                    ||  res.bottom <= clip.y) {
+                    return null;
+                }
+
+                // Reduce the bounding box according to the clipping box.
+                res.left   = Math.max(res.left, clip.x);
+                res.top    = Math.max(res.top, clip.y);
+                res.right  = Math.min(res.right, clip.x + clip.width);
+                res.bottom = Math.min(res.bottom, clip.y + clip.height);
+            }
+
+            return res;
         }
     });
     Kinetic.Util.extend(Kinetic.Group, Kinetic.Container);
