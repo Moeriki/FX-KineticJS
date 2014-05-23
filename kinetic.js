@@ -5848,9 +5848,13 @@ var Kinetic = {};
         anim;
 
     function drawWorkNodes() {
+        var stage = workQueue.length > 0 ? workQueue[0].getStage() : null;
          // Process our work queue.
         workQueue.forEach(function (node) {
             node.draw();
+            stage._fire('draw', {
+                node: node
+            });
         });
     }
 
