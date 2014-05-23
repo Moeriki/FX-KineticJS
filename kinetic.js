@@ -9770,7 +9770,7 @@ var Kinetic = {};
                 canvas = can || (layer && layer.getCanvas());
 
             this.withBatchDrawSections(canvas, top, function (canvas, top) {
-                this._fire(BEFORE_DRAW, {
+                this._fireAndBubble(BEFORE_DRAW, {
                     node: this
                 });
 
@@ -9780,7 +9780,7 @@ var Kinetic = {};
 
                 Kinetic.Container.prototype.drawScene.call(this, canvas, top);
 
-                this._fire(DRAW, {
+                this._fireAndBubble(DRAW, {
                     node: this
                 });
 
