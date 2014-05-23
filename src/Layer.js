@@ -106,7 +106,10 @@
                 canvas = can || (layer && layer.getCanvas());
 
             this.withBatchDrawSections(canvas, top, function (canvas, top) {
-                this._fireAndBubble(BEFORE_DRAW, {
+                this._fire(BEFORE_DRAW, {
+                    node: this
+                });
+                layer._fire(BEFORE_DRAW, {
                     node: this
                 });
 
@@ -116,7 +119,10 @@
 
                 Kinetic.Container.prototype.drawScene.call(this, canvas, top);
 
-                this._fireAndBubble(DRAW, {
+                this._fire(DRAW, {
+                    node: this
+                });
+                layer._fire(DRAW, {
                     node: this
                 });
 
