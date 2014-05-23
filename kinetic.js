@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-05-16
+ * Date: 2014-05-23
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -8885,7 +8885,7 @@ var Kinetic = {};
                 obj = {};
             }
             obj.container = Kinetic.document.createElement(DIV);
-            
+
             return Kinetic.Container.prototype.clone.call(this, obj);
         },
         /**
@@ -8979,6 +8979,63 @@ var Kinetic = {};
                 imageObj.src = layerUrl;
             }
             drawLayer(0);
+        },
+        /**
+         * Creates a composite data URL for specified layers. Does not require a callback as the data URL is generated synchronously.
+         * @method
+         * @memberof Kinetic.Stage.prototype
+         * @param {Object} config
+         * @param {Layer[]} [config.layers] an array of layers.
+         * @param {String} [config.background] color to use as background.
+         * @param {String} [config.mimeType] can be "image/png" or "image/jpeg".
+         *  "image/png" is the default
+         * @param {Number} [config.x] x position of canvas section
+         * @param {Number} [config.y] y position of canvas section
+         * @param {Number} [config.width] width of canvas section
+         * @param {Number} [config.height] height of canvas section
+         * @param {Number} [config.quality] jpeg quality.  If using an "image/jpeg" mimeType,
+         *  you can specify the quality from 0 to 1, where 0 is very poor quality and 1
+         *  is very high quality
+         */
+        toDataURLFor: function(config) {
+            var mimeType = config.mimeType || null,
+                quality = config.quality || null,
+                x = config.x || 0,
+                y = config.y || 0,
+                scale = config.scale || 1,
+                layers = config.layers || this.getLayers(),
+                background = config.background,
+                canvas = new Kinetic.SceneCanvas({
+                    width: config.width,
+                    height: config.height,
+                    pixelRatio: 1
+                }),
+                context = canvas.getContext(),
+                _context = context._context,
+                layers = this.children;
+
+            _context.save();
+
+            if (background) {
+                context.rect(0, 0, config.width, config.height);
+                context.setAttr('fillStyle', background);
+                context.fill();
+            } else {
+                context.clear();
+            }
+
+            _context.translate(-x, -y);
+            _context.scale(scale, scale);
+
+            for (var l = 0, lLen = layers.length; l < lLen; l++) {
+                _context.save();
+                Kinetic.Container.prototype.drawScene.call(layers[l], canvas);
+                _context.restore();
+            }
+
+            _context.restore();
+
+            return canvas.toDataURL(mimeType, quality);
         },
         /**
          * converts stage into an image.
