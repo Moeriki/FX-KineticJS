@@ -21,13 +21,14 @@ var layer = new Kinetic.Layer({
 
 stage.add(layer);
 
-var circle = new Kinetic.Circle({
+var circle = new Kinetic.Arc({
 	x: 500,
 	y: 500,
 	scale: 0.6,
 	rotation: 0,
 	fill: 'green',
-	radius: 200
+	outerRadius: 200,
+	innerRadius: 150
 });
 layer.add(circle);
 
@@ -38,9 +39,10 @@ var bounds = new Kinetic.Rect({
 layer.add(bounds);
 
 var anim = new Kinetic.Animation(function (frame) {
-	circle.setScaleX(Math.sin(frame.time / 1000));
-	circle.setScaleY(Math.sin(frame.time / 1000));
+//	circle.setScaleX(Math.sin(frame.time / 1000));
+//	circle.setScaleY(Math.sin(frame.time / 1000));
 	circle.setRotation(Math.sin(frame.time / 1000) * 180);
+   circle.setAngle(Math.sin(frame.time / 1000) * 180 + 180)
 
 	var b = circle.calculateBoundingBox();
 	bounds.setPosition({x: b.left, y: b.top});

@@ -10857,6 +10857,25 @@ var Kinetic = {};
             context.arc(0, 0, this.getInnerRadius(), angle, 0, !clockwise);
             context.closePath();
             context.fillStrokeShape(this);
+        },
+        calculateLocalBoundingBox: function() {
+            var innerBounds = this._calculateRadiusBounds(this.innerRadius());
+            var outerBounds = this._calculateRadiusBounds(this.outerRadius());
+            return {
+                left: Math.min(innerBounds.left, outerBounds.left),
+                top: Math.min(innerBounds.top, outerBounds.top),
+                right: Math.max(innerBounds.right, outerBounds.right),
+                bottom: Math.max(innerBounds.bottom, outerBounds.bottom)
+            };
+        },
+        _calculateRadiusBounds: function(radius) {
+            var angle = -Kinetic.getAngle(this.angle());
+            return {
+                left: radius * (angle <= -Math.PI ? -1 : Math.cos(angle)),
+                top: radius * (angle <= -3 * Math.PI / 2 ? -1 : Math.min(0, -Math.sin(angle))),
+                right: radius,
+                bottom: radius * (angle <= -Math.PI / 2 ? 1 : -Math.sin(angle))
+            };
         }
     };
     Kinetic.Util.extend(Kinetic.Arc, Kinetic.Shape);
@@ -10878,7 +10897,7 @@ var Kinetic = {};
      * // set inner radius
      * arc.innerRadius(20);
      */
-     
+
     Kinetic.Factory.addGetterSetter(Kinetic.Arc, 'outerRadius', 0);
 
     /**
