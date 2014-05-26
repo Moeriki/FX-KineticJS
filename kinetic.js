@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-05-23
+ * Date: 2014-05-26
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -5848,13 +5848,15 @@ var Kinetic = {};
         anim;
 
     function drawWorkNodes() {
-        var stage = workQueue.length > 0 ? workQueue[0].getStage() : null;
          // Process our work queue.
         workQueue.forEach(function (node) {
             node.draw();
-            stage._fire('draw', {
-                node: node
-            });
+            var stage = node.getStage();
+            if (stage) {
+                stage._fire('draw', {
+                    node: node
+                });
+            }
         });
     }
 
