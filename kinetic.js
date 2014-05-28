@@ -874,7 +874,7 @@ var Kinetic = {};
          * instead of only drawing a straight rectangle.
          *
          * @param  {Bounds} bounds A bounding box
-         * @return {Array of Points}        An array with the transformed cornerpoints of the bounding box
+         * @return {Array<Object>} An array with the transformed cornerpoints of the bounding box
          * @example
          * var box = new Polygon({<br>
          *     points: node.getTransform().boundsToPoints(node.calculateLocalBoundingBox()).flattenPoints(),<br>
