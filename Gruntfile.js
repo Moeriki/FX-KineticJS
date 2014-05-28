@@ -254,6 +254,11 @@ module.exports = function(grunt) {
         nonull: true,
         src: 'dist/kinetic-v<%= pkg.version %>.js',
         dest: 'kinetic.js',
+      },
+      prod3: {
+        nonull: true,
+        src: 'dist/kinetic-v<%= pkg.version %>.js',
+        dest: '../../app/assets/javascripts/application/vendor/kinetic.js',
       }
     },
     shell: {
@@ -308,7 +313,8 @@ module.exports = function(grunt) {
     'replace:prod3',
     'replace:prod4',
     'copy:prod1',
-    'copy:prod2'
+    'copy:prod2',
+    'copy:prod3',
   ]);
 
   grunt.registerTask('docs', 'Generate docs', [
