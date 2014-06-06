@@ -58,11 +58,12 @@
         },
         calculateLocalBoundingBox: function() {
             var radius = this.getRadius();
+            var halfStrokeWidth = this.getStrokeWidth() / 2;
             return {
-                left: -radius,
-                right: radius,
-                top: -radius,
-                bottom: radius,
+                left: -radius - halfStrokeWidth,
+                right: radius + halfStrokeWidth,
+                top: -radius - halfStrokeWidth,
+                bottom: radius + halfStrokeWidth,
             };
         },
         // implements Node.prototype.calculateBoundingBox()
