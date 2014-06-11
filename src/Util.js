@@ -159,6 +159,20 @@
             };
         },
         /**
+         * Transform point by linear part (no translation)
+         * @method
+         * @memberof Kinetic.Transform.prototype
+         * @param {Object} 2D point(x, y)
+         * @returns {Object} 2D point(x, y)
+         */
+        linearPoint: function(p) {
+            var m = this.m;
+            return {
+                x: m[0] * p.x + m[2] * p.y,
+                y: m[1] * p.x + m[3] * p.y
+            };
+        },
+        /**
          * Apply translation
          * @method
          * @memberof Kinetic.Transform.prototype
@@ -346,7 +360,31 @@
             return corners.map(function (corner) {
                 return this.point(corner);
             }, this);
-        }
+        },
+
+        /**
+         * Heuristical method to get scaleX.
+         */
+        getScaleX: function() {
+            var vec = this.linearPoint({ x: 1, y: 0 });
+            return Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+        },
+
+        /**
+         * Heuristical method to get scaleY.
+         */
+        getScaleY: function() {
+            var vec = this.linearPoint({ x: 0, y: 1 });
+            return Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+        },
+
+        /**
+         * Heuristical method to get rotation.
+         */
+        getRotation: function() {
+            var vec = this.linearPoint({ x: 0, y: 1 });
+            return Math.atan2(vec.y, vec.x);
+        },
     };
 
     // CONSTANTS

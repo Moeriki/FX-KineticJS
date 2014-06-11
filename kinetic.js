@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-06-06
+ * Date: 2014-06-10
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -713,6 +713,20 @@ var Kinetic = {};
             };
         },
         /**
+         * Transform point by linear part (no translation)
+         * @method
+         * @memberof Kinetic.Transform.prototype
+         * @param {Object} 2D point(x, y)
+         * @returns {Object} 2D point(x, y)
+         */
+        linearPoint: function(p) {
+            var m = this.m;
+            return {
+                x: m[0] * p.x + m[2] * p.y,
+                y: m[1] * p.x + m[3] * p.y
+            };
+        },
+        /**
          * Apply translation
          * @method
          * @memberof Kinetic.Transform.prototype
@@ -900,7 +914,31 @@ var Kinetic = {};
             return corners.map(function (corner) {
                 return this.point(corner);
             }, this);
-        }
+        },
+
+        /**
+         * Heuristical method to get scaleX.
+         */
+        getScaleX: function() {
+            var vec = this.linearPoint({ x: 1, y: 0 });
+            return Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+        },
+
+        /**
+         * Heuristical method to get scaleY.
+         */
+        getScaleY: function() {
+            var vec = this.linearPoint({ x: 0, y: 1 });
+            return Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+        },
+
+        /**
+         * Heuristical method to get rotation.
+         */
+        getRotation: function() {
+            var vec = this.linearPoint({ x: 0, y: 1 });
+            return Math.atan2(vec.y, vec.x);
+        },
     };
 
     // CONSTANTS
@@ -2315,7 +2353,8 @@ var Kinetic = {};
             'rotationChange.kinetic',
             'offsetXChange.kinetic',
             'offsetYChange.kinetic',
-            'transformsEnabledChange.kinetic'
+            'transformsEnabledChange.kinetic',
+            'directTransformChange.kinetic'
         ].join(SPACE);
 
 
@@ -3606,28 +3645,37 @@ var Kinetic = {};
             var m = new Kinetic.Transform(),
                 x = this.getX(),
                 y = this.getY(),
-                rotation = Kinetic.getAngle(this.getRotation()),
-                scaleX = this.getScaleX(),
-                scaleY = this.getScaleY(),
-                skewX = this.getSkewX(),
-                skewY = this.getSkewY(),
                 offsetX = this.getOffsetX(),
-                offsetY = this.getOffsetY();
+                offsetY = this.getOffsetY(),
+                directTransform = this.getDirectTransform();
 
-            if(x !== 0 || y !== 0) {
-                m.translate(x, y);
-            }
-            if(rotation !== 0) {
-                m.rotate(rotation);
-            }
-            if(skewX !== 0 || skewY !== 0) {
-                m.skew(skewX, skewY);
-            }
-            if(scaleX !== 1 || scaleY !== 1) {
-                m.scale(scaleX, scaleY);
-            }
-            if(offsetX !== 0 || offsetY !== 0) {
-                m.translate(-1 * offsetX, -1 * offsetY);
+            if (directTransform) {
+                m.multiply(directTransform);
+                if(offsetX !== 0 || offsetY !== 0) {
+                    m.translate(-1 * offsetX, -1 * offsetY);
+                }
+            } else {
+                var rotation = Kinetic.getAngle(this.getRotation()),
+                    scaleX = this.getScaleX(),
+                    scaleY = this.getScaleY(),
+                    skewX = this.getSkewX(),
+                    skewY = this.getSkewY();
+
+                if(x !== 0 || y !== 0) {
+                    m.translate(x, y);
+                }
+                if(rotation !== 0) {
+                    m.rotate(rotation);
+                }
+                if(skewX !== 0 || skewY !== 0) {
+                    m.skew(skewX, skewY);
+                }
+                if(scaleX !== 1 || scaleY !== 1) {
+                    m.scale(scaleX, scaleY);
+                }
+                if(offsetX !== 0 || offsetY !== 0) {
+                    m.translate(-1 * offsetX, -1 * offsetY);
+                }
             }
 
             return m;
@@ -4307,6 +4355,25 @@ var Kinetic = {};
      *
      * // set id<br>
      * node.id('foo');
+     */
+
+    Kinetic.Factory.addGetterSetter(Kinetic.Node, 'directTransform', null);
+
+    /**
+     * get/set directTransform. Overrides rotation, scale, position and skew.
+     * Use if you like matrices or if it is too cumbersome to decompose a transform into rotation etc.
+     * Note that it doesn't take offset into account because it is considered an internal detail of the shape.
+     * @name directTransform
+     * @method
+     * @memberof Kinetic.Node.prototype
+     * @param {Number} directTransform
+     * @returns {Number}
+     * @example
+     * // get directTransform<br>
+     * var directTransform = node.directTransform();<br><br>
+     *
+     * // set directTransform<br>
+     * node.directTransform(transform);
      */
 
     Kinetic.Factory.addGetterSetter(Kinetic.Node, 'rotation', 0);
