@@ -939,6 +939,14 @@ var Kinetic = {};
             var vec = this.linearPoint({ x: 1, y: 0 });
             return Math.atan2(vec.y, vec.x);
         },
+
+        /**
+         * Heuristical method to get the skewX.
+         */
+        getSkewX: function() {
+            var vec = this.linearPoint({ x: 0, y: 1 });
+            return Math.atan2(vec.y, vec.x) - Math.PI / 2 - this.getRotation();
+        },
     };
 
     // CONSTANTS
