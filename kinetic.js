@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-06-10
+ * Date: 2014-06-11
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -936,7 +936,7 @@ var Kinetic = {};
          * Heuristical method to get rotation.
          */
         getRotation: function() {
-            var vec = this.linearPoint({ x: 0, y: 1 });
+            var vec = this.linearPoint({ x: 1, y: 0 });
             return Math.atan2(vec.y, vec.x);
         },
     };
@@ -4108,8 +4108,8 @@ var Kinetic = {};
          * For example, a rotated circle's bounding box should not rotate, since it
          * always has the same radius.
          */
-        calculateBoundingBox: function() {
-            var transform = this.getTransform();
+        calculateBoundingBox: function(top) {
+            var transform = arguments.length > 0 ? this.getAbsoluteTransform(top) : this.getTransform();
             var localBounds = this.calculateLocalBoundingBox();
             if(localBounds == null) {
                 return null;

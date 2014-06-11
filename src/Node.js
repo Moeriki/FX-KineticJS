@@ -1788,8 +1788,8 @@
          * For example, a rotated circle's bounding box should not rotate, since it
          * always has the same radius.
          */
-        calculateBoundingBox: function() {
-            var transform = this.getTransform();
+        calculateBoundingBox: function(top) {
+            var transform = arguments.length > 0 ? this.getAbsoluteTransform(top) : this.getTransform();
             var localBounds = this.calculateLocalBoundingBox();
             if(localBounds == null) {
                 return null;
