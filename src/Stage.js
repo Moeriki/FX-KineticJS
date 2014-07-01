@@ -294,7 +294,7 @@
 
             for (var l = 0, lLen = layers.length; l < lLen; l++) {
                 _context.save();
-                Kinetic.Container.prototype.drawScene.call(layers[l], canvas);
+                Kinetic.Container.prototype.drawScene.call(layers[l], canvas, null, { unbuffered: true });
                 _context.restore();
             }
 
