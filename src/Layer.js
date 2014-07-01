@@ -101,7 +101,7 @@
                 return {};
             }
         },
-        drawScene: function(can, top) {
+        drawScene: function(can, top, options) {
             var layer = this.getLayer(),
                 canvas = can || (layer && layer.getCanvas());
 
@@ -117,7 +117,7 @@
                     canvas.getContext().clear();
                 }
 
-                Kinetic.Container.prototype.drawScene.call(this, canvas, top);
+                Kinetic.Container.prototype.drawScene.call(this, canvas, top, options);
 
                 this._fire(DRAW, {
                     node: this

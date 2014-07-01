@@ -151,13 +151,14 @@
         _useBufferCanvas: function() {
             return (this.hasShadow() || this.getAbsoluteOpacity() !== 1) && this.hasFill() && this.hasStroke() && this.getStage();
         },
-        drawScene: function(can, top) {
+        drawScene: function(can, top, options) {
             var layer = this.getLayer(),
                 canvas = can || layer.getCanvas(),
                 context = canvas.getContext(),
                 cachedCanvas = this._cache.canvas,
                 drawFunc = this.sceneFunc(),
                 hasShadow = this.hasShadow(),
+                unbuffered = options && options.unbuffered,
                 stage, bufferCanvas, bufferContext;
 
             if(this.isVisible()) {
@@ -167,7 +168,7 @@
                 else if (drawFunc) {
                     context.save();
                     // if buffer canvas is needed
-                    if (this._useBufferCanvas()) {
+                    if (!unbuffered && this._useBufferCanvas()) {
                         stage = this.getStage();
                         bufferCanvas = stage.bufferCanvas;
                         bufferContext = bufferCanvas.getContext();

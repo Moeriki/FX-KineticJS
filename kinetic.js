@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-07-14
+ * Date: 2014-07-15
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -7226,7 +7226,7 @@ var Kinetic = {};
                 child.index = n;
             });
         },
-        drawScene: function(can, top) {
+        drawScene: function(can, top, options) {
             var layer = this.getLayer(),
                 canvas = can || (layer && layer.getCanvas()),
                 context = canvas && canvas.getContext(),
@@ -7238,7 +7238,7 @@ var Kinetic = {};
                     this._drawCachedSceneCanvas(context);
                 }
                 else {
-                    this._drawChildren(canvas, 'drawScene', top);
+                    this._drawChildren(canvas, 'drawScene', top, options);
                 }
             }
             return this;
@@ -7260,7 +7260,7 @@ var Kinetic = {};
             }
             return this;
         },
-        _drawChildren: function(canvas, drawMethod, top) {
+        _drawChildren: function(canvas, drawMethod, top, options) {
             var layer = this.getLayer(),
                 context = canvas && canvas.getContext(),
                 clipWidth = this.getClipWidth(),
@@ -7281,7 +7281,7 @@ var Kinetic = {};
             }
 
             this.children.each(function(child) {
-                child[drawMethod](canvas, top);
+                child[drawMethod](canvas, top, options);
             });
 
             if (hasClip) {
@@ -7539,13 +7539,14 @@ var Kinetic = {};
         _useBufferCanvas: function() {
             return (this.hasShadow() || this.getAbsoluteOpacity() !== 1) && this.hasFill() && this.hasStroke() && this.getStage();
         },
-        drawScene: function(can, top) {
+        drawScene: function(can, top, options) {
             var layer = this.getLayer(),
                 canvas = can || layer.getCanvas(),
                 context = canvas.getContext(),
                 cachedCanvas = this._cache.canvas,
                 drawFunc = this.sceneFunc(),
                 hasShadow = this.hasShadow(),
+                unbuffered = options && options.unbuffered,
                 stage, bufferCanvas, bufferContext;
 
             if(this.isVisible()) {
@@ -7555,7 +7556,7 @@ var Kinetic = {};
                 else if (drawFunc) {
                     context.save();
                     // if buffer canvas is needed
-                    if (this._useBufferCanvas()) {
+                    if (!unbuffered && this._useBufferCanvas()) {
                         stage = this.getStage();
                         bufferCanvas = stage.bufferCanvas;
                         bufferContext = bufferCanvas.getContext();
@@ -9110,7 +9111,7 @@ var Kinetic = {};
 
             for (var l = 0, lLen = layers.length; l < lLen; l++) {
                 _context.save();
-                Kinetic.Container.prototype.drawScene.call(layers[l], canvas);
+                Kinetic.Container.prototype.drawScene.call(layers[l], canvas, null, { unbuffered: true });
                 _context.restore();
             }
 
@@ -9846,7 +9847,7 @@ var Kinetic = {};
                 return {};
             }
         },
-        drawScene: function(can, top) {
+        drawScene: function(can, top, options) {
             var layer = this.getLayer(),
                 canvas = can || (layer && layer.getCanvas());
 
@@ -9862,7 +9863,7 @@ var Kinetic = {};
                     canvas.getContext().clear();
                 }
 
-                Kinetic.Container.prototype.drawScene.call(this, canvas, top);
+                Kinetic.Container.prototype.drawScene.call(this, canvas, top, options);
 
                 this._fire(DRAW, {
                     node: this
