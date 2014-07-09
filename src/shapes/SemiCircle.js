@@ -52,7 +52,20 @@
         setHeight: function(height) {
             Kinetic.Node.prototype.setHeight.call(this, height);
             this.setRadius(height);
-        }
+        },
+        calculateLocalBoundingBox: function() {
+            var radius, halfStroke;
+
+            radius = this.getRadius();
+            halfStroke = this.getStrokeWidth() / 2;
+
+            return {
+                left: -radius - halfStroke,
+                right: radius + halfStroke,
+                top: 0,
+                bottom: radius + halfStroke,
+            };
+        },
     };
 
     Kinetic.Util.extend(Kinetic.SemiCircle, Kinetic.Circle);
