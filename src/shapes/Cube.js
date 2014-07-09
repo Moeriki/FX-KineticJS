@@ -29,20 +29,23 @@
         _sceneFunc: function(context) {
             var w = this.getWidth(),
                 wr = Math.ceil(w * RATIO);
+
             context.beginPath();
+
+            context.moveTo(w, 0); context.lineTo(0, 0);
+            context.moveTo(w, 0); context.lineTo(w + wr, -wr);
+            context.moveTo(w, 0); context.lineTo(w, w);
+
             context.moveTo(0, 0);
-            context.lineTo(w, 0);
+            context.lineTo(wr, -wr);
+            context.lineTo(w + wr, -wr);
+            context.lineTo(w + wr, w - wr);
             context.lineTo(w, w);
             context.lineTo(0, w);
             context.lineTo(0, 0);
-            context.lineTo(wr, -wr);
-            context.lineTo(wr + w, -wr);
-            context.lineTo(wr + w, -wr + w);
-            context.lineTo(w, w);
-            context.moveTo(w,0);
-            context.lineTo(wr + w, -wr);
             context.closePath();
-            context.strokeShape(this);
+
+            context.fillStrokeShape(this);
         },
         // implements Shape.prototype.setWidth()
         setWidth: function(width) {
