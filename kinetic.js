@@ -12409,7 +12409,6 @@ var Kinetic = {};
             context.lineTo(w, 0);
             context.moveTo(w / 2, 0);
             context.lineTo(w / 2, h);
-            context.closePath();
             context.strokeShape(this);
         }
     };
