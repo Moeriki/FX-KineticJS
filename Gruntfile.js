@@ -113,6 +113,7 @@ module.exports = function(grunt) {
     'src/shapes/Line.js',
 
     // custom shapes
+    'src/shapes/Cube.js',
     'src/shapes/SemiCircle.js',
     'src/shapes/SplitT.js',
 
