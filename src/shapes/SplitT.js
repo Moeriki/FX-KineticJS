@@ -1,6 +1,5 @@
 (function() {
-    var SPLIT_T = 'SplitT',
-        RATIO = 1/4;
+    var SPLIT_T = 'SplitT';
 
     /**
      * SplitT constructor
@@ -36,8 +35,8 @@
             context.beginPath();
             context.moveTo(0, 0);
             context.lineTo(w, 0);
-            context.moveTo(w/2, 0);
-            context.lineTo(w/2, h);
+            context.moveTo(w / 2, 0);
+            context.lineTo(w / 2, h);
             context.closePath();
             context.strokeShape(this);
         }

@@ -35,6 +35,15 @@
             context.closePath();
             context.fillStrokeShape(this);
         },
+        // implements Shape.prototype.getWidth()
+        getWidth: function() {
+            return this.getRadius() * 2;
+        },
+        // implements Shape.prototype.setWidth()
+        setWidth: function(width) {
+            Kinetic.Node.prototype.setWidth.call(this, width);
+            this.setRadius(width / 2);
+        },
         // implements Shape.prototype.getHeight()
         getHeight: function() {
             return this.getRadius();

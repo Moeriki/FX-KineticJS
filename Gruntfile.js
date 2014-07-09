@@ -44,16 +44,16 @@ module.exports = function(grunt) {
     'src/Group.js',
 
     // shapes
-    'src/shapes/Rect.js',
+    'src/shapes/Arc.js',
     'src/shapes/Circle.js',
     'src/shapes/Ellipse.js',
-    'src/shapes/Ring.js',
-    'src/shapes/Wedge.js',
-    'src/shapes/Arc.js',
     'src/shapes/Image.js',
-    'src/shapes/Text.js',
     'src/shapes/Line.js',
+    'src/shapes/Rect.js',
+    'src/shapes/Ring.js',
     'src/shapes/Sprite.js',
+    'src/shapes/Text.js',
+    'src/shapes/Wedge.js',
 
     // custom shapes
     'src/shapes/Arrow.js',
@@ -111,6 +111,10 @@ module.exports = function(grunt) {
     'src/shapes/Image.js',
     'src/shapes/Text.js',
     'src/shapes/Line.js',
+
+    // custom shapes
+    'src/shapes/SemiCircle.js',
+    'src/shapes/SplitT.js',
 
     // plugins
     'src/plugins/RegularPolygon.js',
