@@ -713,6 +713,20 @@ var Kinetic = {};
             };
         },
         /**
+         * Transform point by linear part (no translation)
+         * @method
+         * @memberof Kinetic.Transform.prototype
+         * @param {Object} 2D point(x, y)
+         * @returns {Object} 2D point(x, y)
+         */
+        linearPoint: function(p) {
+            var m = this.m;
+            return {
+                x: m[0] * p.x + m[2] * p.y,
+                y: m[1] * p.x + m[3] * p.y
+            };
+        },
+        /**
          * Apply translation
          * @method
          * @memberof Kinetic.Transform.prototype
@@ -900,7 +914,39 @@ var Kinetic = {};
             return corners.map(function (corner) {
                 return this.point(corner);
             }, this);
-        }
+        },
+
+        /**
+         * Heuristical method to get scaleX.
+         */
+        getScaleX: function() {
+            var vec = this.linearPoint({ x: 1, y: 0 });
+            return Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+        },
+
+        /**
+         * Heuristical method to get scaleY.
+         */
+        getScaleY: function() {
+            var vec = this.linearPoint({ x: 0, y: 1 });
+            return Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+        },
+
+        /**
+         * Heuristical method to get rotation.
+         */
+        getRotation: function() {
+            var vec = this.linearPoint({ x: 1, y: 0 });
+            return Math.atan2(vec.y, vec.x);
+        },
+
+        /**
+         * Heuristical method to get the skewX.
+         */
+        getSkewX: function() {
+            var vec = this.linearPoint({ x: 0, y: 1 });
+            return Math.atan2(vec.y, vec.x) - Math.PI / 2 - this.getRotation();
+        },
     };
 
     // CONSTANTS
@@ -2315,7 +2361,8 @@ var Kinetic = {};
             'rotationChange.kinetic',
             'offsetXChange.kinetic',
             'offsetYChange.kinetic',
-            'transformsEnabledChange.kinetic'
+            'transformsEnabledChange.kinetic',
+            'directTransformChange.kinetic'
         ].join(SPACE);
 
 
@@ -3606,28 +3653,37 @@ var Kinetic = {};
             var m = new Kinetic.Transform(),
                 x = this.getX(),
                 y = this.getY(),
-                rotation = Kinetic.getAngle(this.getRotation()),
-                scaleX = this.getScaleX(),
-                scaleY = this.getScaleY(),
-                skewX = this.getSkewX(),
-                skewY = this.getSkewY(),
                 offsetX = this.getOffsetX(),
-                offsetY = this.getOffsetY();
+                offsetY = this.getOffsetY(),
+                directTransform = this.getDirectTransform();
 
-            if(x !== 0 || y !== 0) {
-                m.translate(x, y);
-            }
-            if(rotation !== 0) {
-                m.rotate(rotation);
-            }
-            if(skewX !== 0 || skewY !== 0) {
-                m.skew(skewX, skewY);
-            }
-            if(scaleX !== 1 || scaleY !== 1) {
-                m.scale(scaleX, scaleY);
-            }
-            if(offsetX !== 0 || offsetY !== 0) {
-                m.translate(-1 * offsetX, -1 * offsetY);
+            if (directTransform) {
+                m.multiply(directTransform);
+                if(offsetX !== 0 || offsetY !== 0) {
+                    m.translate(-1 * offsetX, -1 * offsetY);
+                }
+            } else {
+                var rotation = Kinetic.getAngle(this.getRotation()),
+                    scaleX = this.getScaleX(),
+                    scaleY = this.getScaleY(),
+                    skewX = this.getSkewX(),
+                    skewY = this.getSkewY();
+
+                if(x !== 0 || y !== 0) {
+                    m.translate(x, y);
+                }
+                if(rotation !== 0) {
+                    m.rotate(rotation);
+                }
+                if(skewX !== 0 || skewY !== 0) {
+                    m.skew(skewX, skewY);
+                }
+                if(scaleX !== 1 || scaleY !== 1) {
+                    m.scale(scaleX, scaleY);
+                }
+                if(offsetX !== 0 || offsetY !== 0) {
+                    m.translate(-1 * offsetX, -1 * offsetY);
+                }
             }
 
             return m;
@@ -4060,8 +4116,8 @@ var Kinetic = {};
          * For example, a rotated circle's bounding box should not rotate, since it
          * always has the same radius.
          */
-        calculateBoundingBox: function() {
-            var transform = this.getTransform();
+        calculateBoundingBox: function(top) {
+            var transform = arguments.length > 0 ? this.getAbsoluteTransform(top) : this.getTransform();
             var localBounds = this.calculateLocalBoundingBox();
             if(localBounds == null) {
                 return null;
@@ -4307,6 +4363,25 @@ var Kinetic = {};
      *
      * // set id<br>
      * node.id('foo');
+     */
+
+    Kinetic.Factory.addGetterSetter(Kinetic.Node, 'directTransform', null);
+
+    /**
+     * get/set directTransform. Overrides rotation, scale, position and skew.
+     * Use if you like matrices or if it is too cumbersome to decompose a transform into rotation etc.
+     * Note that it doesn't take offset into account because it is considered an internal detail of the shape.
+     * @name directTransform
+     * @method
+     * @memberof Kinetic.Node.prototype
+     * @param {Number} directTransform
+     * @returns {Number}
+     * @example
+     * // get directTransform<br>
+     * var directTransform = node.directTransform();<br><br>
+     *
+     * // set directTransform<br>
+     * node.directTransform(transform);
      */
 
     Kinetic.Factory.addGetterSetter(Kinetic.Node, 'rotation', 0);
@@ -10166,7 +10241,7 @@ var Kinetic = {};
                 width = this.getWidth(),
                 height = this.getHeight();
 
-            
+
             context.beginPath();
 
             if(!cornerRadius) {
@@ -10187,7 +10262,22 @@ var Kinetic = {};
             }
             context.closePath();
             context.fillStrokeShape(this);
-        }
+        },
+        /**
+         * Calculate the bounding box within the node's local space.
+         *
+         * A bare node's bounding box can be calculated by simply using the w/h
+         * This may be overridden for irregular shapes like circles.
+         */
+        calculateLocalBoundingBox: function() {
+            var halfStrokeWidth = this.getStrokeWidth() / 2;
+            return {
+                left: -halfStrokeWidth,
+                top: -halfStrokeWidth,
+                right: this.getWidth() + halfStrokeWidth,
+                bottom: this.getHeight() + halfStrokeWidth
+            };
+        },
     };
 
     Kinetic.Util.extend(Kinetic.Rect, Kinetic.Shape);
@@ -10203,7 +10293,7 @@ var Kinetic = {};
      * @example
      * // get corner radius<br>
      * var cornerRadius = rect.cornerRadius();<br><br>
-     * 
+     *
      * // set corner radius<br>
      * rect.cornerRadius(10);
      */
@@ -10348,11 +10438,12 @@ var Kinetic = {};
         },
         calculateLocalBoundingBox: function() {
             var radius = this.getRadius();
+            var halfStrokeWidth = this.getStrokeWidth() / 2;
             return {
-                left: -radius,
-                right: radius,
-                top: -radius,
-                bottom: radius,
+                left: -radius - halfStrokeWidth,
+                right: radius + halfStrokeWidth,
+                top: -radius - halfStrokeWidth,
+                bottom: radius + halfStrokeWidth,
             };
         },
         // implements Node.prototype.calculateBoundingBox()
@@ -12200,6 +12291,130 @@ var Kinetic = {};
 
     Kinetic.Util.extend(Kinetic.SemiCircle, Kinetic.Circle);
     Kinetic.Collection.mapMethods(Kinetic.SemiCircle);
+})();
+;(function() {
+    var SPLIT_T = 'SplitT';
+
+    /**
+     * SplitT constructor
+     * @constructor
+     * @memberof Kinetic
+     * @augments Kinetic.Shape
+     * @param {Object} config
+     * @param {String} [config.fill] fill color
+     * @param {Integer} [config.fillRed] set fill red component
+     * @param {Integer} [config.fillGreen] set fill green component
+     * @param {Integer} [config.fillBlue] set fill blue component
+     * @param {Integer} [config.fillAlpha] set fill alpha component
+     * @param {Image} [config.fillPatternImage] fill pattern image
+     * @param {Number} [config.fillPatternX]
+     * @param {Number} [config.fillPatternY]
+     * @param {Object} [config.fillPatternOffset] object with x and y component
+     * @param {Number} [config.fillPatternOffsetX] 
+     * @param {Number} [config.fillPatternOffsetY] 
+     * @param {Object} [config.fillPatternScale] object with x and y component
+     * @param {Number} [config.fillPatternScaleX]
+     * @param {Number} [config.fillPatternScaleY]
+     * @param {Number} [config.fillPatternRotation]
+     * @param {String} [config.fillPatternRepeat] can be "repeat", "repeat-x", "repeat-y", or "no-repeat".  The default is "no-repeat"
+     * @param {Object} [config.fillLinearGradientStartPoint] object with x and y component
+     * @param {Number} [config.fillLinearGradientStartPointX]
+     * @param {Number} [config.fillLinearGradientStartPointY]
+     * @param {Object} [config.fillLinearGradientEndPoint] object with x and y component
+     * @param {Number} [config.fillLinearGradientEndPointX]
+     * @param {Number} [config.fillLinearGradientEndPointY]
+     * @param {Array} [config.fillLinearGradientColorStops] array of color stops
+     * @param {Object} [config.fillRadialGradientStartPoint] object with x and y component
+     * @param {Number} [config.fillRadialGradientStartPointX]
+     * @param {Number} [config.fillRadialGradientStartPointY]
+     * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
+     * @param {Number} [config.fillRadialGradientEndPointX] 
+     * @param {Number} [config.fillRadialGradientEndPointY] 
+     * @param {Number} [config.fillRadialGradientStartRadius]
+     * @param {Number} [config.fillRadialGradientEndRadius]
+     * @param {Array} [config.fillRadialGradientColorStops] array of color stops
+     * @param {Boolean} [config.fillEnabled] flag which enables or disables the fill.  The default value is true
+     * @param {String} [config.fillPriority] can be color, linear-gradient, radial-graident, or pattern.  The default value is color.  The fillPriority property makes it really easy to toggle between different fill types.  For example, if you want to toggle between a fill color style and a fill pattern style, simply set the fill property and the fillPattern properties, and then use setFillPriority('color') to render the shape with a color fill, or use setFillPriority('pattern') to render the shape with the pattern fill configuration
+     * @param {String} [config.stroke] stroke color
+     * @param {Integer} [config.strokeRed] set stroke red component
+     * @param {Integer} [config.strokeGreen] set stroke green component
+     * @param {Integer} [config.strokeBlue] set stroke blue component
+     * @param {Integer} [config.strokeAlpha] set stroke alpha component
+     * @param {Number} [config.strokeWidth] stroke width
+     * @param {Boolean} [config.strokeScaleEnabled] flag which enables or disables stroke scale.  The default is true
+     * @param {Boolean} [config.strokeEnabled] flag which enables or disables the stroke.  The default value is true
+     * @param {String} [config.lineJoin] can be miter, round, or bevel.  The default
+     *  is miter
+     * @param {String} [config.lineCap] can be butt, round, or sqare.  The default
+     *  is butt
+     * @param {String} [config.shadowColor]
+     * @param {Integer} [config.shadowRed] set shadow color red component
+     * @param {Integer} [config.shadowGreen] set shadow color green component
+     * @param {Integer} [config.shadowBlue] set shadow color blue component
+     * @param {Integer} [config.shadowAlpha] set shadow color alpha component
+     * @param {Number} [config.shadowBlur]
+     * @param {Object} [config.shadowOffset] object with x and y component
+     * @param {Number} [config.shadowOffsetX]
+     * @param {Number} [config.shadowOffsetY]
+     * @param {Number} [config.shadowOpacity] shadow opacity.  Can be any real number
+     *  between 0 and 1
+     * @param {Boolean} [config.shadowEnabled] flag which enables or disables the shadow.  The default value is true
+     * @param {Array} [config.dash]
+     * @param {Boolean} [config.dashEnabled] flag which enables or disables the dashArray.  The default value is true
+     * @param {Number} [config.x]
+     * @param {Number} [config.y]
+     * @param {Number} [config.width]
+     * @param {Number} [config.height]
+     * @param {Boolean} [config.visible]
+     * @param {Boolean} [config.listening] whether or not the node is listening for events
+     * @param {String} [config.id] unique id
+     * @param {String} [config.name] non-unique name
+     * @param {Number} [config.opacity] determines node opacity.  Can be any number between 0 and 1
+     * @param {Object} [config.scale] set scale
+     * @param {Number} [config.scaleX] set scale x
+     * @param {Number} [config.scaleY] set scale y
+     * @param {Number} [config.rotation] rotation in degrees
+     * @param {Object} [config.offset] offset from center point and rotation point
+     * @param {Number} [config.offsetX] set offset x
+     * @param {Number} [config.offsetY] set offset y
+     * @param {Boolean} [config.draggable] makes the node draggable.  When stages are draggable, you can drag and drop
+     *  the entire stage by dragging any portion of the stage
+     * @param {Number} [config.dragDistance]
+     * @param {Function} [config.dragBoundFunc]
+     * @example
+     * // create split-t
+     * var splitT = new Kinetic.SplitT({<br>
+     *   height: 50,<br>
+     *   width: 100,<br>
+     *   stroke: 'black'<br>
+     *   strokeWidth: 5<br>
+     * });
+     */
+    Kinetic.SplitT = function(config) {
+        this.___init(config);
+    };
+
+    Kinetic.SplitT.prototype = {
+        ___init: function(config) {
+            // call super constructor
+            Kinetic.Shape.call(this, config);
+            this.className = SPLIT_T;
+            this.sceneFunc(this._sceneFunc);
+        },
+        _sceneFunc: function(context) {
+            var w = this.getWidth(),
+                h = this.getHeight();
+            context.beginPath();
+            context.moveTo(0, 0);
+            context.lineTo(w, 0);
+            context.moveTo(w / 2, 0);
+            context.lineTo(w / 2, h);
+            context.closePath();
+            context.strokeShape(this);
+        }
+    };
+    Kinetic.Util.extend(Kinetic.SplitT, Kinetic.Shape);
+    Kinetic.Collection.mapMethods(Kinetic.SplitT);
 })();
 ;(function() {
     /**

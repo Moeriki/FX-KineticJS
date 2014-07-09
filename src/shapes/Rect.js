@@ -32,7 +32,7 @@
                 width = this.getWidth(),
                 height = this.getHeight();
 
-            
+
             context.beginPath();
 
             if(!cornerRadius) {
@@ -53,7 +53,22 @@
             }
             context.closePath();
             context.fillStrokeShape(this);
-        }
+        },
+        /**
+         * Calculate the bounding box within the node's local space.
+         *
+         * A bare node's bounding box can be calculated by simply using the w/h
+         * This may be overridden for irregular shapes like circles.
+         */
+        calculateLocalBoundingBox: function() {
+            var halfStrokeWidth = this.getStrokeWidth() / 2;
+            return {
+                left: -halfStrokeWidth,
+                top: -halfStrokeWidth,
+                right: this.getWidth() + halfStrokeWidth,
+                bottom: this.getHeight() + halfStrokeWidth
+            };
+        },
     };
 
     Kinetic.Util.extend(Kinetic.Rect, Kinetic.Shape);
@@ -69,7 +84,7 @@
      * @example
      * // get corner radius<br>
      * var cornerRadius = rect.cornerRadius();<br><br>
-     * 
+     *
      * // set corner radius<br>
      * rect.cornerRadius(10);
      */
