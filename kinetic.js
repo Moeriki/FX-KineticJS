@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-07-09
+ * Date: 2014-07-10
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -12155,8 +12155,8 @@ var Kinetic = {};
 
     Kinetic.Collection.mapMethods(Kinetic.Line);
 })();;(function() {
-    var CUBE = 'Cube',
-        RATIO = 1/2;
+    var CUBE = 'Cube';
+
     /**
      * Cube constructor
      * @constructor
@@ -12262,7 +12262,7 @@ var Kinetic = {};
         },
         _sceneFunc: function(context) {
             var w = this.getWidth(),
-                wr = Math.ceil(w * RATIO);
+                wr = Math.ceil(w * this.getRatio());
 
             context.beginPath();
 
@@ -12290,10 +12290,28 @@ var Kinetic = {};
         setHeight: function(height) {
             Kinetic.Node.prototype.setHeight.call(this, height);
             this._setAttr('width', height);
-        }
+        },
+        calculateLocalBoundingBox: function() {
+            var s, sr, halfStroke;
+
+            s = this.getWidth();
+            sr = Math.ceil(s * this.getRatio());
+            halfStroke = this.getStrokeWidth() / 2;
+
+            return {
+                left: -halfStroke,
+                right: s + sr + halfStroke,
+                top: -sr - halfStroke,
+                bottom: s + halfStroke,
+            };
+        },
     };
 
     Kinetic.Util.extend(Kinetic.Cube, Kinetic.Shape);
+
+    // add getters setters
+    Kinetic.Factory.addGetterSetter(Kinetic.Cube, 'ratio', 0.5);
+
     Kinetic.Collection.mapMethods(Kinetic.Cube);
 
 })();
