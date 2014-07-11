@@ -32,12 +32,15 @@
             this.sceneFunc(this._sceneFunc);
         },
         _sceneFunc: function(context) {
-            var points = this.constructBasicPoints();
+            var points, plen, i;
+
+            points = this.constructBasicPoints();
+            plen = 30;//points.length;
 
             context.beginPath();
             context.moveTo(points[0], points[1]);
 
-            for (var i = 2; i < points.length; i = i + 4) {
+            for (i = 2; i < plen; i = i + 4) {
                 context.quadraticCurveTo(points[i], points[i + 1], points[i + 2], points[i + 3]);
             }
 
