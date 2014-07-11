@@ -12469,6 +12469,168 @@ var Kinetic = {};
 
 })();
 ;(function() {
+    var PYRAMID = 'Pyramid';
+
+    var RIGHT_RATIO = 0.1,  // 0 through 1  : amount of space reserved on the X-axis for the 'depth'
+        DEPTH_RATIO = 0.6,  // 0 through 1  : 'depth' of the pyramid on the Y-axis
+        TOP_POINT = 0.5;  // -1 through 1 : deviation of the top point away from the center
+
+    /**
+     * Pyramid constructor
+     * @constructor
+     * @memberof Kinetic
+     * @augments Kinetic.Shape
+     * @param {Object} config
+     * @param {String} [config.fill] fill color
+     * @param {Integer} [config.fillRed] set fill red component
+     * @param {Integer} [config.fillGreen] set fill green component
+     * @param {Integer} [config.fillBlue] set fill blue component
+     * @param {Integer} [config.fillAlpha] set fill alpha component
+     * @param {Image} [config.fillPatternImage] fill pattern image
+     * @param {Number} [config.fillPatternX]
+     * @param {Number} [config.fillPatternY]
+     * @param {Object} [config.fillPatternOffset] object with x and y component
+     * @param {Number} [config.fillPatternOffsetX] 
+     * @param {Number} [config.fillPatternOffsetY] 
+     * @param {Object} [config.fillPatternScale] object with x and y component
+     * @param {Number} [config.fillPatternScaleX]
+     * @param {Number} [config.fillPatternScaleY]
+     * @param {Number} [config.fillPatternRotation]
+     * @param {String} [config.fillPatternRepeat] can be "repeat", "repeat-x", "repeat-y", or "no-repeat".  The default is "no-repeat"
+     * @param {Object} [config.fillLinearGradientStartPoint] object with x and y component
+     * @param {Number} [config.fillLinearGradientStartPointX]
+     * @param {Number} [config.fillLinearGradientStartPointY]
+     * @param {Object} [config.fillLinearGradientEndPoint] object with x and y component
+     * @param {Number} [config.fillLinearGradientEndPointX]
+     * @param {Number} [config.fillLinearGradientEndPointY]
+     * @param {Array} [config.fillLinearGradientColorStops] array of color stops
+     * @param {Object} [config.fillRadialGradientStartPoint] object with x and y component
+     * @param {Number} [config.fillRadialGradientStartPointX]
+     * @param {Number} [config.fillRadialGradientStartPointY]
+     * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
+     * @param {Number} [config.fillRadialGradientEndPointX] 
+     * @param {Number} [config.fillRadialGradientEndPointY] 
+     * @param {Number} [config.fillRadialGradientStartRadius]
+     * @param {Number} [config.fillRadialGradientEndRadius]
+     * @param {Array} [config.fillRadialGradientColorStops] array of color stops
+     * @param {Boolean} [config.fillEnabled] flag which enables or disables the fill.  The default value is true
+     * @param {String} [config.fillPriority] can be color, linear-gradient, radial-graident, or pattern.  The default value is color.  The fillPriority property makes it really easy to toggle between different fill types.  For example, if you want to toggle between a fill color style and a fill pattern style, simply set the fill property and the fillPattern properties, and then use setFillPriority('color') to render the shape with a color fill, or use setFillPriority('pattern') to render the shape with the pattern fill configuration
+     * @param {String} [config.stroke] stroke color
+     * @param {Integer} [config.strokeRed] set stroke red component
+     * @param {Integer} [config.strokeGreen] set stroke green component
+     * @param {Integer} [config.strokeBlue] set stroke blue component
+     * @param {Integer} [config.strokeAlpha] set stroke alpha component
+     * @param {Number} [config.strokeWidth] stroke width
+     * @param {Boolean} [config.strokeScaleEnabled] flag which enables or disables stroke scale.  The default is true
+     * @param {Boolean} [config.strokeEnabled] flag which enables or disables the stroke.  The default value is true
+     * @param {String} [config.lineJoin] can be miter, round, or bevel.  The default
+     *  is miter
+     * @param {String} [config.lineCap] can be butt, round, or sqare.  The default
+     *  is butt
+     * @param {String} [config.shadowColor]
+     * @param {Integer} [config.shadowRed] set shadow color red component
+     * @param {Integer} [config.shadowGreen] set shadow color green component
+     * @param {Integer} [config.shadowBlue] set shadow color blue component
+     * @param {Integer} [config.shadowAlpha] set shadow color alpha component
+     * @param {Number} [config.shadowBlur]
+     * @param {Object} [config.shadowOffset] object with x and y component
+     * @param {Number} [config.shadowOffsetX]
+     * @param {Number} [config.shadowOffsetY]
+     * @param {Number} [config.shadowOpacity] shadow opacity.  Can be any real number
+     *  between 0 and 1
+     * @param {Boolean} [config.shadowEnabled] flag which enables or disables the shadow.  The default value is true
+     * @param {Array} [config.dash]
+     * @param {Boolean} [config.dashEnabled] flag which enables or disables the dashArray.  The default value is true
+     * @param {Number} [config.x]
+     * @param {Number} [config.y]
+     * @param {Number} [config.width]
+     * @param {Number} [config.height]
+     * @param {Boolean} [config.visible]
+     * @param {Boolean} [config.listening] whether or not the node is listening for events
+     * @param {String} [config.id] unique id
+     * @param {String} [config.name] non-unique name
+     * @param {Number} [config.opacity] determines node opacity.  Can be any number between 0 and 1
+     * @param {Object} [config.scale] set scale
+     * @param {Number} [config.scaleX] set scale x
+     * @param {Number} [config.scaleY] set scale y
+     * @param {Number} [config.rotation] rotation in degrees
+     * @param {Object} [config.offset] offset from center point and rotation point
+     * @param {Number} [config.offsetX] set offset x
+     * @param {Number} [config.offsetY] set offset y
+     * @param {Boolean} [config.draggable] makes the node draggable.  When stages are draggable, you can drag and drop
+     *  the entire stage by dragging any portion of the stage
+     * @param {Number} [config.dragDistance]
+     * @param {Function} [config.dragBoundFunc]
+     * @example
+     * var cylinder = new Kinetic.Pyramid({<br>
+     *   width: 100,<br>
+     *   height: 50, <br>
+     *   stroke: 'red',<br>
+     *   strokeWidth: 5<br>
+     * });
+     */
+    Kinetic.Pyramid = function(config) {
+        this.___init(config);
+    };
+
+    Kinetic.Pyramid.prototype = {
+        ___init: function(config) {
+            Kinetic.Shape.call(this, config);
+            this.className = PYRAMID;
+            this.sceneFunc(this._sceneFunc);
+        },
+        _sceneFunc: function(context) {
+            var points, plen, i;
+
+            points = this.constructBasicPoints();
+            plen = 8;//points.length;
+
+            // paint outer lines and fill shape
+
+            context.beginPath();
+            context.moveTo(points[0], points[1]);
+            for(i = 2; i < plen; i = i + 2) {
+                context.lineTo(points[i], points[i + 1]);
+            }
+            context.closePath();
+            context.fillStrokeShape(this);
+
+            // paint single inner line (between point 0 and 2)
+            context.beginPath();
+            context.moveTo(points[0], points[1]);
+            context.lineTo(points[4], points[5]);
+            context.strokeShape(this);
+        },
+        /**
+         * @private
+         * Only contain the outer points of the pyramid so they can be reconstructed by PaperJS
+         */
+        constructBasicPoints: function() {
+            var width, height, rightSpace;
+
+            width = this.getWidth();
+            height = this.getHeight();
+            rightSpace = width * RIGHT_RATIO;
+
+            return [
+                // top point
+                (width - rightSpace) * TOP_POINT, 0,
+                // right 'depth' point
+                width, height * DEPTH_RATIO,
+                // bottom right point
+                width - rightSpace,  height,
+                // bottom left point
+                0, height
+            ];
+        },
+    };
+
+    Kinetic.Util.extend(Kinetic.Pyramid, Kinetic.Shape);
+
+    Kinetic.Collection.mapMethods(Kinetic.Pyramid);
+
+})();
+;(function() {
     // the 0.0001 offset fixes a bug in Chrome 27
     var PI = Math.PI - 0.0001,
         SEMI_CIRCLE = 'SemiCircle';
@@ -12731,12 +12893,15 @@ var Kinetic = {};
             this.sceneFunc(this._sceneFunc);
         },
         _sceneFunc: function(context) {
-            var points = this.constructBasicPoints();
+            var points, plen, i;
+
+            points = this.constructBasicPoints();
+            plen = 30;//points.length;
 
             context.beginPath();
             context.moveTo(points[0], points[1]);
 
-            for (var i = 2; i < points.length; i = i + 4) {
+            for (i = 2; i < plen; i = i + 4) {
                 context.quadraticCurveTo(points[i], points[i + 1], points[i + 2], points[i + 3]);
             }
 
