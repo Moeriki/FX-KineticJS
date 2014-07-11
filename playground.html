@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <script src="dist/kinetic-dev.js"></script>
+    </head>
+    <body>
+        <div id="playground"></div>
+        <script type="text/javascript">
+            var DEGR_TO_RAD = Math.PI / 180;
+
+            var stage = new Kinetic.Stage({
+                width: window.innerWidth,
+                height: window.innerHeight,
+                container: 'playground',
+            });
+
+            var layer = new Kinetic.Layer();
+            stage.add(layer);
+
+            var rect = new Kinetic.Rect({
+                width: 220,
+                height: 120,
+                fill: 'green',
+            });
+            layer.add(rect);
+
+            var shape = new Kinetic.Arrow({
+                x: 10,
+                y: 10,
+                points: [0, 0, 200, 100],
+                stroke: 'black',
+                strokeWidth: 3,
+                arrowStyle: Kinetic.Arrow.STYLE_FILLED,
+                fill: 'black',
+                // dash: [10, 5],
+            });
+            layer.add(shape);
+
+            layer.batchDraw();
+
+        </script>
+    </body>
+</html>
