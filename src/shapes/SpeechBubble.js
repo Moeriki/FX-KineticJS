@@ -48,9 +48,7 @@
             context.fillStrokeShape(this);
         },
         constructBasicPoints: function() {
-            var points;// = new Array(30);
-
-            var width, height, bubbleHeight, halfWidth, halfBubbleHeight;
+            var points, width, height, bubbleHeight, halfWidth, halfBubbleHeight;
 
             // base data
 
