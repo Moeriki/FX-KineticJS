@@ -12155,6 +12155,192 @@ var Kinetic = {};
 
     Kinetic.Collection.mapMethods(Kinetic.Line);
 })();;(function() {
+    var ARROW_CLASS = 'Arrow';
+
+    var PI, cos, sin;
+
+    PI = Math.PI;
+    cos = Math.cos;
+    sin = Math.sin;
+
+    function angleFromTo(centerX, centerY, pointX, pointY) {
+        return Math.atan2(pointY - centerY, pointX - centerX);
+    }
+
+    /**
+     * Arrow constructor
+     * @constructor
+     * @memberof Kinetic
+     * @augments Kinetic.Line
+     * @param {Object} config
+     * @param {String} [config.fill] fill color
+     * @param {Integer} [config.fillRed] set fill red component
+     * @param {Integer} [config.fillGreen] set fill green component
+     * @param {Integer} [config.fillBlue] set fill blue component
+     * @param {Integer} [config.fillAlpha] set fill alpha component
+     * @param {Image} [config.fillPatternImage] fill pattern image
+     * @param {Number} [config.fillPatternX]
+     * @param {Number} [config.fillPatternY]
+     * @param {Object} [config.fillPatternOffset] object with x and y component
+     * @param {Number} [config.fillPatternOffsetX] 
+     * @param {Number} [config.fillPatternOffsetY] 
+     * @param {Object} [config.fillPatternScale] object with x and y component
+     * @param {Number} [config.fillPatternScaleX]
+     * @param {Number} [config.fillPatternScaleY]
+     * @param {Number} [config.fillPatternRotation]
+     * @param {String} [config.fillPatternRepeat] can be "repeat", "repeat-x", "repeat-y", or "no-repeat".  The default is "no-repeat"
+     * @param {Object} [config.fillLinearGradientStartPoint] object with x and y component
+     * @param {Number} [config.fillLinearGradientStartPointX]
+     * @param {Number} [config.fillLinearGradientStartPointY]
+     * @param {Object} [config.fillLinearGradientEndPoint] object with x and y component
+     * @param {Number} [config.fillLinearGradientEndPointX]
+     * @param {Number} [config.fillLinearGradientEndPointY]
+     * @param {Array} [config.fillLinearGradientColorStops] array of color stops
+     * @param {Object} [config.fillRadialGradientStartPoint] object with x and y component
+     * @param {Number} [config.fillRadialGradientStartPointX]
+     * @param {Number} [config.fillRadialGradientStartPointY]
+     * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
+     * @param {Number} [config.fillRadialGradientEndPointX] 
+     * @param {Number} [config.fillRadialGradientEndPointY] 
+     * @param {Number} [config.fillRadialGradientStartRadius]
+     * @param {Number} [config.fillRadialGradientEndRadius]
+     * @param {Array} [config.fillRadialGradientColorStops] array of color stops
+     * @param {Boolean} [config.fillEnabled] flag which enables or disables the fill.  The default value is true
+     * @param {String} [config.fillPriority] can be color, linear-gradient, radial-graident, or pattern.  The default value is color.  The fillPriority property makes it really easy to toggle between different fill types.  For example, if you want to toggle between a fill color style and a fill pattern style, simply set the fill property and the fillPattern properties, and then use setFillPriority('color') to render the shape with a color fill, or use setFillPriority('pattern') to render the shape with the pattern fill configuration
+     * @param {String} [config.stroke] stroke color
+     * @param {Integer} [config.strokeRed] set stroke red component
+     * @param {Integer} [config.strokeGreen] set stroke green component
+     * @param {Integer} [config.strokeBlue] set stroke blue component
+     * @param {Integer} [config.strokeAlpha] set stroke alpha component
+     * @param {Number} [config.strokeWidth] stroke width
+     * @param {Boolean} [config.strokeScaleEnabled] flag which enables or disables stroke scale.  The default is true
+     * @param {Boolean} [config.strokeEnabled] flag which enables or disables the stroke.  The default value is true
+     * @param {String} [config.lineJoin] can be miter, round, or bevel.  The default
+     *  is miter
+     * @param {String} [config.lineCap] can be butt, round, or sqare.  The default
+     *  is butt
+     * @param {String} [config.shadowColor]
+     * @param {Integer} [config.shadowRed] set shadow color red component
+     * @param {Integer} [config.shadowGreen] set shadow color green component
+     * @param {Integer} [config.shadowBlue] set shadow color blue component
+     * @param {Integer} [config.shadowAlpha] set shadow color alpha component
+     * @param {Number} [config.shadowBlur]
+     * @param {Object} [config.shadowOffset] object with x and y component
+     * @param {Number} [config.shadowOffsetX]
+     * @param {Number} [config.shadowOffsetY]
+     * @param {Number} [config.shadowOpacity] shadow opacity.  Can be any real number
+     *  between 0 and 1
+     * @param {Boolean} [config.shadowEnabled] flag which enables or disables the shadow.  The default value is true
+     * @param {Array} [config.dash]
+     * @param {Boolean} [config.dashEnabled] flag which enables or disables the dashArray.  The default value is true
+     * @param {Number} [config.x]
+     * @param {Number} [config.y]
+     * @param {Number} [config.width]
+     * @param {Number} [config.height]
+     * @param {Boolean} [config.visible]
+     * @param {Boolean} [config.listening] whether or not the node is listening for events
+     * @param {String} [config.id] unique id
+     * @param {String} [config.name] non-unique name
+     * @param {Number} [config.opacity] determines node opacity.  Can be any number between 0 and 1
+     * @param {Object} [config.scale] set scale
+     * @param {Number} [config.scaleX] set scale x
+     * @param {Number} [config.scaleY] set scale y
+     * @param {Number} [config.rotation] rotation in degrees
+     * @param {Object} [config.offset] offset from center point and rotation point
+     * @param {Number} [config.offsetX] set offset x
+     * @param {Number} [config.offsetY] set offset y
+     * @param {Boolean} [config.draggable] makes the node draggable.  When stages are draggable, you can drag and drop
+     *  the entire stage by dragging any portion of the stage
+     * @param {Number} [config.dragDistance]
+     * @param {Function} [config.dragBoundFunc]
+     * @example
+     * // create arrow
+     * var arrow = new Kinetic.Arrow({<br>
+     *   height: 50,<br>
+     *   width: 150,<br>
+     *   fill: 'red',<br>
+     *   stroke: 'black'<br>
+     *   strokeWidth: 5<br>
+     * });
+     */
+    Kinetic.Arrow = function(config) {
+        this.___init(config);
+    };
+
+    Kinetic.Arrow.STYLE_BARE = 0;
+    Kinetic.Arrow.STYLE_HOLLOW = 1;//TODO hollow doesn't work as intended yet, but we don't use it yet so wuteva ~DL
+    Kinetic.Arrow.STYLE_FILLED = 2;
+
+    Kinetic.Arrow.prototype = {
+        ___init: function(config) {
+            // call super constructor
+            Kinetic.Shape.call(this, config);
+            this.className = ARROW_CLASS;
+            this.sceneFunc(this._sceneFunc);
+        },
+        _sceneFunc: function(context) {
+            Kinetic.Line.prototype._sceneFunc.call(this, context);
+
+            var points, plen, style, angle, lineAngle;
+
+            points = this.getPoints();
+            plen = points.length;
+            style = this.getArrowStyle();
+            angle = this.getArrowAngle();
+
+            if (plen < 4) {
+                return;
+            }
+
+            //TODO adapt line angle to tension ~DL
+            lineAngle = angleFromTo(points[plen - 4], points[plen - 3], points[plen - 2], points[plen - 1]);
+
+            var size, angle1, angle2, arrowTopX, arrowTopY, arrowPoint1X, arrowPoint1Y, arrowPoint2X, arrowPoint2Y;
+
+            size = 25;
+            angle1 = lineAngle + PI + angle;
+            angle2 = lineAngle + PI - angle;
+
+            arrowTopX = points[plen - 2];
+            arrowTopY = points[plen - 1];
+
+            // cover the top of the line when we're using fill to cover up the fact that we don't draw a border
+            if (style === Kinetic.Arrow.STYLE_FILLED) {
+                arrowTopX += cos(lineAngle) * this.getStrokeWidth();
+                arrowTopY += sin(lineAngle) * this.getStrokeWidth();
+            }
+
+            arrowPoint1X = arrowTopX + cos(angle1) * size;
+            arrowPoint1Y = arrowTopY + sin(angle1) * size;
+            arrowPoint2X = arrowTopX + cos(angle2) * size;
+            arrowPoint2Y = arrowTopY + sin(angle2) * size;
+
+            context.beginPath();
+            context.moveTo(arrowPoint1X, arrowPoint1Y);
+            context.lineTo(arrowTopX, arrowTopY);
+            context.lineTo(arrowPoint2X, arrowPoint2Y);
+
+            if (style !== Kinetic.Arrow.STYLE_BARE) {
+                context.closePath();
+            }
+
+            if (style === Kinetic.Arrow.STYLE_FILLED) {
+                context.fillShape(this);
+            } else {
+                context.strokeShape(this);
+            }
+        }
+    };
+
+    Kinetic.Util.extend(Kinetic.Arrow, Kinetic.Line);
+
+    // add getters setters
+    Kinetic.Factory.addGetterSetter(Kinetic.Arrow, 'arrowAngle', Math.PI / 4);
+    Kinetic.Factory.addGetterSetter(Kinetic.Arrow, 'arrowStyle', Kinetic.Arrow.STYLE_FILLED);
+
+    Kinetic.Collection.mapMethods(Kinetic.Arrow);
+})();
+;(function() {
     var CUBE = 'Cube';
 
     /**

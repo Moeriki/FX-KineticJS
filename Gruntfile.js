@@ -115,6 +115,7 @@ module.exports = function(grunt) {
     'src/shapes/Line.js',
 
     // custom shapes
+    'src/shapes/Arrow.js',
     'src/shapes/Cube.js',
     'src/shapes/Cylinder.js',
     'src/shapes/Pyramid.js',
