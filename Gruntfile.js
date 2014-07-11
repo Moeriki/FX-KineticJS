@@ -58,6 +58,7 @@ module.exports = function(grunt) {
     // custom shapes
     'src/shapes/Arrow.js',
     'src/shapes/Cube.js',
+    'src/shapes/Cylinder.js',
     'src/shapes/Diamond.js',
     'src/shapes/Parallelogram.js',
     'src/shapes/SemiCircle.js',
@@ -114,6 +115,7 @@ module.exports = function(grunt) {
 
     // custom shapes
     'src/shapes/Cube.js',
+    'src/shapes/Cylinder.js',
     'src/shapes/SemiCircle.js',
     'src/shapes/SpeechBubble.js',
     'src/shapes/SplitT.js',
