@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-07-10
+ * Date: 2014-07-11
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -12465,6 +12465,214 @@ var Kinetic = {};
 
     Kinetic.Util.extend(Kinetic.SemiCircle, Kinetic.Circle);
     Kinetic.Collection.mapMethods(Kinetic.SemiCircle);
+})();
+;(function() {
+    var SPEECH_BUBBLE = 'SpeechBubble';
+
+    var BUBBLE_RATIO = 0.85; // How much space in percentage, the bubble should fill the height of the shape
+    var SPEAK_LEFT = 0.35;
+    var SPEAK_RIGHT = 0.20;
+
+    /**
+     * SpeechBubble constructor
+     * @constructor
+     * @memberof Kinetic
+     * @augments Kinetic.Shape
+     * @param {Object} config
+     * @param {String} [config.fill] fill color
+     * @param {Integer} [config.fillRed] set fill red component
+     * @param {Integer} [config.fillGreen] set fill green component
+     * @param {Integer} [config.fillBlue] set fill blue component
+     * @param {Integer} [config.fillAlpha] set fill alpha component
+     * @param {Image} [config.fillPatternImage] fill pattern image
+     * @param {Number} [config.fillPatternX]
+     * @param {Number} [config.fillPatternY]
+     * @param {Object} [config.fillPatternOffset] object with x and y component
+     * @param {Number} [config.fillPatternOffsetX] 
+     * @param {Number} [config.fillPatternOffsetY] 
+     * @param {Object} [config.fillPatternScale] object with x and y component
+     * @param {Number} [config.fillPatternScaleX]
+     * @param {Number} [config.fillPatternScaleY]
+     * @param {Number} [config.fillPatternRotation]
+     * @param {String} [config.fillPatternRepeat] can be "repeat", "repeat-x", "repeat-y", or "no-repeat".  The default is "no-repeat"
+     * @param {Object} [config.fillLinearGradientStartPoint] object with x and y component
+     * @param {Number} [config.fillLinearGradientStartPointX]
+     * @param {Number} [config.fillLinearGradientStartPointY]
+     * @param {Object} [config.fillLinearGradientEndPoint] object with x and y component
+     * @param {Number} [config.fillLinearGradientEndPointX]
+     * @param {Number} [config.fillLinearGradientEndPointY]
+     * @param {Array} [config.fillLinearGradientColorStops] array of color stops
+     * @param {Object} [config.fillRadialGradientStartPoint] object with x and y component
+     * @param {Number} [config.fillRadialGradientStartPointX]
+     * @param {Number} [config.fillRadialGradientStartPointY]
+     * @param {Object} [config.fillRadialGradientEndPoint] object with x and y component
+     * @param {Number} [config.fillRadialGradientEndPointX] 
+     * @param {Number} [config.fillRadialGradientEndPointY] 
+     * @param {Number} [config.fillRadialGradientStartRadius]
+     * @param {Number} [config.fillRadialGradientEndRadius]
+     * @param {Array} [config.fillRadialGradientColorStops] array of color stops
+     * @param {Boolean} [config.fillEnabled] flag which enables or disables the fill.  The default value is true
+     * @param {String} [config.fillPriority] can be color, linear-gradient, radial-graident, or pattern.  The default value is color.  The fillPriority property makes it really easy to toggle between different fill types.  For example, if you want to toggle between a fill color style and a fill pattern style, simply set the fill property and the fillPattern properties, and then use setFillPriority('color') to render the shape with a color fill, or use setFillPriority('pattern') to render the shape with the pattern fill configuration
+     * @param {String} [config.stroke] stroke color
+     * @param {Integer} [config.strokeRed] set stroke red component
+     * @param {Integer} [config.strokeGreen] set stroke green component
+     * @param {Integer} [config.strokeBlue] set stroke blue component
+     * @param {Integer} [config.strokeAlpha] set stroke alpha component
+     * @param {Number} [config.strokeWidth] stroke width
+     * @param {Boolean} [config.strokeScaleEnabled] flag which enables or disables stroke scale.  The default is true
+     * @param {Boolean} [config.strokeEnabled] flag which enables or disables the stroke.  The default value is true
+     * @param {String} [config.lineJoin] can be miter, round, or bevel.  The default
+     *  is miter
+     * @param {String} [config.lineCap] can be butt, round, or sqare.  The default
+     *  is butt
+     * @param {String} [config.shadowColor]
+     * @param {Integer} [config.shadowRed] set shadow color red component
+     * @param {Integer} [config.shadowGreen] set shadow color green component
+     * @param {Integer} [config.shadowBlue] set shadow color blue component
+     * @param {Integer} [config.shadowAlpha] set shadow color alpha component
+     * @param {Number} [config.shadowBlur]
+     * @param {Object} [config.shadowOffset] object with x and y component
+     * @param {Number} [config.shadowOffsetX]
+     * @param {Number} [config.shadowOffsetY]
+     * @param {Number} [config.shadowOpacity] shadow opacity.  Can be any real number
+     *  between 0 and 1
+     * @param {Boolean} [config.shadowEnabled] flag which enables or disables the shadow.  The default value is true
+     * @param {Array} [config.dash]
+     * @param {Boolean} [config.dashEnabled] flag which enables or disables the dashArray.  The default value is true
+     * @param {Number} [config.x]
+     * @param {Number} [config.y]
+     * @param {Number} [config.width]
+     * @param {Number} [config.height]
+     * @param {Boolean} [config.visible]
+     * @param {Boolean} [config.listening] whether or not the node is listening for events
+     * @param {String} [config.id] unique id
+     * @param {String} [config.name] non-unique name
+     * @param {Number} [config.opacity] determines node opacity.  Can be any number between 0 and 1
+     * @param {Object} [config.scale] set scale
+     * @param {Number} [config.scaleX] set scale x
+     * @param {Number} [config.scaleY] set scale y
+     * @param {Number} [config.rotation] rotation in degrees
+     * @param {Object} [config.offset] offset from center point and rotation point
+     * @param {Number} [config.offsetX] set offset x
+     * @param {Number} [config.offsetY] set offset y
+     * @param {Boolean} [config.draggable] makes the node draggable.  When stages are draggable, you can drag and drop
+     *  the entire stage by dragging any portion of the stage
+     * @param {Number} [config.dragDistance]
+     * @param {Function} [config.dragBoundFunc]
+     * @example
+     * var speechBubble = new Kinetic.SpeechBubble({<br>
+     *   width: 100,<br>
+     *   height: 50, <br>
+     *   stroke: 'red',<br>
+     *   strokeWidth: 5<br>
+     * });
+     */
+    Kinetic.SpeechBubble = function(config) {
+        this.___init(config);
+    };
+
+    Kinetic.SpeechBubble.prototype = {
+        ___init: function(config) {
+            Kinetic.Shape.call(this, config);
+            this.className = SPEECH_BUBBLE;
+            this.sceneFunc(this._sceneFunc);
+        },
+        _sceneFunc: function(context) {
+            var points = this.constructBasicPoints();
+
+            context.beginPath();
+            context.moveTo(points[0], points[1]);
+
+            for (var i = 2; i < points.length; i = i + 4) {
+                context.quadraticCurveTo(points[i], points[i + 1], points[i + 2], points[i + 3]);
+            }
+
+            context.closePath();
+            context.fillStrokeShape(this);
+        },
+        constructBasicPoints: function() {
+            var points;// = new Array(30);
+
+            var width, height, bubbleHeight, halfWidth, halfBubbleHeight;
+
+            // base data
+
+            width = this.getWidth();
+            height = this.getHeight();
+            bubbleHeight = height * BUBBLE_RATIO;
+            halfBubbleHeight = bubbleHeight / 2;
+            halfWidth = width / 2;
+
+            var revLeft, speakLeftX, speakLeftY, revRight, speakRightX, speakRightY;
+
+            // speak angle data
+
+            // https://stackoverflow.com/questions/5634460/quadratic-bezier-curve-calculate-point
+            revRight = 1 - SPEAK_RIGHT;
+            speakRightX = revRight * revRight * halfWidth;
+            speakRightY = revRight * revRight * bubbleHeight + 2 * revRight * SPEAK_RIGHT * bubbleHeight + SPEAK_RIGHT * SPEAK_RIGHT * halfBubbleHeight;
+            revLeft = 1 - SPEAK_LEFT;
+            speakLeftX = revLeft * revLeft * halfWidth;
+            speakLeftY = revLeft * revLeft * bubbleHeight + 2 * revLeft * SPEAK_LEFT * bubbleHeight + SPEAK_LEFT * SPEAK_LEFT * halfBubbleHeight;
+
+            var /*controlRightX, controlRightY,*/ controlLeftX, controlLeftY;
+
+            // controlRightX = (halfWidth + 3 * speakRightX) / 4;
+            // controlRightY = speakRightY;//(speakRightY + 3 * halfBubbleHeight) / 4;
+            controlLeftX = 0;//speakLeftX / 4;
+            controlLeftY = (halfBubbleHeight + 3 * speakLeftY) / 4;
+
+            // construct
+
+            // base structure of array
+            // [
+            //   point1.x, point1.y,
+            //   controlPoint1.x, controlPoint1.y,
+            //   point2.x, point2.y,
+            //   controlPoint2.x, controlPoint2.y,
+            //   ..
+            // ]
+
+            points = [
+                // left of bubble
+                0, halfBubbleHeight,
+                // control point top left
+                0, 0,
+                // top of bubble
+                halfWidth, 0,
+                // control point top right
+                width, 0,
+                // right of bubble
+                width, halfBubbleHeight,
+                // bottom right control point
+                width, bubbleHeight,
+                // bottom of bubble
+                halfWidth, bubbleHeight,
+                // right speaker control point
+                speakRightX, bubbleHeight,
+                // right speaker corner
+                speakRightX, speakRightY,
+                // speaker angle right corner
+                speakRightX, height,
+                // speaker angle
+                speakLeftX - (speakRightX - speakLeftX) / 2, height,
+                // speaker angle left corner
+                speakLeftX, height,
+                // left speaker corner
+                speakLeftX, speakLeftY,
+                // control point bottom left
+                controlLeftX, controlLeftY,
+                // back to left of bubble
+                0, halfBubbleHeight
+            ];
+
+            return points;
+        },
+    };
+
+    Kinetic.Util.extend(Kinetic.SpeechBubble, Kinetic.Shape);
+    Kinetic.Collection.mapMethods(Kinetic.SpeechBubble);
+
 })();
 ;(function() {
     var SPLIT_T = 'SplitT';

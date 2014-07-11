@@ -1,14 +1,10 @@
 (function() {
-    var SPEECH_BUBBLE = 'SpeechBubble',
-        // ratio used for bubble rest used for tail
-        HEIGHT_RATIO = 5/8,
-        HEIGHT_CURVE_RATIO = 3/4,
-        // tail start position (i.e. at 1/4 of total width)
-        WIDTH_RATIO = 1/4,
-        // tail point position
-        RATIO_BEGIN = 1/10,
-        // tail back position
-        RATIO_END = 3/20;
+    var SPEECH_BUBBLE = 'SpeechBubble';
+
+    var BUBBLE_RATIO = 0.85; // How much space in percentage, the bubble should fill the height of the shape
+    var SPEAK_LEFT = 0.35;
+    var SPEAK_RIGHT = 0.20;
+
     /**
      * SpeechBubble constructor
      * @constructor
@@ -36,19 +32,95 @@
             this.sceneFunc(this._sceneFunc);
         },
         _sceneFunc: function(context) {
-            var w = this.getWidth(),
-                h = this.getHeight(),
-                mh = h/2 * HEIGHT_RATIO;
+            var points = this.constructBasicPoints();
+
             context.beginPath();
-            context.moveTo(0, 0);
-            context.quadraticCurveTo(0, -h/2, w/2, -h/2);
-            context.quadraticCurveTo(w, -h/2, w, 0);
-            context.quadraticCurveTo(w, h/2 * HEIGHT_CURVE_RATIO, WIDTH_RATIO * w, mh);
-            context.lineTo(RATIO_BEGIN*w, h/2);
-            context.lineTo(RATIO_END*w, mh);
-            context.quadraticCurveTo(0, mh, 0, 0);
+            context.moveTo(points[0], points[1]);
+
+            for (var i = 2; i < points.length; i = i + 4) {
+                context.quadraticCurveTo(points[i], points[i + 1], points[i + 2], points[i + 3]);
+            }
+
             context.closePath();
-            context.strokeShape(this);
+            context.fillStrokeShape(this);
+        },
+        constructBasicPoints: function() {
+            var points;// = new Array(30);
+
+            var width, height, bubbleHeight, halfWidth, halfBubbleHeight;
+
+            // base data
+
+            width = this.getWidth();
+            height = this.getHeight();
+            bubbleHeight = height * BUBBLE_RATIO;
+            halfBubbleHeight = bubbleHeight / 2;
+            halfWidth = width / 2;
+
+            var revLeft, speakLeftX, speakLeftY, revRight, speakRightX, speakRightY;
+
+            // speak angle data
+
+            // https://stackoverflow.com/questions/5634460/quadratic-bezier-curve-calculate-point
+            revRight = 1 - SPEAK_RIGHT;
+            speakRightX = revRight * revRight * halfWidth;
+            speakRightY = revRight * revRight * bubbleHeight + 2 * revRight * SPEAK_RIGHT * bubbleHeight + SPEAK_RIGHT * SPEAK_RIGHT * halfBubbleHeight;
+            revLeft = 1 - SPEAK_LEFT;
+            speakLeftX = revLeft * revLeft * halfWidth;
+            speakLeftY = revLeft * revLeft * bubbleHeight + 2 * revLeft * SPEAK_LEFT * bubbleHeight + SPEAK_LEFT * SPEAK_LEFT * halfBubbleHeight;
+
+            var /*controlRightX, controlRightY,*/ controlLeftX, controlLeftY;
+
+            // controlRightX = (halfWidth + 3 * speakRightX) / 4;
+            // controlRightY = speakRightY;//(speakRightY + 3 * halfBubbleHeight) / 4;
+            controlLeftX = 0;//speakLeftX / 4;
+            controlLeftY = (halfBubbleHeight + 3 * speakLeftY) / 4;
+
+            // construct
+
+            // base structure of array
+            // [
+            //   point1.x, point1.y,
+            //   controlPoint1.x, controlPoint1.y,
+            //   point2.x, point2.y,
+            //   controlPoint2.x, controlPoint2.y,
+            //   ..
+            // ]
+
+            points = [
+                // left of bubble
+                0, halfBubbleHeight,
+                // control point top left
+                0, 0,
+                // top of bubble
+                halfWidth, 0,
+                // control point top right
+                width, 0,
+                // right of bubble
+                width, halfBubbleHeight,
+                // bottom right control point
+                width, bubbleHeight,
+                // bottom of bubble
+                halfWidth, bubbleHeight,
+                // right speaker control point
+                speakRightX, bubbleHeight,
+                // right speaker corner
+                speakRightX, speakRightY,
+                // speaker angle right corner
+                speakRightX, height,
+                // speaker angle
+                speakLeftX - (speakRightX - speakLeftX) / 2, height,
+                // speaker angle left corner
+                speakLeftX, height,
+                // left speaker corner
+                speakLeftX, speakLeftY,
+                // control point bottom left
+                controlLeftX, controlLeftY,
+                // back to left of bubble
+                0, halfBubbleHeight
+            ];
+
+            return points;
         },
     };
 

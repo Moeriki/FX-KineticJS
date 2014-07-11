@@ -115,6 +115,7 @@ module.exports = function(grunt) {
     // custom shapes
     'src/shapes/Cube.js',
     'src/shapes/SemiCircle.js',
+    'src/shapes/SpeechBubble.js',
     'src/shapes/SplitT.js',
 
     // plugins
