@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-07-11
+ * Date: 2014-07-14
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -12281,12 +12281,13 @@ var Kinetic = {};
         _sceneFunc: function(context) {
             Kinetic.Line.prototype._sceneFunc.call(this, context);
 
-            var points, plen, style, angle, lineAngle;
+            var points, plen, style, angle, strokeWidth, lineAngle;
 
             points = this.getPoints();
             plen = points.length;
             style = this.getArrowStyle();
             angle = this.getArrowAngle();
+            strokeWidth = this.getStrokeWidth();
 
             if (plen < 4) {
                 return;
@@ -12297,7 +12298,7 @@ var Kinetic = {};
 
             var size, angle1, angle2, arrowTopX, arrowTopY, arrowPoint1X, arrowPoint1Y, arrowPoint2X, arrowPoint2Y;
 
-            size = 25;
+            size = this.getArrowSize() * strokeWidth;
             angle1 = lineAngle + PI + angle;
             angle2 = lineAngle + PI - angle;
 
@@ -12306,8 +12307,8 @@ var Kinetic = {};
 
             // cover the top of the line when we're using fill to cover up the fact that we don't draw a border
             if (style === Kinetic.Arrow.STYLE_FILLED) {
-                arrowTopX += cos(lineAngle) * this.getStrokeWidth();
-                arrowTopY += sin(lineAngle) * this.getStrokeWidth();
+                arrowTopX += cos(lineAngle) * strokeWidth * 2;
+                arrowTopY += sin(lineAngle) * strokeWidth * 2;
             }
 
             arrowPoint1X = arrowTopX + cos(angle1) * size;
@@ -12337,6 +12338,7 @@ var Kinetic = {};
     // add getters setters
     Kinetic.Factory.addGetterSetter(Kinetic.Arrow, 'arrowAngle', Math.PI / 4);
     Kinetic.Factory.addGetterSetter(Kinetic.Arrow, 'arrowStyle', Kinetic.Arrow.STYLE_FILLED);
+    Kinetic.Factory.addGetterSetter(Kinetic.Arrow, 'arrowSize', 5);
 
     Kinetic.Collection.mapMethods(Kinetic.Arrow);
 })();
@@ -13095,9 +13097,7 @@ var Kinetic = {};
             context.fillStrokeShape(this);
         },
         constructBasicPoints: function() {
-            var points;// = new Array(30);
-
-            var width, height, bubbleHeight, halfWidth, halfBubbleHeight;
+            var points, width, height, bubbleHeight, halfWidth, halfBubbleHeight;
 
             // base data
 
