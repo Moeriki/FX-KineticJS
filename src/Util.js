@@ -798,6 +798,32 @@
         },
         _removeLastLetter: function(str) {
             return str.substring(0, str.length - 1);
+        },
+        /*
+         * Based on (but modified)
+         * http://www.sitepoint.com/javascript-generate-lighter-darker-color/
+         */
+        colorLuminance: function(hex, lum) {
+            var rgb = '#', c, i;
+
+            // validate hex string
+            hex = String(hex).replace(/[^0-9a-f]/gi, '');
+            if (hex.length === 3) {
+                hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+            }
+            if (hex.length !== 6) {
+                return;
+            }
+            lum = lum || 0;
+
+            // convert to decimal and change luminosity
+            for (i = 0; i < 3; i++) {
+                c = parseInt(hex.substr(i * 2, 2), 16);
+                c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
+                rgb += ('00' + c).substr(c.length);
+            }
+
+            return rgb;
         }
     };
 })();

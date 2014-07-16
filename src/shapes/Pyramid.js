@@ -32,26 +32,53 @@
             this.sceneFunc(this._sceneFunc);
         },
         _sceneFunc: function(context) {
-            var points, plen, i;
+            var points, fill, shadowFill;
 
+            fill = this.getFill();
             points = this.constructBasicPoints();
-            plen = 8;//points.length;
 
-            // paint outer lines and fill shape
+            if (fill) {
+                // fill contour
+                this._outlinePyramid(context, points);
+                context.fillShape(this);
 
-            context.beginPath();
-            context.moveTo(points[0], points[1]);
-            for(i = 2; i < plen; i = i + 2) {
-                context.lineTo(points[i], points[i + 1]);
+                // fill shadow
+                shadowFill = Kinetic.Util.colorLuminance(fill, this.getLuminance());
+                if (shadowFill) {
+                    context.beginPath();
+                    context.moveTo(points[0], points[1]);
+                    context.lineTo(points[2], points[3]);
+                    context.lineTo(points[4], points[5]);
+                    context.lineTo(points[0], points[1]);
+                    context.closePath();
+                    this._setAttr('fill', shadowFill);
+                    context.fillShape(this);
+                    this._setAttr('fill', fill);
+                }
             }
-            context.closePath();
-            context.fillStrokeShape(this);
 
-            // paint single inner line (between point 0 and 2)
+            // stroke contour
+            this._outlinePyramid(context, points);
+            context.strokeShape(this);
+
+            // stroke inner line
             context.beginPath();
             context.moveTo(points[0], points[1]);
             context.lineTo(points[4], points[5]);
             context.strokeShape(this);
+        },
+        _outlinePyramid: function(context, points) {
+            var i, plen;
+
+            context.beginPath();
+            context.moveTo(points[0], points[1]);
+
+            plen = 8;//points.length;
+            for(i = 2; i < plen; i = i + 2) {
+                context.lineTo(points[i], points[i + 1]);
+            }
+
+            context.closePath();
         },
         /**
          * @private
@@ -78,6 +105,9 @@
     };
 
     Kinetic.Util.extend(Kinetic.Pyramid, Kinetic.Shape);
+
+    // add getters and setters
+    Kinetic.Factory.addGetterSetter(Kinetic.Pyramid, 'luminance', -0.2);
 
     Kinetic.Collection.mapMethods(Kinetic.Pyramid);
 

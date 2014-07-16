@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-07-15
+ * Date: 2014-07-16
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -1352,6 +1352,32 @@ var Kinetic = {};
         },
         _removeLastLetter: function(str) {
             return str.substring(0, str.length - 1);
+        },
+        /*
+         * Based on (but modified)
+         * http://www.sitepoint.com/javascript-generate-lighter-darker-color/
+         */
+        colorLuminance: function(hex, lum) {
+            var rgb = '#', c, i;
+
+            // validate hex string
+            hex = String(hex).replace(/[^0-9a-f]/gi, '');
+            if (hex.length === 3) {
+                hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+            }
+            if (hex.length !== 6) {
+                return;
+            }
+            lum = lum || 0;
+
+            // convert to decimal and change luminosity
+            for (i = 0; i < 3; i++) {
+                c = parseInt(hex.substr(i * 2, 2), 16);
+                c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
+                rgb += ('00' + c).substr(c.length);
+            }
+
+            return rgb;
         }
     };
 })();
@@ -12450,15 +12476,44 @@ var Kinetic = {};
             this.sceneFunc(this._sceneFunc);
         },
         _sceneFunc: function(context) {
-            var w = this.getWidth(),
-                wr = Math.ceil(w * this.getRatio());
+            var w, wr, fill, shadowFill;
 
+            w = this.getWidth();
+            wr = Math.ceil(w * this.getRatio());
+            fill = this.getFill();
+
+            if (fill) {
+                // fill contour
+                this._outlineCube(context, w, wr);
+                context.fillShape(this);
+
+                // fill side (shadow)
+                shadowFill = Kinetic.Util.colorLuminance(fill, this.getLuminance());
+                if (shadowFill) {
+                    context.beginPath();
+                    context.moveTo(w, 0);
+                    context.lineTo(w + wr, -wr);
+                    context.lineTo(w + wr, w - wr);
+                    context.lineTo(w, w);
+                    this._setAttr('fill', shadowFill);
+                    context.fillShape(this);
+                    this._setAttr('fill', fill);
+                }
+            }
+
+            // stroke contour
+            this._outlineCube(context, w, wr);
+            context.strokeShape(this);
+
+            // stroke middle
             context.beginPath();
-
             context.moveTo(w, 0); context.lineTo(0, 0);
             context.moveTo(w, 0); context.lineTo(w + wr, -wr);
             context.moveTo(w, 0); context.lineTo(w, w);
-
+            context.strokeShape(this);
+        },
+        _outlineCube: function(context, w, wr) {
+            context.beginPath();
             context.moveTo(0, 0);
             context.lineTo(wr, -wr);
             context.lineTo(w + wr, -wr);
@@ -12467,8 +12522,6 @@ var Kinetic = {};
             context.lineTo(0, w);
             context.lineTo(0, 0);
             context.closePath();
-
-            context.fillStrokeShape(this);
         },
         // implements Shape.prototype.setWidth()
         setWidth: function(width) {
@@ -12499,7 +12552,8 @@ var Kinetic = {};
     Kinetic.Util.extend(Kinetic.Cube, Kinetic.Shape);
 
     // add getters setters
-    Kinetic.Factory.addGetterSetter(Kinetic.Cube, 'ratio', 0.5);
+    Kinetic.Factory.addGetterSetter(Kinetic.Cube, 'ratio', 0.35);
+    Kinetic.Factory.addGetterSetter(Kinetic.Cube, 'luminance', -0.2);
 
     Kinetic.Collection.mapMethods(Kinetic.Cube);
 
@@ -12769,26 +12823,53 @@ var Kinetic = {};
             this.sceneFunc(this._sceneFunc);
         },
         _sceneFunc: function(context) {
-            var points, plen, i;
+            var points, fill, shadowFill;
 
+            fill = this.getFill();
             points = this.constructBasicPoints();
-            plen = 8;//points.length;
 
-            // paint outer lines and fill shape
+            if (fill) {
+                // fill contour
+                this._outlinePyramid(context, points);
+                context.fillShape(this);
 
-            context.beginPath();
-            context.moveTo(points[0], points[1]);
-            for(i = 2; i < plen; i = i + 2) {
-                context.lineTo(points[i], points[i + 1]);
+                // fill shadow
+                shadowFill = Kinetic.Util.colorLuminance(fill, this.getLuminance());
+                if (shadowFill) {
+                    context.beginPath();
+                    context.moveTo(points[0], points[1]);
+                    context.lineTo(points[2], points[3]);
+                    context.lineTo(points[4], points[5]);
+                    context.lineTo(points[0], points[1]);
+                    context.closePath();
+                    this._setAttr('fill', shadowFill);
+                    context.fillShape(this);
+                    this._setAttr('fill', fill);
+                }
             }
-            context.closePath();
-            context.fillStrokeShape(this);
 
-            // paint single inner line (between point 0 and 2)
+            // stroke contour
+            this._outlinePyramid(context, points);
+            context.strokeShape(this);
+
+            // stroke inner line
             context.beginPath();
             context.moveTo(points[0], points[1]);
             context.lineTo(points[4], points[5]);
             context.strokeShape(this);
+        },
+        _outlinePyramid: function(context, points) {
+            var i, plen;
+
+            context.beginPath();
+            context.moveTo(points[0], points[1]);
+
+            plen = 8;//points.length;
+            for(i = 2; i < plen; i = i + 2) {
+                context.lineTo(points[i], points[i + 1]);
+            }
+
+            context.closePath();
         },
         /**
          * @private
@@ -12815,6 +12896,9 @@ var Kinetic = {};
     };
 
     Kinetic.Util.extend(Kinetic.Pyramid, Kinetic.Shape);
+
+    // add getters and setters
+    Kinetic.Factory.addGetterSetter(Kinetic.Pyramid, 'luminance', -0.2);
 
     Kinetic.Collection.mapMethods(Kinetic.Pyramid);
 
