@@ -379,6 +379,13 @@
                 var crumb = e.target;
 
                 while(crumb != this) {
+                    if(crumb == null) {
+                        // Detached node. One of the previously checked events probably detached it.
+                        // I long doubted if this should be done, whether this is really the best place
+                        // to solve the problem. I'm still not entirely sure. ~RT
+                        return;
+                    }
+
                     breadcrumbs.push(crumb);
                     crumb = crumb.parent;
                 }
