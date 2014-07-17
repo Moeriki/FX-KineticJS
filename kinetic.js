@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-07-16
+ * Date: 2014-07-17
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -2733,6 +2733,13 @@ var Kinetic = {};
                 var crumb = e.target;
 
                 while(crumb != this) {
+                    if(crumb == null) {
+                        // Detached node. One of the previously checked events probably detached it.
+                        // I long doubted if this should be done, whether this is really the best place
+                        // to solve the problem. I'm still not entirely sure. ~RT
+                        return;
+                    }
+
                     breadcrumbs.push(crumb);
                     crumb = crumb.parent;
                 }
