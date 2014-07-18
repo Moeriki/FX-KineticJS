@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-07-17
+ * Date: 2014-07-18
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -7310,7 +7310,8 @@ var Kinetic = {};
                 context.beginPath();
                 context.rect(clipX, clipY, clipWidth, clipHeight);
                 context.clip();
-                context.reset();
+                //context.reset();
+                layer._applyReverseTransform(this, context);
             }
 
             this.children.each(function(child) {
@@ -9913,6 +9914,12 @@ var Kinetic = {};
         // should be used
         _applyTransform: function(shape, context, top) {
             var m = shape.getAbsoluteTransform(top).getMatrix();
+            context.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        },
+        _applyReverseTransform: function(shape, context, top) {
+            var tf = shape.getAbsoluteTransform(top).copy();
+            tf.invert();
+            var m = tf.getMatrix();
             context.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
         },
         drawHit: function(can, top) {

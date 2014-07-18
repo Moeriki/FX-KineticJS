@@ -327,7 +327,8 @@
                 context.beginPath();
                 context.rect(clipX, clipY, clipWidth, clipHeight);
                 context.clip();
-                context.reset();
+                //context.reset();
+                layer._applyReverseTransform(this, context);
             }
 
             this.children.each(function(child) {
