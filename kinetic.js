@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-07-18
+ * Date: 2014-07-22
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -910,10 +910,7 @@ var Kinetic = {};
                 x: bounds.left,
                 y: bounds.bottom
             }];
-
-            return corners.map(function (corner) {
-                return this.point(corner);
-            }, this);
+            return corners.map(this.point, this);
         },
 
         /**
@@ -4150,8 +4147,15 @@ var Kinetic = {};
          * always has the same radius.
          */
         calculateBoundingBox: function(top) {
+            var strokeEnabled = this.getStrokeEnabled();
+            var strokeScaleEnabled = this.getStrokeScaleEnabled();
             var transform = arguments.length > 0 ? this.getAbsoluteTransform(top) : this.getTransform();
             var localBounds = this.calculateLocalBoundingBox();
+
+            if (strokeEnabled && strokeScaleEnabled) {
+                this._adaptBoundingBoxToStrokeWidth(localBounds);
+            }
+
             if(localBounds == null) {
                 return null;
             }
@@ -4170,7 +4174,21 @@ var Kinetic = {};
                 res.bottom = Math.max(res.bottom, corner.y);
             });
 
+            if (strokeEnabled && !strokeScaleEnabled) {
+                this._adaptBoundingBoxToStrokeWidth(res);
+            }
+
             return res;
+        },
+        _adaptBoundingBoxToStrokeWidth: function(bounds) {
+            if (!this.getStrokeEnabled()) {
+                return;
+            }
+            var halfStrokeWidth = this.getStrokeWidth() / 2;
+            bounds.left -= halfStrokeWidth;
+            bounds.right += halfStrokeWidth;
+            bounds.top -= halfStrokeWidth;
+            bounds.bottom += halfStrokeWidth;
         },
 
         getInverseAbsoluteTransform: function (top) {
@@ -10311,12 +10329,11 @@ var Kinetic = {};
          * This may be overridden for irregular shapes like circles.
          */
         calculateLocalBoundingBox: function() {
-            var halfStrokeWidth = this.getStrokeWidth() / 2;
             return {
-                left: -halfStrokeWidth,
-                top: -halfStrokeWidth,
-                right: this.getWidth() + halfStrokeWidth,
-                bottom: this.getHeight() + halfStrokeWidth
+                left: 0,
+                top: 0,
+                right: this.getWidth(),
+                bottom: this.getHeight(),
             };
         },
     };
@@ -10479,28 +10496,13 @@ var Kinetic = {};
         },
         calculateLocalBoundingBox: function() {
             var radius = this.getRadius();
-            var halfStrokeWidth = this.getStrokeWidth() / 2;
             return {
-                left: -radius - halfStrokeWidth,
-                right: radius + halfStrokeWidth,
-                top: -radius - halfStrokeWidth,
-                bottom: radius + halfStrokeWidth,
+                left: -radius,
+                right: radius,
+                top: -radius,
+                bottom: radius,
             };
         },
-        // implements Node.prototype.calculateBoundingBox()
-        // calculateBoundingBox: function() {
-        //     var res, radius;
-
-        //     res = Kinetic.Node.prototype.calculateBoundingBox.call(this);
-        //     radius = this.getRadius();
-
-        //     res.left -= radius;
-        //     res.right -= radius;
-        //     res.top -= radius;
-        //     res.bottom -= radius;
-
-        //     return res;
-        // },
     };
     Kinetic.Util.extend(Kinetic.Circle, Kinetic.Shape);
 
@@ -10605,21 +10607,6 @@ var Kinetic = {};
                 bottom: radiusY,
             };
         },
-        // implements Node.prototype.calculateBoundingBox()
-        // calculateBoundingBox: function() {
-        //     var res, radiusX, radiusY;
-
-        //     res = Kinetic.Node.prototype.calculateBoundingBox.call(this);
-        //     radiusX = this.getRadiusX();
-        //     radiusY = this.getRadiusY();
-
-        //     res.left -= radiusX;
-        //     res.right -= radiusX;
-        //     res.top -= radiusY;
-        //     res.bottom -= radiusY;
-
-        //     return res;
-        // },
     };
     Kinetic.Util.extend(Kinetic.Ellipse, Kinetic.Shape);
 
@@ -12548,17 +12535,14 @@ var Kinetic = {};
             this._setAttr('width', height);
         },
         calculateLocalBoundingBox: function() {
-            var s, sr, halfStroke;
-
+            var s, sr;
             s = this.getWidth();
             sr = Math.ceil(s * this.getRatio());
-            halfStroke = this.getStrokeWidth() / 2;
-
             return {
-                left: -halfStroke,
-                right: s + sr + halfStroke,
-                top: -sr - halfStroke,
-                bottom: s + halfStroke,
+                left: 0,
+                right: s + sr,
+                top: -sr,
+                bottom: s,
             };
         },
     };
@@ -13051,21 +13035,18 @@ var Kinetic = {};
             this.setRadius(height);
         },
         calculateLocalBoundingBox: function() {
-            var radius, halfStroke;
-
-            radius = this.getRadius();
-            halfStroke = this.getStrokeWidth() / 2;
-
+            var radius = this.getRadius();
             return {
-                left: -radius - halfStroke,
-                right: radius + halfStroke,
+                left: -radius,
+                right: radius,
                 top: 0,
-                bottom: radius + halfStroke,
+                bottom: radius,
             };
         },
     };
 
     Kinetic.Util.extend(Kinetic.SemiCircle, Kinetic.Circle);
+
     Kinetic.Collection.mapMethods(Kinetic.SemiCircle);
 })();
 ;(function() {
@@ -13543,11 +13524,12 @@ var Kinetic = {};
             };
         },
     };
+
     Kinetic.Util.extend(Kinetic.RegularPolygon, Kinetic.Shape);
 
     // add getters setters
-    Kinetic.Factory.addGetterSetter(Kinetic.RegularPolygon, 'radius', 0);
 
+    Kinetic.Factory.addGetterSetter(Kinetic.RegularPolygon, 'radius', 0);
     /**
      * set radius
      * @name setRadius
@@ -13555,7 +13537,6 @@ var Kinetic = {};
      * @memberof Kinetic.RegularPolygon.prototype
      * @param {Number} radius
      */
-
      /**
      * get radius
      * @name getRadius
@@ -13564,7 +13545,6 @@ var Kinetic = {};
      */
 
     Kinetic.Factory.addGetterSetter(Kinetic.RegularPolygon, 'sides', 0);
-
     /**
      * set number of sides
      * @name setSides
@@ -13572,7 +13552,6 @@ var Kinetic = {};
      * @memberof Kinetic.RegularPolygon.prototype
      * @param {int} sides
      */
-
     /**
      * get number of sides
      * @name getSides
@@ -13581,6 +13560,7 @@ var Kinetic = {};
      */
 
     Kinetic.Collection.mapMethods(Kinetic.RegularPolygon);
+
 })();
 ;(function() {
     /**
@@ -13720,20 +13700,21 @@ var Kinetic = {};
             return this.attrs.outerRadius * 2;
         },
         calculateLocalBoundingBox: function() {
-            var radius = this.attrs.outerRadius;
+            var radius = this.getOuterRadius();
             return {
                 left: -radius,
                 right: radius,
                 top: -radius,
-                bottom: radius,
+                bottom: radius
             };
         },
     };
+
     Kinetic.Util.extend(Kinetic.Star, Kinetic.Shape);
 
     // add getters setters
-    Kinetic.Factory.addGetterSetter(Kinetic.Star, 'numPoints', 5);
 
+    Kinetic.Factory.addGetterSetter(Kinetic.Star, 'numPoints', 5);
     /**
      * set number of points
      * @name setNumPoints
@@ -13741,7 +13722,6 @@ var Kinetic = {};
      * @memberof Kinetic.Star.prototype
      * @param {Integer} points
      */
-
      /**
      * get number of points
      * @name getNumPoints
@@ -13750,7 +13730,6 @@ var Kinetic = {};
      */
 
     Kinetic.Factory.addGetterSetter(Kinetic.Star, 'innerRadius', 0);
-
     /**
      * set inner radius
      * @name setInnerRadius
@@ -13758,7 +13737,6 @@ var Kinetic = {};
      * @memberof Kinetic.Star.prototype
      * @param {Number} radius
      */
-
      /**
      * get inner radius
      * @name getInnerRadius
@@ -13767,7 +13745,6 @@ var Kinetic = {};
      */
 
     Kinetic.Factory.addGetterSetter(Kinetic.Star, 'outerRadius', 0);
-
     /**
      * set outer radius
      * @name setOuterRadius
@@ -13775,7 +13752,6 @@ var Kinetic = {};
      * @memberof Kinetic.Star.prototype
      * @param {Number} radius
      */
-
      /**
      * get outer radius
      * @name getOuterRadius
@@ -13784,4 +13760,5 @@ var Kinetic = {};
      */
 
     Kinetic.Collection.mapMethods(Kinetic.Star);
+
 })();
