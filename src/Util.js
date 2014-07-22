@@ -356,10 +356,7 @@
                 x: bounds.left,
                 y: bounds.bottom
             }];
-
-            return corners.map(function (corner) {
-                return this.point(corner);
-            }, this);
+            return corners.map(this.point, this);
         },
 
         /**
