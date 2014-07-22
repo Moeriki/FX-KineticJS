@@ -79,21 +79,6 @@
                 bottom: radiusY,
             };
         },
-        // implements Node.prototype.calculateBoundingBox()
-        // calculateBoundingBox: function() {
-        //     var res, radiusX, radiusY;
-
-        //     res = Kinetic.Node.prototype.calculateBoundingBox.call(this);
-        //     radiusX = this.getRadiusX();
-        //     radiusY = this.getRadiusY();
-
-        //     res.left -= radiusX;
-        //     res.right -= radiusX;
-        //     res.top -= radiusY;
-        //     res.bottom -= radiusY;
-
-        //     return res;
-        // },
     };
     Kinetic.Util.extend(Kinetic.Ellipse, Kinetic.Shape);
 

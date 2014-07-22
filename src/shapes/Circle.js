@@ -65,20 +65,6 @@
                 bottom: radius,
             };
         },
-        // implements Node.prototype.calculateBoundingBox()
-        // calculateBoundingBox: function() {
-        //     var res, radius;
-
-        //     res = Kinetic.Node.prototype.calculateBoundingBox.call(this);
-        //     radius = this.getRadius();
-
-        //     res.left -= radius;
-        //     res.right -= radius;
-        //     res.top -= radius;
-        //     res.bottom -= radius;
-
-        //     return res;
-        // },
     };
     Kinetic.Util.extend(Kinetic.Circle, Kinetic.Shape);
 
