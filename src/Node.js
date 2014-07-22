@@ -1796,8 +1796,15 @@
          * always has the same radius.
          */
         calculateBoundingBox: function(top) {
+            var strokeEnabled = this.getStrokeEnabled();
+            var strokeScaleEnabled = this.getStrokeScaleEnabled();
             var transform = arguments.length > 0 ? this.getAbsoluteTransform(top) : this.getTransform();
             var localBounds = this.calculateLocalBoundingBox();
+
+            if (strokeEnabled && strokeScaleEnabled) {
+                this._adaptBoundingBoxToStrokeWidth(localBounds);
+            }
+
             if(localBounds == null) {
                 return null;
             }
@@ -1816,7 +1823,21 @@
                 res.bottom = Math.max(res.bottom, corner.y);
             });
 
+            if (strokeEnabled && !strokeScaleEnabled) {
+                this._adaptBoundingBoxToStrokeWidth(res);
+            }
+
             return res;
+        },
+        _adaptBoundingBoxToStrokeWidth: function(bounds) {
+            if (!this.getStrokeEnabled()) {
+                return;
+            }
+            var halfStrokeWidth = this.getStrokeWidth() / 2;
+            bounds.left -= halfStrokeWidth;
+            bounds.right += halfStrokeWidth;
+            bounds.top -= halfStrokeWidth;
+            bounds.bottom += halfStrokeWidth;
         },
 
         getInverseAbsoluteTransform: function (top) {

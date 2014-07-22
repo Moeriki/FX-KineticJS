@@ -61,12 +61,11 @@
          * This may be overridden for irregular shapes like circles.
          */
         calculateLocalBoundingBox: function() {
-            var halfStrokeWidth = this.getStrokeWidth() / 2;
             return {
-                left: -halfStrokeWidth,
-                top: -halfStrokeWidth,
-                right: this.getWidth() + halfStrokeWidth,
-                bottom: this.getHeight() + halfStrokeWidth
+                left: 0,
+                top: 0,
+                right: this.getWidth(),
+                bottom: this.getHeight(),
             };
         },
     };

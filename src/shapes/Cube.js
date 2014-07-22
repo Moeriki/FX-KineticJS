@@ -85,17 +85,14 @@
             this._setAttr('width', height);
         },
         calculateLocalBoundingBox: function() {
-            var s, sr, halfStroke;
-
+            var s, sr;
             s = this.getWidth();
             sr = Math.ceil(s * this.getRatio());
-            halfStroke = this.getStrokeWidth() / 2;
-
             return {
-                left: -halfStroke,
-                right: s + sr + halfStroke,
-                top: -sr - halfStroke,
-                bottom: s + halfStroke,
+                left: 0,
+                right: s + sr,
+                top: -sr,
+                bottom: s,
             };
         },
     };

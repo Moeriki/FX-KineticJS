@@ -58,20 +58,20 @@
             return this.attrs.outerRadius * 2;
         },
         calculateLocalBoundingBox: function() {
-            var radius = this.attrs.outerRadius;
+            var radius = this.getOuterRadius();
             return {
                 left: -radius,
                 right: radius,
                 top: -radius,
-                bottom: radius,
+                bottom: radius
             };
         },
     };
     Kinetic.Util.extend(Kinetic.Star, Kinetic.Shape);
 
     // add getters setters
-    Kinetic.Factory.addGetterSetter(Kinetic.Star, 'numPoints', 5);
 
+    Kinetic.Factory.addGetterSetter(Kinetic.Star, 'numPoints', 5);
     /**
      * set number of points
      * @name setNumPoints

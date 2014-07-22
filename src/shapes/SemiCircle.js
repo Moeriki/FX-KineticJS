@@ -54,16 +54,12 @@
             this.setRadius(height);
         },
         calculateLocalBoundingBox: function() {
-            var radius, halfStroke;
-
-            radius = this.getRadius();
-            halfStroke = this.getStrokeWidth() / 2;
-
+            var radius = this.getRadius();
             return {
-                left: -radius - halfStroke,
-                right: radius + halfStroke,
+                left: -radius,
+                right: radius,
                 top: 0,
-                bottom: radius + halfStroke,
+                bottom: radius,
             };
         },
     };
