@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-07-22
+ * Date: 2014-07-23
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -13046,7 +13046,6 @@ var Kinetic = {};
     };
 
     Kinetic.Util.extend(Kinetic.SemiCircle, Kinetic.Circle);
-
     Kinetic.Collection.mapMethods(Kinetic.SemiCircle);
 })();
 ;(function() {
@@ -13524,12 +13523,11 @@ var Kinetic = {};
             };
         },
     };
-
     Kinetic.Util.extend(Kinetic.RegularPolygon, Kinetic.Shape);
 
     // add getters setters
-
     Kinetic.Factory.addGetterSetter(Kinetic.RegularPolygon, 'radius', 0);
+
     /**
      * set radius
      * @name setRadius
@@ -13537,6 +13535,7 @@ var Kinetic = {};
      * @memberof Kinetic.RegularPolygon.prototype
      * @param {Number} radius
      */
+
      /**
      * get radius
      * @name getRadius
@@ -13545,6 +13544,7 @@ var Kinetic = {};
      */
 
     Kinetic.Factory.addGetterSetter(Kinetic.RegularPolygon, 'sides', 0);
+
     /**
      * set number of sides
      * @name setSides
@@ -13552,6 +13552,7 @@ var Kinetic = {};
      * @memberof Kinetic.RegularPolygon.prototype
      * @param {int} sides
      */
+
     /**
      * get number of sides
      * @name getSides
@@ -13560,7 +13561,6 @@ var Kinetic = {};
      */
 
     Kinetic.Collection.mapMethods(Kinetic.RegularPolygon);
-
 })();
 ;(function() {
     /**
@@ -13709,7 +13709,6 @@ var Kinetic = {};
             };
         },
     };
-
     Kinetic.Util.extend(Kinetic.Star, Kinetic.Shape);
 
     // add getters setters
@@ -13722,6 +13721,7 @@ var Kinetic = {};
      * @memberof Kinetic.Star.prototype
      * @param {Integer} points
      */
+
      /**
      * get number of points
      * @name getNumPoints
@@ -13730,6 +13730,7 @@ var Kinetic = {};
      */
 
     Kinetic.Factory.addGetterSetter(Kinetic.Star, 'innerRadius', 0);
+
     /**
      * set inner radius
      * @name setInnerRadius
@@ -13737,6 +13738,7 @@ var Kinetic = {};
      * @memberof Kinetic.Star.prototype
      * @param {Number} radius
      */
+
      /**
      * get inner radius
      * @name getInnerRadius
@@ -13745,6 +13747,7 @@ var Kinetic = {};
      */
 
     Kinetic.Factory.addGetterSetter(Kinetic.Star, 'outerRadius', 0);
+
     /**
      * set outer radius
      * @name setOuterRadius
@@ -13752,6 +13755,7 @@ var Kinetic = {};
      * @memberof Kinetic.Star.prototype
      * @param {Number} radius
      */
+
      /**
      * get outer radius
      * @name getOuterRadius
@@ -13760,5 +13764,4 @@ var Kinetic = {};
      */
 
     Kinetic.Collection.mapMethods(Kinetic.Star);
-
 })();
