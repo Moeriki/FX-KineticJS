@@ -1796,8 +1796,8 @@
          * always has the same radius.
          */
         calculateBoundingBox: function(top) {
-            var strokeEnabled = this.getStrokeEnabled();
-            var strokeScaleEnabled = this.getStrokeScaleEnabled();
+            var strokeEnabled = this.getStrokeEnabled && this.getStrokeEnabled();
+            var strokeScaleEnabled = strokeEnabled && this.getStrokeScaleEnabled();
             var transform = arguments.length > 0 ? this.getAbsoluteTransform(top) : this.getTransform();
             var localBounds = this.calculateLocalBoundingBox();
 
