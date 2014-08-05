@@ -30,7 +30,7 @@
             var w, wr, fill, shadowFill;
 
             w = this.getWidth();
-            wr = Math.ceil(w * this.getRatio());
+            wr = w * this.getRatio();
             fill = this.getFill();
 
             if (fill) {

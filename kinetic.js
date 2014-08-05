@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-07-23
+ * Date: 2014-08-05
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -12480,7 +12480,7 @@ var Kinetic = {};
             var w, wr, fill, shadowFill;
 
             w = this.getWidth();
-            wr = Math.ceil(w * this.getRatio());
+            wr = w * this.getRatio();
             fill = this.getFill();
 
             if (fill) {
