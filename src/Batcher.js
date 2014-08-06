@@ -18,16 +18,20 @@
     }
 
     function workLoop(frame) {
-        if (frame.timeDiff > BATCH_DRAW_STOP_TIME_DIFF) {
-            anim.stop();
-        } else {
+        // I don't know what i was thinking here. This does not time out the anim, which would be the diff between
+        // the addWork call and the workLoop call, this stops the anim when there's a long pause between frames.
+        // Combined with anim.disable, this stopped and started the anim every time at the start of a render.
+        // if (frame.timeDiff > BATCH_DRAW_STOP_TIME_DIFF) {
+        //     anim.stop();
+        // } else {
             anim.disable();
-        }
+        // }
 
         drawWorkNodes();
         workQueue = [];
     }
     anim = new Kinetic.Animation(workLoop);
+    Kinetic.batcherAnim = anim;
 
     function isWorkAlreadyQueued(node) {
         // Check all items in the work queue
