@@ -32,6 +32,11 @@
     }
     anim = new Kinetic.Animation(workLoop);
     Kinetic.batcherAnim = anim;
+    Object.defineProperty(Kinetic, 'batcherWorkQueue', {
+        get: function() {
+            return workQueue;
+        }
+    });
 
     function isWorkAlreadyQueued(node) {
         // Check all items in the work queue

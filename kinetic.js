@@ -4,7 +4,7 @@
  * http://www.kineticjs.com/
  * Copyright 2013, Eric Rowell
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: 2014-08-08
+ * Date: 2014-08-12
  *
  * Copyright (C) 2011 - 2013 by Eric Rowell
  *
@@ -6001,6 +6001,11 @@ var Kinetic = {};
     }
     anim = new Kinetic.Animation(workLoop);
     Kinetic.batcherAnim = anim;
+    Object.defineProperty(Kinetic, 'batcherWorkQueue', {
+        get: function() {
+            return workQueue;
+        }
+    });
 
     function isWorkAlreadyQueued(node) {
         // Check all items in the work queue
